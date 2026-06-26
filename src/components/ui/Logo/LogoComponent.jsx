@@ -1,17 +1,36 @@
+import { useState } from 'react'
 import { NEGOCIO } from '../../../data/contacto'
 
 /**
  * Logotipo de A.S Barbería.
  *
- * Versión TIPOGRÁFICA (Fase 1), fiel al estilo manuscrito blanco y negro del
- * logo real. Cuando Adrián facilite el PNG/SVG definitivo, basta con soltarlo
- * en /public/logo.png y sustituir el bloque de texto por una <img>.
+ * Usa el LOGO ORIGINAL de Adrián si existe el archivo `public/logo.png`
+ * (idealmente PNG con fondo transparente y trazo blanco, para que luzca sobre
+ * los fondos oscuros del nav/hero/footer). Si el archivo no está, cae a una
+ * versión tipográfica fiel al estilo manuscrito, para que la web nunca se vea
+ * coja.
  *
  * Props:
- *  - claro: true para texto claro (sobre fondos oscuros / hero).
- *  - conClaim: muestra el subtítulo "Peluquería y barbería".
+ *  - claro: true para texto claro (sobre fondos oscuros). Solo afecta al fallback.
+ *  - conClaim: muestra el subtítulo "Peluquería y barbería" (solo en fallback).
+ *  - alto: altura del logo en px cuando se usa la imagen (por defecto 44).
  */
-export default function LogoComponent({ claro = false, conClaim = true }) {
+export default function LogoComponent({ claro = false, conClaim = true, alto = 44 }) {
+  const [hayImagen, setHayImagen] = useState(true)
+
+  if (hayImagen) {
+    return (
+      <img
+        src="/logo.png"
+        alt={NEGOCIO.nombreCompleto}
+        style={{ height: alto }}
+        className="w-auto select-none"
+        onError={() => setHayImagen(false)}
+      />
+    )
+  }
+
+  // ── Fallback tipográfico ──
   const colorPrincipal = claro ? 'text-hueso' : 'text-tinta'
   const colorClaim = claro ? 'text-hueso/70' : 'text-tinta/60'
 
