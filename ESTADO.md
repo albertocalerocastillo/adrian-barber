@@ -9,6 +9,10 @@ Web de **reserva de citas** para la barbería de **Adrián Sánchez** (A.S Peluq
 y Barbería), en **La Rinconada, Sevilla**. Stack React + Vite + Tailwind v4 +
 Supabase + Vercel (mismo que el proyecto `paco.vago`).
 
+- **Web en producción:** https://adrian-barber.vercel.app
+- **GitHub:** https://github.com/albertocalerocastillo/adrian-barber (público)
+- **Deploy:** automático en Vercel con cada `git push` a `main`.
+
 - ✅ **Fase 1 — Web pública** montada: hero, servicios (precio+duración), sobre mí,
   galería con lightbox, horario (con badge abierto/cerrado en vivo), ubicación con
   mapa, footer y botón flotante de WhatsApp. Diseño premium monocromo + acento dorado.
@@ -70,7 +74,7 @@ la (Recomendado) y tirar por ella; ir poco a poco.
 - JavaScript (NO TypeScript)
 - **Backend: Supabase** (PostgreSQL + Auth + Storage) — se configura en Fase 2.
   Cliente en `src/lib/supabase.js` (con fallback: si no hay `.env`, usa datos estáticos).
-- **Deploy:** Vercel (pendiente de crear proyecto y conectar repo).
+- **Deploy:** Vercel ✅ conectado al repo. Cada push a `main` redespliega solo.
 
 ### Cuidado con Vite 8 / oxc (parser estricto)
 - Cerrar etiquetas auto-cerradas con `/>`.
