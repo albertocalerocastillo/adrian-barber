@@ -2,7 +2,7 @@ import { Clock } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
 import RevealComponent from '../../ui/Reveal/RevealComponent'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
-import { SERVICIOS } from '../../../data/servicios'
+import { SERVICIOS, PROMO } from '../../../data/servicios'
 import { ICONOS } from '../../../theme/icons'
 
 /**
@@ -50,6 +50,22 @@ export default function ServiciosComponent() {
             )
           })}
         </div>
+
+        {/* Promo destacada */}
+        <RevealComponent className="mt-6">
+          <div className="grain flex flex-col items-center gap-4 overflow-hidden rounded-2xl bg-tinta px-6 py-8 text-center text-hueso sm:flex-row sm:justify-between sm:text-left">
+            <div className="relative">
+              <p className="text-xs tracking-kicker text-acento">{PROMO.titulo}</p>
+              <p className="mt-2 max-w-md font-display text-xl font-semibold sm:text-2xl">
+                {PROMO.texto}
+              </p>
+            </div>
+            <span className="relative flex shrink-0 items-baseline gap-1 font-display text-5xl font-bold text-acento">
+              {PROMO.precio}
+              <span className="text-2xl">€</span>
+            </span>
+          </div>
+        </RevealComponent>
 
         {/* Nota + CTA */}
         <RevealComponent className="mt-12 flex flex-col items-center gap-4 text-center">
