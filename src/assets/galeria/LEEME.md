@@ -3,9 +3,8 @@
 Suelta aquí las fotos de los trabajos de Adrián (.jpg, .jpeg, .png o .webp) y
 aparecerán automáticamente en la sección **Galería** de la web.
 
-- El **orden** lo marca el nombre del archivo (descendente). Para mostrarlas de
-  más nuevas a más antiguas, nómbralas con el año delante:
-  `2026-01.jpg`, `2026-02.jpg`, `2025-01.jpg`, `2024-01.jpg`…
+- El **orden** lo marca el nombre del archivo (ascendente y natural): `corte-1`,
+  `corte-2`, … `corte-10`. La que quieras primero, ponle el número más bajo.
 - No hace falta tocar código: al hacer `npm run build` / desplegar, Vite las
   incluye y optimiza solas.
 - Recomendación: fotos enfocadas y bien iluminadas; mejor verticales o

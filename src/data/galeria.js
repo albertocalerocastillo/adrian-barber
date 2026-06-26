@@ -18,13 +18,12 @@ const modulos = import.meta.glob(
 )
 
 const fotosLocales = Object.entries(modulos)
-  .sort(([a], [b]) => b.localeCompare(a)) // descendente: lo más nuevo primero
-  .map(([ruta, url], i) => ({
+  // Orden ascendente y "natural" (corte-2 antes que corte-10).
+  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+  .map(([ruta, url]) => ({
     id: ruta,
     src: url,
     alt: 'Trabajo de A.S Peluquería y Barbería',
-    // Ritmo visual del mosaico: una de cada tres, más alta.
-    alto: i % 3 === 0 ? 'tall' : undefined,
   }))
 
 // Placeholders (solo si aún no hay fotos reales en src/assets/galeria/).
