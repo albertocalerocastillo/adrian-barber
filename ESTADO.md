@@ -48,6 +48,17 @@ la (Recomendado) y tirar por ella; ir poco a poco.
   (fondos claros). `LogoComponent.jsx` elige según `claro`. El logo blanco es el
   protagonista del hero. Reejecutar el script si Adrián cambia el logo.
 
+## SEO / Google
+
+- ✅ Datos estructurados `HairSalon` en `index.html` (NAP + horario + IG).
+- ✅ `public/robots.txt` y `public/sitemap.xml`.
+- ✅ Favicon e icono iOS generados del logo (`scripts/generar-favicon.py` →
+  `public/favicon.png`, `public/apple-touch-icon.png`).
+- ⬜ **Google Search Console:** verificar la propiedad `adrian-barber.vercel.app`
+  (pegar el `<meta name="google-site-verification">` que dé Google en `index.html`)
+  y pulsar "Solicitar indexación". Es lo que hace que aparezca/actualice rápido en Google.
+- ⬜ (Recomendado) Ficha gratuita de **Google Business Profile** para salir en Maps.
+
 ## ⚠️ PENDIENTE DE DATOS REALES (de Adrián)
 
 1. **Logo:** soltar el archivo en `public/logo.png`. IDEAL: PNG con **fondo
