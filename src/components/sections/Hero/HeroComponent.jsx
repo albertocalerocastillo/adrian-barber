@@ -1,4 +1,4 @@
-import { MapPin, ChevronDown } from 'lucide-react'
+import { MapPin, ChevronDown, Scissors } from 'lucide-react'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
 import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
 import { NEGOCIO, INSTAGRAM, INSTAGRAM_URL } from '../../../data/contacto'
@@ -35,13 +35,17 @@ export default function HeroComponent() {
           {NEGOCIO.ciudad}
         </p>
 
-        {/* Título */}
-        <h1 className="font-display text-6xl font-bold leading-[0.95] sm:text-7xl md:text-8xl">
+        {/* Título — caligrafía fiel al logo */}
+        <h1 className="font-script text-7xl leading-[0.9] sm:text-8xl md:text-9xl">
           A<span className="text-acento">.</span>S
         </h1>
-        <p className="mt-3 font-display text-xl italic text-hueso/85 sm:text-2xl">
-          {NEGOCIO.claim}
-        </p>
+
+        {/* Claim con tijeras a los lados */}
+        <div className="mt-2 flex items-center gap-3 text-hueso/85">
+          <Scissors size={18} className="text-acento" />
+          <p className="font-script text-2xl sm:text-3xl">Peluquería y barbería</p>
+          <Scissors size={18} className="-scale-x-100 text-acento" />
+        </div>
 
         {/* Subtítulo */}
         <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-hueso/70 sm:text-lg">

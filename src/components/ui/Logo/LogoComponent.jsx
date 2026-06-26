@@ -5,17 +5,16 @@ import { NEGOCIO } from '../../../data/contacto'
  * Logotipo de A.S Barbería.
  *
  * Usa el LOGO ORIGINAL de Adrián si existe el archivo `public/logo.png`
- * (idealmente PNG con fondo transparente y trazo blanco, para que luzca sobre
- * los fondos oscuros del nav/hero/footer). Si el archivo no está, cae a una
- * versión tipográfica fiel al estilo manuscrito, para que la web nunca se vea
- * coja.
+ * (idealmente PNG con fondo transparente y trazo blanco). Si no está, cae a
+ * una recreación TIPOGRÁFICA con fuente caligráfica (font-script), fiel al
+ * estilo manuscrito del logo real, para que la web nunca se vea coja.
  *
  * Props:
  *  - claro: true para texto claro (sobre fondos oscuros). Solo afecta al fallback.
  *  - conClaim: muestra el subtítulo "Peluquería y barbería" (solo en fallback).
- *  - alto: altura del logo en px cuando se usa la imagen (por defecto 44).
+ *  - alto: altura del logo en px cuando se usa la imagen (por defecto 46).
  */
-export default function LogoComponent({ claro = false, conClaim = true, alto = 44 }) {
+export default function LogoComponent({ claro = false, conClaim = true, alto = 46 }) {
   const [hayImagen, setHayImagen] = useState(true)
 
   if (hayImagen) {
@@ -30,18 +29,18 @@ export default function LogoComponent({ claro = false, conClaim = true, alto = 4
     )
   }
 
-  // ── Fallback tipográfico ──
+  // ── Fallback caligráfico (eco del logo manuscrito) ──
   const colorPrincipal = claro ? 'text-hueso' : 'text-tinta'
-  const colorClaim = claro ? 'text-hueso/70' : 'text-tinta/60'
+  const colorClaim = claro ? 'text-hueso/65' : 'text-tinta/55'
 
   return (
-    <span className="flex flex-col leading-none select-none">
-      <span className={`font-display text-2xl font-bold tracking-tight ${colorPrincipal}`}>
+    <span className="flex flex-col items-start leading-none select-none">
+      <span className={`font-script text-3xl leading-none ${colorPrincipal}`}>
         A<span className="text-acento">.</span>S
       </span>
       {conClaim && (
-        <span className={`mt-0.5 text-[0.6rem] tracking-kicker ${colorClaim}`}>
-          {NEGOCIO.claim}
+        <span className={`-mt-0.5 text-[0.95rem] leading-tight font-script ${colorClaim}`}>
+          Peluquería y barbería
         </span>
       )}
     </span>
