@@ -1,0 +1,90 @@
+/* ════════════════════════════════════════════════════════════
+   THEME — Identidad visual de A.S Barbería (Adrián Sánchez)
+   Tailwind v4: tokens de marca con @theme.
+   Dirección: MONOCROMO PREMIUM + ACENTO CÁLIDO (fiel al logo
+   manuscrito blanco y negro). Negros profundos, grises, blanco
+   hueso y un dorado/latón sobrio para botones y detalles.
+   ════════════════════════════════════════════════════════════ */
+
+@import "tailwindcss";
+
+/* ─── TOKENS DE MARCA ───────────────────────────────────────
+   Tailwind genera utilidades automáticamente:
+     --color-acento  →  bg-acento, text-acento, border-acento…
+     --font-display  →  font-display
+   ──────────────────────────────────────────────────────────── */
+@theme {
+  /* Tipografía */
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Paleta monocroma (escala de tinta) */
+  --color-tinta:        #0c0c0d; /* negro casi puro (fondos, hero)   */
+  --color-tinta-800:    #1a1a1d; /* superficies oscuras              */
+  --color-tinta-700:    #2a2a2e; /* bordes sobre oscuro              */
+  --color-hueso:        #f5f3ee; /* blanco hueso (fondo claro)       */
+  --color-hueso-200:    #e9e5dc; /* hueso más cálido / bordes claros */
+
+  /* Acento cálido (latón / dorado sobrio) */
+  --color-acento:       #b08d57; /* dorado latón principal           */
+  --color-acento-claro: #c8a673; /* hover / brillos                  */
+  --color-acento-oscuro:#8a6d3f; /* sombras del acento               */
+}
+
+/* ─── ESTILOS BASE ──────────────────────────────────────────
+   Estilos globales del documento.
+   ──────────────────────────────────────────────────────────── */
+@layer base {
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-hueso);
+    color: var(--color-tinta);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  /* Scroll suave para los enlaces del menú */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ─── UTILIDADES PROPIAS ────────────────────────────────────── */
+@layer utilities {
+  /* Texto en mayúsculas espaciadas (etiquetas, kickers) */
+  .tracking-kicker {
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  /* Animación de aparición al hacer scroll.
+     Acelerada por GPU (opacity + transform) → fluida en móvil. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    will-change: opacity, transform;
+  }
+  .reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Grano sutil de textura (overlay premium sobre fondos oscuros) */
+  .grain {
+    position: relative;
+  }
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
+  }
+}
