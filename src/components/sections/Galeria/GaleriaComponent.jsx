@@ -33,9 +33,7 @@ export default function GaleriaComponent() {
                   src={foto.src}
                   alt={foto.alt}
                   loading="lazy"
-                  className={`w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-                    foto.alto === 'tall' ? 'aspect-[3/4]' : 'aspect-square'
-                  }`}
+                  className="block h-auto w-full transition-transform duration-500 group-hover:scale-105"
                 />
                 <span className="absolute inset-0 bg-tinta/0 transition-colors duration-300 group-hover:bg-tinta/20" />
               </button>
