@@ -1,55 +1,46 @@
 // Servicios de A.S Barbería.
-// ⚠️ DATOS DE EJEMPLO (Fase 1) — pendientes de confirmar con Adrián
-//    duración real y precios. En la Fase 2 pasarán a la tabla `servicios`
-//    de Supabase y se gestionarán desde el panel.
+// Precios REALES (de sus historias de Instagram). ⚠️ Las DURACIONES son
+// estimadas — pendientes de confirmar con Adrián (son clave para calcular
+// los huecos de la reserva en la Fase 2).
 //
-// duracion: minutos (clave para calcular los huecos en la reserva).
-// icono: nombre de un icono de lucide-react (ver theme/icons.js).
+// En la Fase 2 estos datos pasarán a la tabla `servicios` de Supabase y se
+// gestionarán desde el panel.
+//
+// duracion: minutos · icono: nombre de un icono de lucide-react (theme/icons.js)
 
 export const SERVICIOS = [
   {
     id: 'corte',
-    nombre: 'Corte de pelo',
-    descripcion: 'Corte personalizado a máquina y tijera, lavado y peinado.',
+    nombre: 'Corte',
+    descripcion: 'Incluye cejas, barba y diseños. El corte completo, sin extras escondidos.',
     duracion: 30,
-    precio: 12,
+    precio: 6,
     icono: 'Scissors',
     destacado: true,
   },
   {
-    id: 'corte-barba',
-    nombre: 'Corte + Barba',
-    descripcion: 'Corte completo y arreglo de barba con perfilado y toalla caliente.',
-    duracion: 45,
-    precio: 18,
-    icono: 'UserRound',
-    destacado: true,
-  },
-  {
-    id: 'barba',
-    nombre: 'Arreglo de barba',
-    descripcion: 'Perfilado, recorte y apurado con navaja y toalla caliente.',
-    duracion: 20,
-    precio: 8,
+    id: 'mechas-corte',
+    nombre: 'Mechas + Corte',
+    descripcion: 'Mechas y corte en una misma sesión, con acabado y peinado.',
+    duracion: 75,
+    precio: 17,
     icono: 'Sparkles',
     destacado: false,
   },
   {
-    id: 'afeitado',
-    nombre: 'Afeitado clásico',
-    descripcion: 'Afeitado tradicional a navaja con espuma caliente y aftershave.',
-    duracion: 30,
-    precio: 12,
-    icono: 'Droplet',
-    destacado: false,
-  },
-  {
-    id: 'corte-nino',
-    nombre: 'Corte infantil',
-    descripcion: 'Corte para los más pequeños, con paciencia y buen rollo.',
-    duracion: 30,
-    precio: 10,
-    icono: 'Baby',
+    id: 'tinte-blanco-corte',
+    nombre: 'Tinte blanco + Corte',
+    descripcion: 'Coloración en blanco más corte completo.',
+    duracion: 60,
+    precio: 20,
+    icono: 'Palette',
     destacado: false,
   },
 ]
+
+// Promoción destacada (de sus historias).
+export const PROMO = {
+  titulo: 'Clientes de cada semana',
+  texto: 'Si te pelas una vez por semana, el corte se queda en 5 €.',
+  precio: 5,
+}

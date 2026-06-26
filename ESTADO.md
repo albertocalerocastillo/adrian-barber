@@ -31,19 +31,29 @@ la (Recomendado) y tirar por ella; ir poco a poco.
 - **Estilo visual:** monocromo premium (negro/gris/blanco hueso) + acento cálido
   dorado/latón, fiel al logo manuscrito B/N.
 
+## Datos REALES ya aplicados (de sus historias de Instagram)
+
+- **Servicios y precios** (en `src/data/servicios.js`):
+  - Corte — **6 €** (incluye cejas, barba y diseños)
+  - Mechas + Corte — **17 €**
+  - Tinte blanco + Corte — **20 €**
+  - PROMO: si te pelas una vez por semana, el corte sale a **5 €**.
+- **Logo original:** `LogoComponent.jsx` usa `public/logo.png` si existe (con
+  fallback tipográfico). Decisión del usuario: conservar el logo original de
+  momento; rediseño se propondrá más adelante.
+
 ## ⚠️ PENDIENTE DE DATOS REALES (de Adrián)
 
-Estos datos son de EJEMPLO y hay que confirmarlos. Son críticos para la Fase 2:
-
-1. **Horario exacto** — editar `src/data/horarios.js`. Ahora: L–V 10–14 y 17–21,
-   sábado 10–14, domingo cerrado.
-2. **Servicios (duración y precio)** — editar `src/data/servicios.js`. Ahora: corte
-   30/12€, corte+barba 45/18€, barba 20/8€, afeitado 30/12€, infantil 30/10€.
-3. **Fotos reales** de trabajos — sustituir placeholders de `src/data/galeria.js`.
-4. **Foto de Adrián** para "Sobre mí" (`SobreMiComponent.jsx`).
-5. **Dirección/coordenadas exactas** para el mapa — `src/data/contacto.js`.
-6. **Logo definitivo** (PNG/SVG) → soltar en `/public` y usarlo en `LogoComponent.jsx`
-   (ahora es tipográfico).
+1. **Logo:** soltar el archivo en `public/logo.png`. IDEAL: PNG con **fondo
+   transparente** y trazo blanco (luce sobre nav/hero/footer oscuros). Si solo
+   está la versión sobre mármol, sirve igual pero se verá el recuadro de fondo.
+2. **Duraciones de los servicios** — ahora SON ESTIMADAS (corte 30 min,
+   mechas+corte 75 min, tinte+corte 60 min). Críticas para los huecos de la Fase 2.
+3. **Horario exacto** — editar `src/data/horarios.js`. Ahora de ejemplo: L–V 10–14
+   y 17–21, sábado 10–14, domingo cerrado.
+4. **Fotos reales** de trabajos — sustituir placeholders de `src/data/galeria.js`.
+5. **Foto de Adrián** para "Sobre mí" (`SobreMiComponent.jsx`).
+6. **Coordenadas exactas** para el mapa (la dirección ya está bien).
 
 ## Datos del negocio (de su Instagram)
 
