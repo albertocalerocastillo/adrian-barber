@@ -42,9 +42,11 @@ la (Recomendado) y tirar por ella; ir poco a poco.
   - Mechas + Corte — **17 €**
   - Tinte blanco + Corte — **20 €**
   - PROMO: si te pelas una vez por semana, el corte sale a **5 €**.
-- **Logo original:** `LogoComponent.jsx` usa `public/logo.png` si existe (con
-  fallback tipográfico). Decisión del usuario: conservar el logo original de
-  momento; rediseño se propondrá más adelante.
+- **Logo original:** ✅ integrado. El JPG real está en `public/logo.jpg` (negro
+  sobre mármol). `scripts/procesar-logo.py` (Pillow) genera versiones recortadas
+  sin fondo: `public/logo-blanco.png` (fondos oscuros) y `public/logo-negro.png`
+  (fondos claros). `LogoComponent.jsx` elige según `claro`. El logo blanco es el
+  protagonista del hero. Reejecutar el script si Adrián cambia el logo.
 
 ## ⚠️ PENDIENTE DE DATOS REALES (de Adrián)
 
@@ -55,7 +57,9 @@ la (Recomendado) y tirar por ella; ir poco a poco.
    mechas+corte 75 min, tinte+corte 60 min). Críticas para los huecos de la Fase 2.
 3. **Horario exacto** — editar `src/data/horarios.js`. Ahora de ejemplo: L–V 10–14
    y 17–21, sábado 10–14, domingo cerrado.
-4. **Fotos reales** de trabajos — sustituir placeholders de `src/data/galeria.js`.
+4. **Fotos reales** de trabajos — soltar en `src/assets/galeria/` (se detectan
+   solas vía `import.meta.glob`; orden por nombre descendente, p. ej. 2026-01.jpg).
+   Tiene 4 historias destacadas en IG: 2026, 2025, 2024 y "Cortes".
 5. **Foto de Adrián** para "Sobre mí" (`SobreMiComponent.jsx`).
 6. **Coordenadas exactas** para el mapa (la dirección ya está bien).
 
