@@ -35,16 +35,21 @@ export default function HeroComponent() {
           {NEGOCIO.ciudad}
         </p>
 
-        {/* Título — caligrafía fiel al logo */}
-        <h1 className="font-script text-7xl leading-[0.9] sm:text-8xl md:text-9xl">
-          A<span className="text-acento">.</span>S
+        {/* Logo original (incluye A.S, el claim y el nombre) */}
+        <h1>
+          <img
+            src="/logo-blanco.png"
+            alt={`${NEGOCIO.nombreCompleto} — ${NEGOCIO.barbero}`}
+            className="w-64 max-w-[80vw] sm:w-80 md:w-[26rem]"
+            fetchPriority="high"
+          />
         </h1>
 
-        {/* Claim con tijeras a los lados */}
-        <div className="mt-2 flex items-center gap-3 text-hueso/85">
-          <Scissors size={18} className="text-acento" />
-          <p className="font-script text-2xl sm:text-3xl">Peluquería y barbería</p>
-          <Scissors size={18} className="-scale-x-100 text-acento" />
+        {/* Filete decorativo con tijeras */}
+        <div className="mt-5 flex items-center gap-3 text-acento">
+          <span className="h-px w-10 bg-acento/50" />
+          <Scissors size={16} />
+          <span className="h-px w-10 bg-acento/50" />
         </div>
 
         {/* Subtítulo */}
