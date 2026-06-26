@@ -2,25 +2,28 @@ import { useState } from 'react'
 import { NEGOCIO } from '../../../data/contacto'
 
 /**
- * Logotipo de A.S Barbería.
+ * Logotipo de A.S Barbería — usa el LOGO ORIGINAL de Adrián, recortado y sin
+ * fondo (generado con scripts/procesar-logo.py a partir de public/logo.jpg):
  *
- * Usa el LOGO ORIGINAL de Adrián si existe el archivo `public/logo.png`
- * (idealmente PNG con fondo transparente y trazo blanco). Si no está, cae a
- * una recreación TIPOGRÁFICA con fuente caligráfica (font-script), fiel al
- * estilo manuscrito del logo real, para que la web nunca se vea coja.
+ *  - claro=true  -> public/logo-blanco.png  (trazo blanco, para fondos oscuros)
+ *  - claro=false -> public/logo-negro.png   (trazo tinta, para fondos claros)
+ *
+ * Si esos PNG no estuvieran, cae a una recreación tipográfica caligráfica para
+ * que la web nunca se vea coja.
  *
  * Props:
- *  - claro: true para texto claro (sobre fondos oscuros). Solo afecta al fallback.
- *  - conClaim: muestra el subtítulo "Peluquería y barbería" (solo en fallback).
- *  - alto: altura del logo en px cuando se usa la imagen (por defecto 46).
+ *  - claro: true sobre fondos oscuros (nav/hero/footer).
+ *  - conClaim: muestra el subtítulo en el fallback tipográfico.
+ *  - alto: altura del logo en px (por defecto 46).
  */
 export default function LogoComponent({ claro = false, conClaim = true, alto = 46 }) {
   const [hayImagen, setHayImagen] = useState(true)
+  const src = claro ? '/logo-blanco.png' : '/logo-negro.png'
 
   if (hayImagen) {
     return (
       <img
-        src="/logo.png"
+        src={src}
         alt={NEGOCIO.nombreCompleto}
         style={{ height: alto }}
         className="w-auto select-none"
