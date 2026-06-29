@@ -2,16 +2,17 @@ import { useState, useEffect } from 'react'
 import { ArrowLeft, CalendarX, Loader2 } from 'lucide-react'
 import { HORARIO } from '../../../data/horarios'
 import { getCitas } from '../../../lib/citas'
-import { generarHuecos } from '../../../utils/disponibilidad'
+import { generarRejilla } from '../../../utils/disponibilidad'
 import { fechaLarga, hora as fmtHora, inicioDia } from '../../../utils/fechas'
 
 /**
- * Paso 3: elegir hora. Carga las citas ocupadas del día y calcula los huecos
- * libres según la duración del servicio (nunca solapes, nunca en pasado).
+ * Paso 3: elegir hora. Carga las citas ocupadas del día y monta la rejilla de
+ * horas según la duración del servicio. Las horas libres son pulsables; las
+ * ocupadas salen en gris/tachadas (sensación de agenda llena). Nunca pasado.
  */
 export default function PasoHora({ servicio, fecha, onElegir, onAtras }) {
   const [cargando, setCargando] = useState(true)
-  const [huecos, setHuecos] = useState([])
+  const [rejilla, setRejilla] = useState([])
 
   useEffect(() => {
     let vivo = true
@@ -21,7 +22,7 @@ export default function PasoHora({ servicio, fecha, onElegir, onAtras }) {
 
     getCitas(desde, hasta).then((citas) => {
       if (!vivo) return
-      const libres = generarHuecos({
+      const slots = generarRejilla({
         fecha,
         duracionMin: servicio.duracion,
         horario: HORARIO,
@@ -29,7 +30,7 @@ export default function PasoHora({ servicio, fecha, onElegir, onAtras }) {
         ahora: new Date(),
         granularidadMin: 15,
       })
-      setHuecos(libres)
+      setRejilla(slots)
       setCargando(false)
     })
 
@@ -38,8 +39,9 @@ export default function PasoHora({ servicio, fecha, onElegir, onAtras }) {
     }
   }, [servicio, fecha])
 
-  const manana = huecos.filter((h) => h.getHours() < 14)
-  const tarde = huecos.filter((h) => h.getHours() >= 14)
+  const manana = rejilla.filter((s) => s.inicio.getHours() < 14)
+  const tarde = rejilla.filter((s) => s.inicio.getHours() >= 14)
+  const hayLibres = rejilla.some((s) => s.estado === 'libre')
 
   return (
     <div>
@@ -55,23 +57,28 @@ export default function PasoHora({ servicio, fecha, onElegir, onAtras }) {
           <Loader2 size={28} className="animate-spin" />
           <p className="text-sm">Buscando huecos libres…</p>
         </div>
-      ) : huecos.length === 0 ? (
+      ) : rejilla.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-hueso-200 bg-white py-12 text-center">
           <CalendarX size={32} className="text-tinta/30" />
-          <p className="font-medium">No quedan huecos ese día</p>
-          <p className="max-w-xs text-sm text-tinta/50">
-            Prueba con otra fecha; suele haber hueco enseguida.
-          </p>
+          <p className="font-medium">Ese día no hay horario</p>
+          <p className="max-w-xs text-sm text-tinta/50">Prueba con otra fecha.</p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {manana.length > 0 && (
-            <FranjaHoras titulo="Mañana" huecos={manana} onElegir={onElegir} />
+        <>
+          {!hayLibres && (
+            <p className="mb-5 rounded-xl bg-tinta/5 px-4 py-3 text-center text-sm text-tinta/70">
+              Día completo 😮‍💨 — prueba con otra fecha, suele liberarse hueco.
+            </p>
           )}
-          {tarde.length > 0 && (
-            <FranjaHoras titulo="Tarde" huecos={tarde} onElegir={onElegir} />
-          )}
-        </div>
+          <div className="space-y-6">
+            {manana.length > 0 && (
+              <FranjaHoras titulo="Mañana" slots={manana} onElegir={onElegir} />
+            )}
+            {tarde.length > 0 && (
+              <FranjaHoras titulo="Tarde" slots={tarde} onElegir={onElegir} />
+            )}
+          </div>
+        </>
       )}
 
       <button
@@ -86,21 +93,32 @@ export default function PasoHora({ servicio, fecha, onElegir, onAtras }) {
   )
 }
 
-function FranjaHoras({ titulo, huecos, onElegir }) {
+function FranjaHoras({ titulo, slots, onElegir }) {
   return (
     <div>
       <p className="mb-3 text-xs tracking-kicker text-tinta/40">{titulo}</p>
       <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
-        {huecos.map((h) => (
-          <button
-            key={h.toISOString()}
-            type="button"
-            onClick={() => onElegir(h)}
-            className="rounded-xl border border-hueso-200 bg-white py-3 text-center font-medium transition-all hover:-translate-y-0.5 hover:border-acento hover:bg-acento/10 hover:shadow-md"
-          >
-            {fmtHora(h)}
-          </button>
-        ))}
+        {slots.map((s) =>
+          s.estado === 'libre' ? (
+            <button
+              key={s.inicio.toISOString()}
+              type="button"
+              onClick={() => onElegir(s.inicio)}
+              className="rounded-xl border border-hueso-200 bg-white py-3 text-center font-medium transition-all hover:-translate-y-0.5 hover:border-acento hover:bg-acento/10 hover:shadow-md"
+            >
+              {fmtHora(s.inicio)}
+            </button>
+          ) : (
+            <span
+              key={s.inicio.toISOString()}
+              aria-disabled="true"
+              title="Ocupado"
+              className="cursor-not-allowed rounded-xl border border-transparent bg-tinta/[0.04] py-3 text-center font-medium text-tinta/30 line-through"
+            >
+              {fmtHora(s.inicio)}
+            </span>
+          )
+        )}
       </div>
     </div>
   )

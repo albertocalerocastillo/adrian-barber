@@ -38,9 +38,12 @@ export function solapan(aIni, aFin, bIni, bFin) {
  * @param {Date}   opts.ahora          Momento actual (para descartar pasado).
  * @param {number} opts.granularidadMin Paso del rejilla de inicios (def. 15).
  * @param {number} opts.margenMin      Antelación mínima para reservar (def. 0).
- * @returns {Date[]} Lista de horas de inicio libres, ordenadas.
+ * @returns {Array<{inicio:Date, estado:'libre'|'ocupado'}>} Rejilla de horas.
+ *   Se EXCLUYEN las horas en pasado (no tiene sentido mostrarlas). Las que
+ *   solapan con una cita/bloqueo salen como 'ocupado' (para mostrarlas en gris
+ *   y dar sensación de agenda llena), el resto como 'libre'.
  */
-export function generarHuecos({
+export function generarRejilla({
   fecha,
   duracionMin,
   horario,
@@ -60,7 +63,7 @@ export function generarHuecos({
   }))
 
   const limite = sumarMin(ahora, margenMin)
-  const huecos = []
+  const rejilla = []
 
   for (const [horaIni, horaFin] of def.tramos) {
     const apertura = aHora(fecha, horaIni)
@@ -71,15 +74,27 @@ export function generarHuecos({
       const fin = sumarMin(cursor, duracionMin)
       if (fin > cierre) break // el servicio no cabe entero en el tramo
 
-      const enPasado = cursor < limite
-      const chocaOcupado = ocupados.some((o) =>
-        solapan(cursor, fin, o.ini, o.fin)
-      )
-
-      if (!enPasado && !chocaOcupado) huecos.push(new Date(cursor))
+      if (cursor >= limite) {
+        // No mostramos el pasado; las solapadas van como 'ocupado'.
+        const chocaOcupado = ocupados.some((o) => solapan(cursor, fin, o.ini, o.fin))
+        rejilla.push({
+          inicio: new Date(cursor),
+          estado: chocaOcupado ? 'ocupado' : 'libre',
+        })
+      }
       cursor = sumarMin(cursor, granularidadMin)
     }
   }
 
-  return huecos
+  return rejilla
+}
+
+/**
+ * Solo las horas LIBRES (atajo sobre generarRejilla). Mismos parámetros.
+ * @returns {Date[]}
+ */
+export function generarHuecos(opts) {
+  return generarRejilla(opts)
+    .filter((s) => s.estado === 'libre')
+    .map((s) => s.inicio)
 }
