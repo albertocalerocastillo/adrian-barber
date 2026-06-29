@@ -16,7 +16,12 @@ Supabase + Vercel (mismo que el proyecto `paco.vago`).
 - ✅ **Fase 1 — Web pública** montada: hero, servicios (precio+duración), sobre mí,
   galería con lightbox, horario (con badge abierto/cerrado en vivo), ubicación con
   mapa, footer y botón flotante de WhatsApp. Diseño premium monocromo + acento dorado.
-- ⬜ **Fase 2 — Reserva online** (servicio → fecha → huecos → datos → confirma).
+- ✅ **Fase 2 — Reserva online** (capa 1): flujo completo `/reserva`
+  (servicio → fecha → huecos → datos → confirmación). Motor de huecos en
+  `utils/disponibilidad.js` (sin solapes, sin pasado; verificado). Capa de datos
+  `lib/citas.js` funciona con **Supabase si está configurado, o localStorage** si no
+  (para probar ya). SQL listo en `supabase/` (con exclusion constraint anti-doble-reserva).
+  ⬜ Pendiente: crear proyecto Supabase, ejecutar SQL, poner credenciales (.env) y email.
 - ⬜ **Fase 3 — Panel del barbero** (login, agenda, bloqueos, CRUD servicios/horario).
 - ⬜ **Fase 4 (opcional)** — recordatorios, seña Stripe, multi-silla, reseñas.
 

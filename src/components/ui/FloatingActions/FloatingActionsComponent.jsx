@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { CalendarCheck } from 'lucide-react'
 import WhatsAppIcon from '../WhatsAppIcon/WhatsAppIcon'
 import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
@@ -41,15 +42,13 @@ export default function FloatingActionsComponent() {
       </a>
 
       {/* Pedir cita (acción principal) */}
-      <a
-        href={wa}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        to="/reserva"
         className="flex items-center gap-2 rounded-full bg-acento px-5 py-3.5 text-sm font-semibold text-tinta shadow-xl shadow-acento/30 transition-transform hover:scale-105"
       >
         <CalendarCheck size={18} strokeWidth={2} />
         Pedir cita
-      </a>
+      </Link>
     </div>
   )
 }
