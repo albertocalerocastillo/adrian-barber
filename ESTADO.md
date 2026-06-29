@@ -47,11 +47,17 @@ la (Recomendado) y tirar por ella; ir poco a poco.
   - Mechas + Corte — **17 €**
   - Tinte blanco + Corte — **20 €**
   - PROMO: si te pelas una vez por semana, el corte sale a **5 €**.
-- **Logo original:** ✅ integrado. El JPG real está en `public/logo.jpg` (negro
-  sobre mármol). `scripts/procesar-logo.py` (Pillow) genera versiones recortadas
-  sin fondo: `public/logo-blanco.png` (fondos oscuros) y `public/logo-negro.png`
-  (fondos claros). `LogoComponent.jsx` elige según `claro`. El logo blanco es el
-  protagonista del hero. Reejecutar el script si Adrián cambia el logo.
+- **Logo:** ✅ integrado y MEJORADO con un emblema/sello.
+  - `public/logo.jpg` = logo original (negro sobre mármol).
+  - `scripts/procesar-logo.py` → `logo-blanco.png` / `logo-negro.png` (recortados sin fondo).
+  - `scripts/generar-marca.py` → `logo-as-blanco.png` / `logo-as-negro.png` (solo el
+    monograma A.S, para nav/emblema).
+  - `scripts/generar-favicon.py` → favicon e icono iOS (monograma A.S sobre cuadrado tinta).
+  - **`SelloComponent.jsx`** = emblema "sello vintage" (anillo dorado + texto curvo
+    "peluquería·barbería / La Rinconada" + tijeras + el A.S manuscrito real en el centro).
+    Se usa en el HERO (grande) y el FOOTER (mediano).
+  - `LogoComponent.jsx` (nav y cabecera de /reserva) usa el monograma A.S compacto.
+  - Reejecutar los 3 scripts si Adrián cambia el logo (orden: procesar-logo → generar-marca → generar-favicon).
 
 ## SEO / Google
 

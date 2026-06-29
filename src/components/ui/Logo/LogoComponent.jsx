@@ -18,7 +18,8 @@ import { NEGOCIO } from '../../../data/contacto'
  */
 export default function LogoComponent({ claro = false, conClaim = true, alto = 46 }) {
   const [hayImagen, setHayImagen] = useState(true)
-  const src = claro ? '/logo-blanco.png' : '/logo-negro.png'
+  // Monograma A.S compacto (legible en la barra de navegación).
+  const src = claro ? '/logo-as-blanco.png' : '/logo-as-negro.png'
 
   if (hayImagen) {
     return (
