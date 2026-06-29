@@ -1,30 +1,20 @@
-import NavComponent from './components/layout/Nav/NavComponent'
-import FooterComponent from './components/layout/Footer/FooterComponent'
-import HeroComponent from './components/sections/Hero/HeroComponent'
-import ServiciosComponent from './components/sections/Servicios/ServiciosComponent'
-import SobreMiComponent from './components/sections/SobreMi/SobreMiComponent'
-import GaleriaComponent from './components/sections/Galeria/GaleriaComponent'
-import HorarioComponent from './components/sections/Horario/HorarioComponent'
-import UbicacionComponent from './components/sections/Ubicacion/UbicacionComponent'
-import FloatingActionsComponent from './components/ui/FloatingActions/FloatingActionsComponent'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import HomeComponent from './components/pages/Home/HomeComponent'
+import ReservaComponent from './components/pages/Reserva/ReservaComponent'
 
 /**
- * Web pública de A.S Barbería (Fase 1).
- * El orden de las secciones alterna fondos claros (hueso) y oscuros (tinta)
- * para dar ritmo visual.
+ * Enrutado de la web.
+ *  - /         → web pública (Fase 1)
+ *  - /reserva  → reserva de citas online (Fase 2)
+ *  - /panel    → panel del barbero (Fase 3, pendiente)
  */
 export default function App() {
   return (
-    <div className="min-h-screen bg-hueso text-tinta">
-      <NavComponent />
-      <HeroComponent />
-      <ServiciosComponent />
-      <SobreMiComponent />
-      <GaleriaComponent />
-      <HorarioComponent />
-      <UbicacionComponent />
-      <FooterComponent />
-      <FloatingActionsComponent />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomeComponent />} />
+        <Route path="/reserva" element={<ReservaComponent />} />
+      </Routes>
+    </BrowserRouter>
   )
 }

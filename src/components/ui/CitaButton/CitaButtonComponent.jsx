@@ -1,12 +1,9 @@
+import { Link } from 'react-router-dom'
 import { CalendarCheck } from 'lucide-react'
-import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
 
 /**
  * Botón principal "Pedir cita" — la acción estrella de toda la web.
- *
- * FASE 1: abre WhatsApp con el mensaje predefinido.
- * FASE 2: pasará a enrutar a /reserva (reserva online). Al estar centralizado
- *         aquí, ese cambio se hará en un único sitio.
+ * Lleva a la reserva online (/reserva).
  *
  * Props:
  *  - variante: 'acento' (dorado, por defecto) | 'contorno' (borde claro).
@@ -19,8 +16,6 @@ export default function CitaButtonComponent({
   tamano = 'md',
   className = '',
 }) {
-  const href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MENSAJE)}`
-
   const variantes = {
     acento:
       'bg-acento text-tinta hover:bg-acento-claro shadow-lg shadow-acento/20',
@@ -33,14 +28,12 @@ export default function CitaButtonComponent({
   }
 
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      to="/reserva"
       className={`group inline-flex items-center justify-center gap-2.5 rounded-full font-semibold tracking-wide transition-all duration-300 ${variantes[variante]} ${tamanos[tamano]} ${className}`}
     >
       <CalendarCheck size={tamano === 'lg' ? 20 : 18} strokeWidth={2} />
       {texto}
-    </a>
+    </Link>
   )
 }
