@@ -1,7 +1,6 @@
-import { MapPin, ChevronDown } from 'lucide-react'
+import { MapPin, ChevronDown, Scissors } from 'lucide-react'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
 import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
-import SelloComponent from '../../ui/Sello/SelloComponent'
 import { NEGOCIO, INSTAGRAM, INSTAGRAM_URL } from '../../../data/contacto'
 
 /**
@@ -36,10 +35,22 @@ export default function HeroComponent() {
           {NEGOCIO.ciudad}
         </p>
 
-        {/* Emblema con el A.S manuscrito real */}
-        <h1 aria-label={`${NEGOCIO.nombreCompleto} — ${NEGOCIO.barbero}`}>
-          <SelloComponent className="w-56 max-w-[78vw] sm:w-64 md:w-72" />
+        {/* Logo original (incluye A.S, el claim y el nombre) */}
+        <h1>
+          <img
+            src="/logo-blanco.png"
+            alt={`${NEGOCIO.nombreCompleto} — ${NEGOCIO.barbero}`}
+            className="w-64 max-w-[80vw] sm:w-80 md:w-[26rem]"
+            fetchPriority="high"
+          />
         </h1>
+
+        {/* Filete decorativo con tijeras */}
+        <div className="mt-5 flex items-center gap-3 text-acento">
+          <span className="h-px w-10 bg-acento/50" />
+          <Scissors size={16} />
+          <span className="h-px w-10 bg-acento/50" />
+        </div>
 
         {/* Subtítulo */}
         <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-hueso/70 sm:text-lg">
