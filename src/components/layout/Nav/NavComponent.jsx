@@ -25,19 +25,16 @@ export default function NavComponent() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-40 border-b transition-all duration-300 ${
         scrolled
-          ? 'bg-tinta/90 backdrop-blur-md shadow-lg shadow-black/20'
-          : 'bg-transparent'
+          ? 'border-transparent bg-tinta/90 shadow-lg shadow-black/30 backdrop-blur-md'
+          : 'border-hueso/10 bg-tinta/50 backdrop-blur-sm'
       }`}
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">
         {/* Logo */}
-        <a href="#inicio" className="flex shrink-0 items-center gap-2.5" aria-label="Inicio">
-          <LogoAdriComponent className="h-11 w-11" />
-          <span className="hidden font-script text-2xl leading-none text-hueso sm:block">
-            A<span className="text-acento">.</span>S
-          </span>
+        <a href="#inicio" className="shrink-0" aria-label="Inicio">
+          <LogoAdriComponent className="h-12 w-12" />
         </a>
 
         {/* Enlaces escritorio */}
