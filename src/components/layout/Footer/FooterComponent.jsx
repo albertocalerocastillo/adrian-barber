@@ -1,5 +1,5 @@
 import { Phone } from 'lucide-react'
-import LogoComponent from '../../ui/Logo/LogoComponent'
+import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
 import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
 import WhatsAppIcon from '../../ui/WhatsAppIcon/WhatsAppIcon'
 import {
@@ -22,8 +22,8 @@ export default function FooterComponent() {
     <footer className="border-t border-tinta-700 bg-tinta py-12 text-hueso">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 px-5 text-center md:flex-row md:justify-between md:px-8 md:text-left">
         {/* Logo + nombre */}
-        <div className="flex flex-col items-center gap-2 md:items-start">
-          <LogoComponent claro />
+        <div className="flex flex-col items-center gap-3 md:items-start">
+          <LogoAdriComponent className="h-24 w-24" redondeado="rounded-xl" />
           <p className="text-sm text-hueso/50">
             {NEGOCIO.barbero} · {NEGOCIO.ciudad}
           </p>

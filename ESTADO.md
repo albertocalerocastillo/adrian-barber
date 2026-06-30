@@ -59,6 +59,20 @@ la (Recomendado) y tirar por ella; ir poco a poco.
   - `LogoComponent.jsx` (nav y cabecera de /reserva) usa el monograma A.S compacto.
   - Reejecutar los 3 scripts si Adrián cambia el logo (orden: procesar-logo → generar-marca → generar-favicon).
 
+## Logo NUEVO (de Adrián) + paleta
+
+- Adrián trajo un **logo propio** (emblema dorado sobre pizarra con cinta granate):
+  `public/logo-adri.jpg` (web, optimizado) y `public/logo-adri-hd.jpg` (alta).
+- Se usa en hero (grande), nav, footer, cabecera de reserva y favicon
+  (`LogoAdriComponent.jsx`). El hero es ahora pizarra a juego para que el
+  emblema se funda con el fondo.
+- **Paleta actualizada** en `theme.css` a los colores del logo: pizarra
+  `#16202a` (tinta), dorado `#c4a05a` (acento), granate `#6e2329` (vino, usado
+  en el banner de la promo).
+- Los logos anteriores (SelloComponent, logo-blanco/negro, propuestas) quedan
+  en el repo pero ya NO se usan en la web.
+- ⏸️ Cambios hechos en LOCAL y commit, **sin desplegar** (a petición del usuario).
+
 ## SEO / Google
 
 - ✅ Datos estructurados `HairSalon` en `index.html` (NAP + horario + IG).
