@@ -25,10 +25,8 @@ export default function NavComponent() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 border-b transition-all duration-300 ${
-        scrolled
-          ? 'border-transparent bg-tinta/90 shadow-lg shadow-black/30 backdrop-blur-md'
-          : 'border-hueso/10 bg-tinta/50 backdrop-blur-sm'
+      className={`pizarra fixed inset-x-0 top-0 z-40 border-b border-acento/15 transition-shadow duration-300 ${
+        scrolled ? 'shadow-lg shadow-black/40' : ''
       }`}
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">

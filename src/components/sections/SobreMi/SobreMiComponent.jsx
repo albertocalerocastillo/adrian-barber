@@ -15,7 +15,7 @@ const VALORES = [
  */
 export default function SobreMiComponent() {
   return (
-    <section id="sobre-mi" className="pizarra bg-tinta py-20 text-hueso md:py-28">
+    <section id="sobre-mi" className="bg-tinta py-20 text-hueso md:py-28">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 md:grid-cols-2 md:px-8">
         {/* Foto */}
         <RevealComponent className="order-1 md:order-none">
