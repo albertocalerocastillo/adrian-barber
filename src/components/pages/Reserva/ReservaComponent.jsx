@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Check } from 'lucide-react'
-import LogoComponent from '../../ui/Logo/LogoComponent'
+import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
 import PasoServicio from './PasoServicio'
 import PasoFecha from './PasoFecha'
 import PasoHora from './PasoHora'
@@ -31,8 +31,11 @@ export default function ReservaComponent() {
       {/* Cabecera */}
       <header className="bg-tinta">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-3.5">
-          <Link to="/" aria-label="Volver al inicio">
-            <LogoComponent claro alto={40} />
+          <Link to="/" aria-label="Volver al inicio" className="flex items-center gap-2.5">
+            <LogoAdriComponent className="h-10 w-10" />
+            <span className="font-script text-xl leading-none text-hueso">
+              A<span className="text-acento">.</span>S
+            </span>
           </Link>
           <Link
             to="/"

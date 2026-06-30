@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { useScrolled } from '../../../hooks/useScrolled'
-import LogoComponent from '../../ui/Logo/LogoComponent'
+import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
 
 const ENLACES = [
@@ -33,8 +33,11 @@ export default function NavComponent() {
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">
         {/* Logo */}
-        <a href="#inicio" className="shrink-0" aria-label="Inicio">
-          <LogoComponent claro />
+        <a href="#inicio" className="flex shrink-0 items-center gap-2.5" aria-label="Inicio">
+          <LogoAdriComponent className="h-11 w-11" />
+          <span className="hidden font-script text-2xl leading-none text-hueso sm:block">
+            A<span className="text-acento">.</span>S
+          </span>
         </a>
 
         {/* Enlaces escritorio */}

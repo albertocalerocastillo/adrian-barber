@@ -53,7 +53,7 @@ export default function ServiciosComponent() {
 
         {/* Promo destacada */}
         <RevealComponent className="mt-6">
-          <div className="grain flex flex-col items-center gap-4 overflow-hidden rounded-2xl bg-tinta px-6 py-8 text-center text-hueso sm:flex-row sm:justify-between sm:text-left">
+          <div className="grain flex flex-col items-center gap-4 overflow-hidden rounded-2xl bg-vino px-6 py-8 text-center text-hueso ring-1 ring-acento/30 sm:flex-row sm:justify-between sm:text-left">
             <div className="relative">
               <p className="text-xs tracking-kicker text-acento">{PROMO.titulo}</p>
               <p className="mt-2 max-w-md font-display text-xl font-semibold sm:text-2xl">

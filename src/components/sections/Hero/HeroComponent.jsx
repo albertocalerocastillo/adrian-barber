@@ -1,59 +1,48 @@
-import { MapPin, ChevronDown, Scissors } from 'lucide-react'
+import { MapPin, ChevronDown } from 'lucide-react'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
 import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
 import { NEGOCIO, INSTAGRAM, INSTAGRAM_URL } from '../../../data/contacto'
 
 /**
- * Hero a pantalla completa. Fondo oscuro con imagen de barbería (placeholder
- * de Unsplash, a sustituir por foto del local de Adrián) + degradado de tinta.
- * Tipografía display grande y CTA principal "Pedir cita".
+ * Hero a pantalla completa. Fondo de pizarra (a juego con el emblema, para que
+ * los bordes del logo se fundan con el fondo) y el LOGO oficial de A.S como
+ * protagonista. CTA principal "Pedir cita".
  */
 export default function HeroComponent() {
   return (
     <section
       id="inicio"
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-tinta text-hueso"
+      className="grain relative flex min-h-screen items-center justify-center overflow-hidden bg-tinta text-hueso"
     >
-      {/* Fondo */}
-      <div className="absolute inset-0">
-        <img
-          src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=1600&q=80"
-          alt="Interior de la barbería"
-          className="h-full w-full object-cover opacity-40"
-          fetchPriority="high"
-        />
-        {/* Degradados para legibilidad y profundidad */}
-        <div className="absolute inset-0 bg-gradient-to-b from-tinta/70 via-tinta/50 to-tinta" />
-        <div className="absolute inset-0 bg-gradient-to-r from-tinta/80 to-transparent" />
-      </div>
+      {/* Foco radial sutil detrás del emblema */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(circle at 50% 42%, #24323f 0%, #1a2530 45%, #11181f 100%)',
+        }}
+      />
 
       {/* Contenido */}
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center px-5 text-center">
         {/* Kicker */}
-        <p className="mb-5 flex items-center gap-2 text-xs tracking-kicker text-acento">
+        <p className="mb-7 flex items-center gap-2 text-xs tracking-kicker text-acento">
           <MapPin size={14} />
           {NEGOCIO.ciudad}
         </p>
 
-        {/* Logo original (incluye A.S, el claim y el nombre) */}
-        <h1>
+        {/* Emblema (logo oficial) */}
+        <h1 aria-label={`${NEGOCIO.nombreCompleto} — ${NEGOCIO.barbero}`}>
           <img
-            src="/logo-blanco.png"
+            src="/logo-adri.jpg"
             alt={`${NEGOCIO.nombreCompleto} — ${NEGOCIO.barbero}`}
-            className="w-64 max-w-[80vw] sm:w-80 md:w-[26rem]"
+            className="w-64 max-w-[80vw] rounded-2xl shadow-2xl shadow-black/50 ring-1 ring-acento/20 sm:w-72 md:w-80"
             fetchPriority="high"
           />
         </h1>
 
-        {/* Filete decorativo con tijeras */}
-        <div className="mt-5 flex items-center gap-3 text-acento">
-          <span className="h-px w-10 bg-acento/50" />
-          <Scissors size={16} />
-          <span className="h-px w-10 bg-acento/50" />
-        </div>
-
         {/* Subtítulo */}
-        <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-hueso/70 sm:text-lg">
+        <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-hueso/70 sm:text-lg">
           Cortes con carácter, barba a navaja y un buen rato en la silla.
           De {NEGOCIO.barbero.split(' ').slice(0, 2).join(' ')}, en el corazón de {NEGOCIO.localidad}.
         </p>

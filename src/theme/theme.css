@@ -19,17 +19,21 @@
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-script: "Great Vibes", "Brush Script MT", cursive; /* eco del logo manuscrito */
 
-  /* Paleta monocroma (escala de tinta) */
-  --color-tinta:        #0c0c0d; /* negro casi puro (fondos, hero)   */
-  --color-tinta-800:    #1a1a1d; /* superficies oscuras              */
-  --color-tinta-700:    #2a2a2e; /* bordes sobre oscuro              */
+  /* Paleta tomada del logo: pizarra azulada + dorado + granate */
+  --color-tinta:        #16202a; /* pizarra oscura (fondos, hero)    */
+  --color-tinta-800:    #1f2c38; /* superficies oscuras              */
+  --color-tinta-700:    #2c3a47; /* bordes sobre oscuro              */
   --color-hueso:        #f5f3ee; /* blanco hueso (fondo claro)       */
   --color-hueso-200:    #e9e5dc; /* hueso más cálido / bordes claros */
 
-  /* Acento cálido (latón / dorado sobrio) */
-  --color-acento:       #b08d57; /* dorado latón principal           */
-  --color-acento-claro: #c8a673; /* hover / brillos                  */
-  --color-acento-oscuro:#8a6d3f; /* sombras del acento               */
+  /* Acento dorado (latón del logo) */
+  --color-acento:       #c4a05a; /* dorado principal                 */
+  --color-acento-claro: #dcbd7d; /* hover / brillos                  */
+  --color-acento-oscuro:#9c7c3f; /* sombras del acento               */
+
+  /* Acento granate (la cinta del logo), para detalles puntuales */
+  --color-vino:         #6e2329;
+  --color-vino-claro:   #8a2f37;
 }
 
 /* ─── ESTILOS BASE ──────────────────────────────────────────
