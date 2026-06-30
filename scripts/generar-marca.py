@@ -11,7 +11,8 @@ Reejecutar tras cambiar el logo:  python scripts/generar-marca.py
 """
 from PIL import Image
 
-PROP_AS = 0.66  # parte superior del logo que contiene el "A.S"
+PROP_AS = 0.70  # parte superior del logo que contiene el "A.S"
+MARGEN = 18     # aire transparente alrededor (para que no quede pegado al borde)
 
 
 def extraer(origen, destino):
@@ -21,8 +22,11 @@ def extraer(origen, destino):
     bbox = arriba.split()[3].point(lambda x: 255 if x > 30 else 0).getbbox()
     if bbox:
         arriba = arriba.crop(bbox)
-    arriba.save(destino)
-    print(f"{destino}  ({arriba.width}x{arriba.height})")
+    # Lienzo transparente con margen alrededor del A.S.
+    lienzo = Image.new("RGBA", (arriba.width + 2 * MARGEN, arriba.height + 2 * MARGEN), (0, 0, 0, 0))
+    lienzo.alpha_composite(arriba, (MARGEN, MARGEN))
+    lienzo.save(destino)
+    print(f"{destino}  ({lienzo.width}x{lienzo.height})")
 
 
 extraer("public/logo-blanco.png", "public/logo-as-blanco.png")
