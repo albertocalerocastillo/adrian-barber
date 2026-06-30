@@ -22,6 +22,16 @@ export default function HeroComponent() {
             'radial-gradient(circle at 50% 42%, #24323f 0%, #1a2530 45%, #11181f 100%)',
         }}
       />
+      {/* Textura de pizarra (como el fondo del logo) */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-50"
+        style={{
+          mixBlendMode: 'soft-light',
+          backgroundSize: '380px 380px',
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.014' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E\")",
+        }}
+      />
 
       {/* Contenido */}
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center px-5 text-center">

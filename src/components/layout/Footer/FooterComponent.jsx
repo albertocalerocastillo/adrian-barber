@@ -19,7 +19,7 @@ export default function FooterComponent() {
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MENSAJE)}`
 
   return (
-    <footer className="border-t border-tinta-700 bg-tinta py-12 text-hueso">
+    <footer className="pizarra border-t-2 border-acento/30 bg-tinta-900 py-12 text-hueso">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 px-5 text-center md:flex-row md:justify-between md:px-8 md:text-left">
         {/* Logo + nombre */}
         <div className="flex flex-col items-center gap-3 md:items-start">
