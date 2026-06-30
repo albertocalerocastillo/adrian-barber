@@ -20,6 +20,7 @@
   --font-script: "Great Vibes", "Brush Script MT", cursive; /* eco del logo manuscrito */
 
   /* Paleta tomada del logo: pizarra azulada + dorado + granate */
+  --color-tinta-900:    #0f161d; /* pizarra más profunda (footer)    */
   --color-tinta:        #16202a; /* pizarra oscura (fondos, hero)    */
   --color-tinta-800:    #1f2c38; /* superficies oscuras              */
   --color-tinta-700:    #2c3a47; /* bordes sobre oscuro              */
@@ -91,5 +92,14 @@
     pointer-events: none;
     opacity: 0.04;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
+  }
+
+  /* Textura de PIZARRA (como el fondo del logo) para secciones oscuras.
+     Va como background-image mezclado con el color de fondo (soft-light), así
+     queda DETRÁS del contenido sin taparlo. */
+  .pizarra {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.014' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+    background-size: 380px 380px;
+    background-blend-mode: soft-light;
   }
 }
