@@ -16,7 +16,7 @@ import {
  */
 export default function UbicacionComponent() {
   return (
-    <section id="ubicacion" className="pizarra bg-tinta py-20 text-hueso md:py-28">
+    <section id="ubicacion" className="bg-tinta py-20 text-hueso md:py-28">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <SectionHeadingComponent kicker="Cómo llegar" titulo="Dónde estamos" claro />
 
