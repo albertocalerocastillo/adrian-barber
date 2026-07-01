@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   ChevronLeft, ChevronRight, Plus, Ban, LogOut, Phone, Check, X,
-  CalendarDays, Loader2, Trash2,
+  CalendarDays, Loader2, Trash2, RotateCcw,
 } from 'lucide-react'
 import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
 import WhatsAppIcon from '../../ui/WhatsAppIcon/WhatsAppIcon'
@@ -341,11 +341,14 @@ function CitaCard({ cita, onAccion }) {
           <p className="text-sm text-tinta/60">{cita.servicio_nombre}</p>
           <p className="mt-1 truncate font-medium">{cita.cliente_nombre}</p>
         </div>
-        {atendida && (
-          <span className="shrink-0 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-            Atendida
-          </span>
-        )}
+        <span
+          className={`flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+            atendida ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+          }`}
+        >
+          <span className={`h-1.5 w-1.5 rounded-full ${atendida ? 'bg-green-500' : 'bg-amber-500'}`} />
+          {atendida ? 'Atendida' : 'Pendiente'}
+        </span>
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -368,22 +371,34 @@ function CitaCard({ cita, onAccion }) {
           </>
         )}
         <div className="ml-auto flex gap-2">
-          {!atendida && (
+          {atendida ? (
             <button
               type="button"
-              onClick={() => onAccion(cita.id, 'atendida')}
-              className="flex items-center gap-1.5 rounded-full bg-green-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-green-700"
+              onClick={() => onAccion(cita.id, 'pendiente')}
+              className="flex items-center gap-1.5 rounded-full border border-hueso-200 px-3 py-1.5 text-xs font-semibold text-tinta/70 transition-colors hover:border-tinta/40"
             >
-              <Check size={14} /> Atendida
+              <RotateCcw size={14} /> Deshacer
             </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => onAccion(cita.id, 'atendida')}
+                className="flex items-center gap-1.5 rounded-full bg-green-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-green-700"
+              >
+                <Check size={14} /> Marcar atendida
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm('¿Cancelar esta cita?')) onAccion(cita.id, 'cancelada')
+                }}
+                className="flex items-center gap-1.5 rounded-full border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
+              >
+                <X size={14} /> Cancelar
+              </button>
+            </>
           )}
-          <button
-            type="button"
-            onClick={() => onAccion(cita.id, 'cancelada')}
-            className="flex items-center gap-1.5 rounded-full border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
-          >
-            <X size={14} /> Cancelar
-          </button>
         </div>
       </div>
     </article>
