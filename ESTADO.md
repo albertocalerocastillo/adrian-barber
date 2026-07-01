@@ -31,6 +31,10 @@ Supabase + Vercel (mismo que el proyecto `paco.vago`).
   el mismo motor anti-solapes. ⬜ Pendiente: vista semana, CRUD servicios/horario,
   crear el usuario de Adrián. Para probar: crear un usuario en Supabase →
   Authentication → Add user (email+password).
+- ✅ **Aviso WhatsApp de cita nueva** (CallMeBot): al reservar por la web se manda
+  un WhatsApp automático. Configurado en `.env` LOCAL con el móvil de PRUEBA de
+  Alberto (apikey de CallMeBot). Verificado. ⬜ Pendiente: variables en Vercel y
+  cambiar al móvil de Adrián; idealmente mover la apikey a una Edge Function.
 - ⬜ **Fase 4 (opcional)** — recordatorios, seña Stripe, multi-silla, reseñas.
 
 **Flujo de trabajo (IMPORTANTE):** trabajar en rama (no en master); `npm run build`
