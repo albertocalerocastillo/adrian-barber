@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Check } from 'lucide-react'
 import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
@@ -7,6 +7,7 @@ import PasoFecha from './PasoFecha'
 import PasoHora from './PasoHora'
 import PasoDatos from './PasoDatos'
 import Confirmacion from './Confirmacion'
+import { getHorario } from '../../../lib/config'
 
 const PASOS = ['Servicio', 'Fecha', 'Hora', 'Tus datos']
 
@@ -20,6 +21,18 @@ export default function ReservaComponent() {
   const [servicio, setServicio] = useState(null)
   const [fecha, setFecha] = useState(null)
   const [hora, setHora] = useState(null) // Date con la hora de inicio
+  const [horario, setHorario] = useState(null)
+
+  // Carga el horario (de Supabase o estático) una vez.
+  useEffect(() => {
+    let vivo = true
+    getHorario().then((h) => {
+      if (vivo) setHorario(h)
+    })
+    return () => {
+      vivo = false
+    }
+  }, [])
 
   const irA = (n) => setPaso(n)
   const atras = () => setPaso((p) => Math.max(1, p - 1))
@@ -107,6 +120,7 @@ export default function ReservaComponent() {
         {paso === 2 && (
           <PasoFecha
             fecha={fecha}
+            horario={horario}
             onAtras={atras}
             onElegir={(f) => {
               setFecha(f)
@@ -121,6 +135,7 @@ export default function ReservaComponent() {
             key={`${servicio?.id}-${fecha?.toISOString()}`}
             servicio={servicio}
             fecha={fecha}
+            horario={horario}
             onAtras={atras}
             onElegir={(h) => {
               setHora(h)

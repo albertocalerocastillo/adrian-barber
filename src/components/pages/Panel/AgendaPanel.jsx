@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   ChevronLeft, ChevronRight, Plus, Ban, LogOut, Phone, Check, X,
-  CalendarDays, Loader2, Trash2, RotateCcw,
+  CalendarDays, Loader2, Trash2, RotateCcw, Clock,
 } from 'lucide-react'
 import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
 import WhatsAppIcon from '../../ui/WhatsAppIcon/WhatsAppIcon'
@@ -19,7 +19,7 @@ import {
  * Agenda del barbero con dos vistas: DÍA (detalle + acciones) y SEMANA
  * (resumen de los 7 días). Añadir cita a mano y bloquear ratos.
  */
-export default function AgendaPanel() {
+export default function AgendaPanel({ onAbrirHorario }) {
   const [vista, setVista] = useState('dia') // 'dia' | 'semana'
   const [dia, setDia] = useState(() => inicioDia(new Date()))
   const [datos, setDatos] = useState({ citas: [], bloqueos: [] })
@@ -71,14 +71,24 @@ export default function AgendaPanel() {
             <LogoAdriComponent className="h-9 w-9" />
             <span className="text-sm tracking-kicker text-acento">Agenda</span>
           </div>
-          <button
-            type="button"
-            onClick={logout}
-            className="flex items-center gap-1.5 text-sm text-hueso/70 transition-colors hover:text-acento"
-          >
-            <LogOut size={16} />
-            Salir
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={onAbrirHorario}
+              className="flex items-center gap-1.5 text-sm text-hueso/70 transition-colors hover:text-acento"
+            >
+              <Clock size={16} />
+              Horario
+            </button>
+            <button
+              type="button"
+              onClick={logout}
+              className="flex items-center gap-1.5 text-sm text-hueso/70 transition-colors hover:text-acento"
+            >
+              <LogOut size={16} />
+              Salir
+            </button>
+          </div>
         </div>
       </header>
 
@@ -149,7 +159,7 @@ export default function AgendaPanel() {
             onClick={() => setModal('bloquear')}
             className="flex flex-1 items-center justify-center gap-2 rounded-full border border-tinta/20 py-3 text-sm font-semibold text-tinta transition-colors hover:bg-tinta hover:text-hueso"
           >
-            <Ban size={18} /> Bloquear
+            <Ban size={18} /> Día libre
           </button>
         </div>
 
