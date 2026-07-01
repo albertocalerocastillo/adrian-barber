@@ -65,7 +65,7 @@ export async function cambiarEstado(id, estado) {
 export async function crearCitaManual(cita) {
   if (!supabase) return { ok: false, error: 'Supabase no configurado.' }
   const { error } = await supabase.from('citas').insert({
-    servicio_id: cita.servicioId ?? null,
+    // servicio_id (bigint FK) se omite: los servicios de la web usan id de texto.
     servicio_nombre: cita.servicioNombre,
     cliente_nombre: cita.clienteNombre,
     cliente_movil: cita.clienteMovil || '',
