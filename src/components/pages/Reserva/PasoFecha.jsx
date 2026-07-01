@@ -1,14 +1,21 @@
-import { ArrowLeft } from 'lucide-react'
-import { HORARIO } from '../../../data/horarios'
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import { proximosDias, fechaCorta, diaAbierto, mismoDia } from '../../../utils/fechas'
 
 const DIAS_A_MOSTRAR = 28
 
 /**
  * Paso 2: elegir fecha. Muestra los próximos días; los días sin horario
- * (cerrados) salen deshabilitados.
+ * (cerrados) salen deshabilitados. `horario` viene de Supabase (o estático).
  */
-export default function PasoFecha({ fecha, onElegir, onAtras }) {
+export default function PasoFecha({ fecha, horario, onElegir, onAtras }) {
+  if (!horario) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-12 text-tinta/50">
+        <Loader2 size={26} className="animate-spin" />
+        <p className="text-sm">Cargando horario…</p>
+      </div>
+    )
+  }
   const dias = proximosDias(DIAS_A_MOSTRAR)
 
   return (
@@ -19,7 +26,7 @@ export default function PasoFecha({ fecha, onElegir, onAtras }) {
 
       <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
         {dias.map((d) => {
-          const abierto = diaAbierto(d, HORARIO)
+          const abierto = diaAbierto(d, horario)
           const sel = fecha && mismoDia(fecha, d)
           const { diaSemana, dia, mes } = fechaCorta(d)
           return (

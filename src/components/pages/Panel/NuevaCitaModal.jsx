@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { X, Loader2 } from 'lucide-react'
 import { SERVICIOS } from '../../../data/servicios'
-import { HORARIO } from '../../../data/horarios'
 import { generarRejilla, sumarMin } from '../../../utils/disponibilidad'
 import { hora as fmtHora, inicioDia } from '../../../utils/fechas'
 import { listarCitas, listarBloqueos, crearCitaManual } from '../../../lib/panel'
+import { getHorario } from '../../../lib/config'
 
 /** Devuelve "YYYY-MM-DD" en local para el <input type=date>. */
 function aInputDate(d) {
@@ -24,16 +24,28 @@ export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
   const [horaISO, setHoraISO] = useState('')
   const [nombre, setNombre] = useState('')
   const [movil, setMovil] = useState('')
-  const [cargandoHuecos, setCargandoHuecos] = useState(false)
+  const [cargandoHuecos, setCargandoHuecos] = useState(true)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
+  const [horario, setHorario] = useState(null)
 
   const servicio = SERVICIOS.find((s) => s.id === servicioId)
 
-  // Recalcula huecos libres cuando cambia servicio o fecha.
+  // Carga el horario una vez.
+  useEffect(() => {
+    let vivo = true
+    getHorario().then((h) => {
+      if (vivo) setHorario(h)
+    })
+    return () => {
+      vivo = false
+    }
+  }, [])
+
+  // Recalcula huecos libres cuando cambia servicio, fecha u horario.
   useEffect(() => {
     const svc = SERVICIOS.find((s) => s.id === servicioId)
-    if (!svc) return
+    if (!svc || !horario) return
     const f = new Date(`${fechaStr}T00:00:00`)
     let vivo = true
     const desde = inicioDia(f)
@@ -44,7 +56,7 @@ export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
         const libres = generarRejilla({
           fecha: f,
           duracionMin: svc.duracion,
-          horario: HORARIO,
+          horario,
           citas: citas.filter((c) => c.estado !== 'cancelada'),
           bloqueos,
           ahora: new Date(0), // en el panel permitimos también hoy más temprano
@@ -58,7 +70,7 @@ export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
     return () => {
       vivo = false
     }
-  }, [servicioId, fechaStr])
+  }, [servicioId, fechaStr, horario])
 
   async function onGuardar(e) {
     e.preventDefault()

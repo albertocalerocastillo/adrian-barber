@@ -4,6 +4,7 @@ import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingCompo
 import RevealComponent from '../../ui/Reveal/RevealComponent'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
 import { HORARIO } from '../../../data/horarios'
+import { getHorario } from '../../../lib/config'
 import { estadoNegocio, diaHoy, formatoTramos } from '../../../utils/horario'
 
 /**
@@ -12,6 +13,7 @@ import { estadoNegocio, diaHoy, formatoTramos } from '../../../utils/horario'
  */
 export default function HorarioComponent() {
   const [ahora, setAhora] = useState(() => new Date())
+  const [horario, setHorario] = useState(HORARIO)
 
   // Refresca cada minuto para mantener el badge al día.
   useEffect(() => {
@@ -19,7 +21,18 @@ export default function HorarioComponent() {
     return () => clearInterval(id)
   }, [])
 
-  const estado = estadoNegocio(HORARIO, ahora)
+  // Carga el horario real (Supabase); mientras, muestra el estático.
+  useEffect(() => {
+    let vivo = true
+    getHorario().then((h) => {
+      if (vivo) setHorario(h)
+    })
+    return () => {
+      vivo = false
+    }
+  }, [])
+
+  const estado = estadoNegocio(horario, ahora)
   const hoy = diaHoy(ahora)
 
   return (
@@ -52,7 +65,7 @@ export default function HorarioComponent() {
         {/* Tabla de horario */}
         <RevealComponent delay={120} className="mt-8">
           <ul className="overflow-hidden rounded-2xl border border-hueso-200 bg-white">
-            {HORARIO.map((d) => {
+            {horario.map((d) => {
               const esHoy = d.dia === hoy
               const cerrado = d.tramos.length === 0
               return (

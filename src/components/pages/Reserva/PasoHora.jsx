@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { ArrowLeft, CalendarX, Loader2 } from 'lucide-react'
-import { HORARIO } from '../../../data/horarios'
 import { getCitas } from '../../../lib/citas'
 import { generarRejilla } from '../../../utils/disponibilidad'
 import { fechaLarga, hora as fmtHora, inicioDia } from '../../../utils/fechas'
@@ -10,7 +9,7 @@ import { fechaLarga, hora as fmtHora, inicioDia } from '../../../utils/fechas'
  * horas según la duración del servicio. Las horas libres son pulsables; las
  * ocupadas salen en gris/tachadas (sensación de agenda llena). Nunca pasado.
  */
-export default function PasoHora({ servicio, fecha, onElegir, onAtras }) {
+export default function PasoHora({ servicio, fecha, horario, onElegir, onAtras }) {
   const [cargando, setCargando] = useState(true)
   const [rejilla, setRejilla] = useState([])
 
@@ -25,7 +24,7 @@ export default function PasoHora({ servicio, fecha, onElegir, onAtras }) {
       const slots = generarRejilla({
         fecha,
         duracionMin: servicio.duracion,
-        horario: HORARIO,
+        horario,
         citas,
         ahora: new Date(),
         granularidadMin: 15,
@@ -37,7 +36,7 @@ export default function PasoHora({ servicio, fecha, onElegir, onAtras }) {
     return () => {
       vivo = false
     }
-  }, [servicio, fecha])
+  }, [servicio, fecha, horario])
 
   const manana = rejilla.filter((s) => s.inicio.getHours() < 14)
   const tarde = rejilla.filter((s) => s.inicio.getHours() >= 14)
