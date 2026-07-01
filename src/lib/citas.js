@@ -11,6 +11,7 @@
 // ════════════════════════════════════════════════════════════
 import { supabase } from './supabase'
 import { solapan } from '../utils/disponibilidad'
+import { avisarNuevaCita } from './aviso'
 
 const LS_KEY = 'as_citas'
 
@@ -83,6 +84,7 @@ export async function crearCita(cita) {
           : 'No se pudo guardar la cita. Inténtalo de nuevo.',
       }
     }
+    avisarNuevaCita(cita)
     return { ok: true }
   }
 
@@ -100,5 +102,6 @@ export async function crearCita(cita) {
   }
   citas.push({ ...registro, id: `local-${citas.length + 1}-${ini.getTime()}` })
   lsGuardar(citas)
+  avisarNuevaCita(cita)
   return { ok: true }
 }

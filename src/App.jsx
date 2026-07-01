@@ -6,8 +6,8 @@ import PanelComponent from './components/pages/Panel/PanelComponent'
 /**
  * Enrutado de la web.
  *  - /         → web pública (Fase 1)
- *  - /reserva  → reserva de citas online (Fase 2)
- *  - /panel    → panel del barbero (Fase 3)
+ *  - /reserva        → reserva de citas online (Fase 2)
+ *  - /admin (/panel) → panel del barbero (Fase 3)
  */
 export default function App() {
   return (
@@ -15,6 +15,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomeComponent />} />
         <Route path="/reserva" element={<ReservaComponent />} />
+        <Route path="/admin" element={<PanelComponent />} />
         <Route path="/panel" element={<PanelComponent />} />
       </Routes>
     </BrowserRouter>
