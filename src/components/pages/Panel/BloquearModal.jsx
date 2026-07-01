@@ -53,12 +53,15 @@ export default function BloquearModal({ fechaInicial, onClose, onCreado }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-4">
       <div className="w-full max-w-md rounded-t-2xl bg-hueso p-6 text-tinta sm:rounded-2xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold">Bloquear</h2>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="font-display text-xl font-bold">Día libre / cerrar</h2>
           <button type="button" onClick={onClose} aria-label="Cerrar" className="text-tinta/50 hover:text-tinta">
             <X size={22} />
           </button>
         </div>
+        <p className="mb-4 text-sm text-tinta/50">
+          Cierra un día entero o un rato (vacaciones, descanso). Esos huecos desaparecen de la web.
+        </p>
 
         <form onSubmit={onGuardar} className="space-y-3">
           <label className="block">
@@ -122,7 +125,7 @@ export default function BloquearModal({ fechaInicial, onClose, onCreado }) {
             className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-tinta py-3 font-semibold text-hueso transition-colors hover:bg-tinta-800 disabled:opacity-60"
           >
             {guardando && <Loader2 size={17} className="animate-spin" />}
-            Bloquear
+            Guardar día libre
           </button>
         </form>
       </div>

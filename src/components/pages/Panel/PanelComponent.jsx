@@ -1,13 +1,17 @@
+import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useAuth } from '../../../hooks/useAuth'
 import LoginPanel from './LoginPanel'
 import AgendaPanel from './AgendaPanel'
+import AjustesHorario from './AjustesHorario'
 
 /**
- * Panel del barbero (Fase 3). Si hay sesión → agenda; si no → login.
+ * Panel del barbero (Fase 3). Sin sesión → login. Con sesión → agenda u
+ * horario, según la sección elegida.
  */
 export default function PanelComponent() {
   const { sesion, cargando } = useAuth()
+  const [seccion, setSeccion] = useState('agenda')
 
   if (cargando) {
     return (
@@ -17,5 +21,11 @@ export default function PanelComponent() {
     )
   }
 
-  return sesion ? <AgendaPanel /> : <LoginPanel />
+  if (!sesion) return <LoginPanel />
+
+  return seccion === 'horario' ? (
+    <AjustesHorario onVolver={() => setSeccion('agenda')} />
+  ) : (
+    <AgendaPanel onAbrirHorario={() => setSeccion('horario')} />
+  )
 }

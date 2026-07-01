@@ -25,12 +25,14 @@ Supabase + Vercel (mismo que el proyecto `paco.vago`).
   URL `https://ydzeqcujmohupzcmhrbk.supabase.co`). SQL ejecutado (tablas +
   RLS + seed). Credenciales en `.env` LOCAL (gitignored). Verificado: lee
   servicios y RPC de huecos. ⬜ Pendiente: variables en Vercel + email (Resend).
-- 🚧 **Fase 3 — Panel del barbero** (`/panel`): ✅ login (Supabase Auth),
-  agenda del día con navegación, marcar atendida/cancelar, **nueva cita manual**
-  (migración + tel/presencial) y **bloquear** día/franja (vacaciones). Todo con
-  el mismo motor anti-solapes. ⬜ Pendiente: vista semana, CRUD servicios/horario,
-  crear el usuario de Adrián. Para probar: crear un usuario en Supabase →
-  Authentication → Add user (email+password).
+- 🚧 **Fase 3 — Panel del barbero** (`/admin`): ✅ login (Supabase Auth),
+  agenda **día y semana**, marcar atendida/deshacer/cancelar (con confirmación),
+  estado visible (Pendiente/Atendida), **nueva cita manual**, **"Día libre"**
+  (antes "bloquear", renombrado) y **sección "Horario"** para editar días y
+  tramos (se guarda en Supabase → la web recalcula huecos). El horario ahora se
+  lee de Supabase en reserva, panel y home (`lib/config.js`, fallback estático).
+  ⬜ Pendiente: editar servicios/precios desde el panel, usuario de Adrián.
+  Para probar: crear usuario en Supabase → Authentication → Add user.
 - ✅ **Aviso WhatsApp de cita nueva** (CallMeBot): al reservar por la web se manda
   un WhatsApp automático. Configurado en `.env` LOCAL con el móvil de PRUEBA de
   Alberto (apikey de CallMeBot). Verificado. ⬜ Pendiente: variables en Vercel y
