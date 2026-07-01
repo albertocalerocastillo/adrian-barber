@@ -62,7 +62,8 @@ export async function getCitas(desde, hasta) {
  */
 export async function crearCita(cita) {
   const registro = {
-    servicio_id: cita.servicioId,
+    // servicio_id (bigint FK) se omite: la web usa servicios estáticos con id
+    // de texto. Guardamos el nombre, que es lo que se muestra y da el histórico.
     servicio_nombre: cita.servicioNombre,
     cliente_nombre: cita.clienteNombre,
     cliente_movil: cita.clienteMovil,
