@@ -43,6 +43,14 @@ export function proximosDias(n, desde = new Date()) {
   })
 }
 
+/** Lunes 00:00 de la semana que contiene a `d`. */
+export function inicioSemana(d) {
+  const x = inicioDia(d)
+  const lunes = (x.getDay() + 6) % 7 // 0 = lunes
+  x.setDate(x.getDate() - lunes)
+  return x
+}
+
 /** ¿Mismo día natural? */
 export function mismoDia(a, b) {
   return (
