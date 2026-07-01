@@ -25,7 +25,12 @@ Supabase + Vercel (mismo que el proyecto `paco.vago`).
   URL `https://ydzeqcujmohupzcmhrbk.supabase.co`). SQL ejecutado (tablas +
   RLS + seed). Credenciales en `.env` LOCAL (gitignored). Verificado: lee
   servicios y RPC de huecos. ⬜ Pendiente: variables en Vercel + email (Resend).
-- ⬜ **Fase 3 — Panel del barbero** (login, agenda, bloqueos, CRUD servicios/horario).
+- 🚧 **Fase 3 — Panel del barbero** (`/panel`): ✅ login (Supabase Auth),
+  agenda del día con navegación, marcar atendida/cancelar, **nueva cita manual**
+  (migración + tel/presencial) y **bloquear** día/franja (vacaciones). Todo con
+  el mismo motor anti-solapes. ⬜ Pendiente: vista semana, CRUD servicios/horario,
+  crear el usuario de Adrián. Para probar: crear un usuario en Supabase →
+  Authentication → Add user (email+password).
 - ⬜ **Fase 4 (opcional)** — recordatorios, seña Stripe, multi-silla, reseñas.
 
 **Flujo de trabajo (IMPORTANTE):** trabajar en rama (no en master); `npm run build`
