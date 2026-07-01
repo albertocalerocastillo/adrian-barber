@@ -1,7 +1,43 @@
 # Estado del proyecto — A.S Barbería (Adrián Sánchez)
 
 > Documento de continuación. Si abres un chat nuevo, léelo para ponerte al día.
-> Última actualización: 26 junio 2026.
+> Última actualización: 1 julio 2026.
+
+## 🔖 HANDOFF (leer esto primero al abrir chat nuevo)
+
+**Estado:** el producto está COMPLETO y funcionando de punta a punta EN LOCAL:
+web pública (logo nuevo + colores), reserva online → Supabase (anti-doble-reserva),
+**aviso automático por WhatsApp** al reservar (CallMeBot), y panel `/admin` (login,
+agenda día/semana, atendida/deshacer/cancelar, nueva cita manual, "Día libre",
+y sección "Horario" editable). Verificado por el usuario (reserva real → WhatsApp
+recibido → aparece en panel y Supabase).
+
+**⚠️ IMPORTANTE — SIN DESPLEGAR:** hay ~12 commits en `main` LOCAL sin `git push`
+(a petición del usuario). La web ONLINE (Vercel) sigue mostrando la versión vieja
+y en modo localStorage (sin Supabase). El `.env` local (gitignored, en la máquina)
+tiene las claves de Supabase + CallMeBot (móvil de PRUEBA de Alberto).
+
+**PRÓXIMAS TAREAS (por orden):**
+1. **Editar servicios/precios desde el panel** (lo pidió el usuario). Hacerlo IGUAL
+   que la sección "Horario": añadir a `lib/config.js` un `getServicios()` (lee de
+   Supabase tabla `servicios`, mapea `duracion_min`→`duracion`; fallback al estático
+   `data/servicios.js`) + CRUD (crear/actualizar/borrar). Crear
+   `components/pages/Panel/AjustesServicios.jsx` (lista + editar nombre/duración/
+   precio/activo + añadir/borrar), añadir sección 'servicios' en `PanelComponent`
+   y un botón "Servicios" en la cabecera de `AgendaPanel`. Que `ReservaComponent`
+   (→PasoServicio), `NuevaCitaModal` y la home `ServiciosComponent` lean de Supabase.
+2. **Subir todo online:** `git push` (pedir OK) + en Vercel → Settings → Environment
+   Variables añadir `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_CALLMEBOT_PHONE`,
+   `VITE_CALLMEBOT_APIKEY` (valores en el `.env` local) y redeploy.
+3. **Datos reales de Adrián:** horario/duraciones ya se editan desde el panel; falta
+   su **móvil** para el aviso (que active CallMeBot en su tel) y su **email**.
+4. **Producción del aviso:** mover la apikey de CallMeBot a una Edge Function (ahora
+   va en el frontend vía VITE_, aceptable para pruebas).
+5. Crear el **usuario de Adrián** en Supabase → Authentication (Alberto ya creó uno de prueba).
+
+**Datos clave:** Supabase URL `https://ydzeqcujmohupzcmhrbk.supabase.co`, org
+"A.S Barbería". Panel en `/admin`. Aviso WhatsApp de prueba al 34684059380.
+SQL completo en `supabase/setup-completo.sql`.
 
 ## ⚡ RESUMEN ACTUAL (para retomar rápido)
 
