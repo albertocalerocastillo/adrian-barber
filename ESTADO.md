@@ -21,7 +21,10 @@ Supabase + Vercel (mismo que el proyecto `paco.vago`).
   `utils/disponibilidad.js` (sin solapes, sin pasado; verificado). Capa de datos
   `lib/citas.js` funciona con **Supabase si está configurado, o localStorage** si no
   (para probar ya). SQL listo en `supabase/` (con exclusion constraint anti-doble-reserva).
-  ⬜ Pendiente: crear proyecto Supabase, ejecutar SQL, poner credenciales (.env) y email.
+  ✅ **Supabase conectado** (org "A.S Barbería", proyecto `adrian-barber`,
+  URL `https://ydzeqcujmohupzcmhrbk.supabase.co`). SQL ejecutado (tablas +
+  RLS + seed). Credenciales en `.env` LOCAL (gitignored). Verificado: lee
+  servicios y RPC de huecos. ⬜ Pendiente: variables en Vercel + email (Resend).
 - ⬜ **Fase 3 — Panel del barbero** (login, agenda, bloqueos, CRUD servicios/horario).
 - ⬜ **Fase 4 (opcional)** — recordatorios, seña Stripe, multi-silla, reseñas.
 
