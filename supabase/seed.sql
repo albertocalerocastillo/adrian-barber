@@ -8,8 +8,8 @@
 -- ── Servicios ──
 insert into servicios (nombre, descripcion, duracion_min, precio, icono, destacado, orden) values
   ('Corte', 'Incluye cejas, barba y diseños.', 30, 6, 'Scissors', true, 1),
-  ('Mechas + Corte', 'Mechas y corte con acabado y peinado.', 75, 17, 'Sparkles', false, 2),
-  ('Tinte blanco + Corte', 'Coloración en blanco más corte completo.', 60, 20, 'Palette', false, 3);
+  ('Mechas + Corte', 'Mechas y corte con acabado y peinado.', 75, 17, 'Paintbrush', false, 2),
+  ('Tinte blanco + Corte', 'Coloración en blanco más corte completo.', 60, 20, 'PaintBucket', false, 3);
 
 -- ── Horario (0=domingo … 6=sábado) ──
 insert into horario (dia_semana, hora_inicio, hora_fin) values
