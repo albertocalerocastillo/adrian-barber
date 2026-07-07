@@ -42,10 +42,10 @@ export default function SobreMiComponent() {
 
           <RevealComponent delay={100}>
             <p className="mt-6 text-base leading-relaxed text-hueso/75">
-              Barbero en {NEGOCIO.localidad}. Me gusta el corte clásico tanto
-              como las tendencias, pero sobre todo me gusta que salgas de la
-              silla con la cabeza alta. Aquí no hay líneas de montaje: hay tiempo,
-              conversación y trabajo bien hecho.
+              Barbero y peluquero en {NEGOCIO.localidad} ({NEGOCIO.provincia}). Me
+              gusta el corte clásico tanto como las tendencias, pero sobre todo me
+              gusta que salgas de la silla con la cabeza alta. Aquí no hay líneas de
+              montaje: hay tiempo, conversación y trabajo bien hecho.
             </p>
           </RevealComponent>
 

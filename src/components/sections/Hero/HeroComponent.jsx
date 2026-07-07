@@ -31,20 +31,26 @@ export default function HeroComponent() {
           {NEGOCIO.ciudad}
         </p>
 
-        {/* Emblema (logo oficial) */}
-        <h1 aria-label={`${NEGOCIO.nombreCompleto} — ${NEGOCIO.barbero}`}>
+        {/* Emblema (logo oficial). El H1 lleva texto real (oculto en pantalla)
+            con las palabras clave para SEO; visualmente manda el logo. */}
+        <h1>
+          <span className="sr-only">
+            {NEGOCIO.nombreCompleto} en {NEGOCIO.ciudad} — {NEGOCIO.barbero}
+          </span>
           <img
             src="/logo-adri.jpg"
             alt={`${NEGOCIO.nombreCompleto} — ${NEGOCIO.barbero}`}
             className="w-64 max-w-[80vw] rounded-2xl shadow-2xl shadow-black/50 ring-1 ring-acento/20 sm:w-72 md:w-80"
             fetchPriority="high"
+            aria-hidden="true"
           />
         </h1>
 
         {/* Subtítulo */}
         <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-hueso/70 sm:text-lg">
-          Cortes con carácter, barba a navaja y un buen rato en la silla.
-          De {NEGOCIO.barbero.split(' ').slice(0, 2).join(' ')}, en el corazón de {NEGOCIO.localidad}.
+          Peluquería y barbería en {NEGOCIO.ciudad}. Cortes con carácter, barba a
+          navaja y un buen rato en la silla, de la mano de{' '}
+          {NEGOCIO.barbero.split(' ').slice(0, 2).join(' ')}.
         </p>
 
         {/* CTAs */}

@@ -20,6 +20,14 @@ export default function UbicacionComponent() {
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <SectionHeadingComponent kicker="Cómo llegar" titulo="Dónde estamos" claro />
 
+        <RevealComponent className="mx-auto mt-5 max-w-2xl text-center">
+          <p className="text-base leading-relaxed text-hueso/70">
+            {NEGOCIO.nombreCompleto} está en {NEGOCIO.localidad} ({NEGOCIO.provincia}),
+            a un paso de San José de la Rinconada. Ven a por tu corte, arreglo de
+            barba, mechas o tinte — o pide tu cita online.
+          </p>
+        </RevealComponent>
+
         <div className="mt-12 grid gap-8 md:grid-cols-2">
           {/* Datos */}
           <RevealComponent className="flex flex-col justify-center">
