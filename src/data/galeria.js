@@ -23,17 +23,17 @@ const fotosLocales = Object.entries(modulos)
   .map(([ruta, url]) => ({
     id: ruta,
     src: url,
-    alt: 'Trabajo de A.S Peluquería y Barbería',
+    alt: 'Corte de pelo y barba en A.S Peluquería y Barbería, La Rinconada (Sevilla)',
   }))
 
 // Placeholders (solo si aún no hay fotos reales en src/assets/galeria/).
 const PLACEHOLDERS = [
-  { id: 'ph1', src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=900&q=80', alt: 'Corte degradado clásico', alto: 'tall' },
-  { id: 'ph2', src: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=900&q=80', alt: 'Arreglo de barba con navaja' },
-  { id: 'ph3', src: 'https://images.unsplash.com/photo-1621607512214-68297480165e?w=900&q=80', alt: 'Detalle de degradado lateral' },
-  { id: 'ph4', src: 'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=900&q=80', alt: 'Corte moderno con textura', alto: 'tall' },
-  { id: 'ph5', src: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=900&q=80', alt: 'Afeitado clásico con toalla caliente' },
-  { id: 'ph6', src: 'https://images.unsplash.com/photo-1517832606299-7ae9b720a186?w=900&q=80', alt: 'Acabado peinado y perfilado' },
+  { id: 'ph1', src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=900&q=80', alt: 'Corte de pelo degradado clásico en barbería de La Rinconada, Sevilla', alto: 'tall' },
+  { id: 'ph2', src: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=900&q=80', alt: 'Arreglo de barba a navaja en A.S Peluquería y Barbería, La Rinconada' },
+  { id: 'ph3', src: 'https://images.unsplash.com/photo-1621607512214-68297480165e?w=900&q=80', alt: 'Detalle de degradado lateral, barbería en La Rinconada (Sevilla)' },
+  { id: 'ph4', src: 'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=900&q=80', alt: 'Corte de pelo moderno con textura en A.S Peluquería y Barbería', alto: 'tall' },
+  { id: 'ph5', src: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=900&q=80', alt: 'Afeitado clásico con toalla caliente, barbería en La Rinconada' },
+  { id: 'ph6', src: 'https://images.unsplash.com/photo-1517832606299-7ae9b720a186?w=900&q=80', alt: 'Peinado y perfilado, peluquería en La Rinconada (Sevilla)' },
 ]
 
 export const GALERIA = fotosLocales.length ? fotosLocales : PLACEHOLDERS
