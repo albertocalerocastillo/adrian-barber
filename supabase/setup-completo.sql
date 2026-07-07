@@ -102,8 +102,8 @@ grant execute on function citas_ocupadas(timestamptz, timestamptz) to anon, auth
 -- ─── DATOS DE EJEMPLO (precios reales; duración/horario a ajustar) ──
 insert into servicios (nombre, descripcion, duracion_min, precio, icono, destacado, orden) values
   ('Corte', 'Incluye cejas, barba y diseños.', 30, 6, 'Scissors', true, 1),
-  ('Mechas + Corte', 'Mechas y corte con acabado y peinado.', 75, 17, 'Sparkles', false, 2),
-  ('Tinte blanco + Corte', 'Coloración en blanco más corte completo.', 60, 20, 'Palette', false, 3);
+  ('Mechas + Corte', 'Mechas y corte con acabado y peinado.', 75, 17, 'Paintbrush', false, 2),
+  ('Tinte blanco + Corte', 'Coloración en blanco más corte completo.', 60, 20, 'PaintBucket', false, 3);
 
 insert into horario (dia_semana, hora_inicio, hora_fin) values
   (1, '10:00', '14:00'), (1, '17:00', '21:00'),

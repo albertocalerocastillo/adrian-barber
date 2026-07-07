@@ -4,6 +4,8 @@
 import {
   Scissors,
   UserRound,
+  Paintbrush,
+  PaintBucket,
   Sparkles,
   Palette,
   Droplet,
@@ -20,6 +22,8 @@ import {
 export const ICONOS = {
   Scissors,
   UserRound,
+  Paintbrush,
+  PaintBucket,
   Sparkles,
   Palette,
   Droplet,

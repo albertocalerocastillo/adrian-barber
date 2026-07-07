@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   ChevronLeft, ChevronRight, Plus, Ban, LogOut, Phone, Check, X,
-  CalendarDays, Loader2, Trash2, RotateCcw, Clock,
+  CalendarDays, Loader2, Trash2, RotateCcw, Clock, Scissors,
 } from 'lucide-react'
 import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
 import WhatsAppIcon from '../../ui/WhatsAppIcon/WhatsAppIcon'
@@ -19,7 +19,7 @@ import {
  * Agenda del barbero con dos vistas: DÍA (detalle + acciones) y SEMANA
  * (resumen de los 7 días). Añadir cita a mano y bloquear ratos.
  */
-export default function AgendaPanel({ onAbrirHorario }) {
+export default function AgendaPanel({ onAbrirHorario, onAbrirServicios }) {
   const [vista, setVista] = useState('dia') // 'dia' | 'semana'
   const [dia, setDia] = useState(() => inicioDia(new Date()))
   const [datos, setDatos] = useState({ citas: [], bloqueos: [] })
@@ -72,6 +72,14 @@ export default function AgendaPanel({ onAbrirHorario }) {
             <span className="text-sm tracking-kicker text-acento">Agenda</span>
           </div>
           <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={onAbrirServicios}
+              className="flex items-center gap-1.5 text-sm text-hueso/70 transition-colors hover:text-acento"
+            >
+              <Scissors size={16} />
+              Servicios
+            </button>
             <button
               type="button"
               onClick={onAbrirHorario}
