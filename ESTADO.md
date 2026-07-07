@@ -49,6 +49,16 @@ La idea aún NO se le ha enseñado a Adrián (Alberto se lo comenta esta noche).
    va en el frontend vía VITE_, aceptable para pruebas).
 7. Crear el **usuario de Adrián** en Supabase → Authentication (Alberto ya creó uno de prueba).
 
+**SEO (estado):** on-page HECHO (7 jul) — H1 con texto real, "peluquería/barbería
+La Rinconada/Sevilla" en Hero/SobreMi/Ubicación, alt de galería, title con
+"Peluquería", canonical, og:url, Twitter Card, código postal en JSON-LD (HairSalon).
+Search Console ya tenía la propiedad verificada (`adrian-barber.vercel.app`); Alberto
+solicitó indexación + sitemap. ⬜ Falta (lo dirá Alberto a Adrián): en su **ficha de
+Google** poner categorías **Peluquería + Barbería** (ahora solo "Peluquería" → es lo
+que MÁS mueve el ranking local), rellenar servicios/fotos, y enlazar la web.
+Pendiente menor: geo (lat/lng) exacto en el JSON-LD. Se sigue en URL de Vercel (sin
+dominio propio de momento; Adrián lo pagará si la web da fruto).
+
 **Datos clave:** Supabase URL `https://ydzeqcujmohupzcmhrbk.supabase.co`, org
 "A.S Barbería". Panel en `/admin`. Aviso WhatsApp de prueba al 34684059380.
 SQL completo en `supabase/setup-completo.sql`.
