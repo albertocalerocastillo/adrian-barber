@@ -106,9 +106,9 @@ insert into servicios (nombre, descripcion, duracion_min, precio, icono, destaca
   ('Tinte blanco + Corte', 'Coloración en blanco más corte completo.', 60, 20, 'PaintBucket', false, 3);
 
 insert into horario (dia_semana, hora_inicio, hora_fin) values
-  (1, '10:00', '14:00'), (1, '17:00', '21:00'),
-  (2, '10:00', '14:00'), (2, '17:00', '21:00'),
-  (3, '10:00', '14:00'), (3, '17:00', '21:00'),
-  (4, '10:00', '14:00'), (4, '17:00', '21:00'),
-  (5, '10:00', '14:00'), (5, '17:00', '21:00'),
-  (6, '10:00', '14:00');
+  (1, '15:00', '22:00'),
+  (2, '10:00', '22:00'),
+  (3, '10:00', '22:00'),
+  (4, '10:00', '22:00'),
+  (5, '10:00', '22:00'),
+  (6, '10:00', '16:00');
