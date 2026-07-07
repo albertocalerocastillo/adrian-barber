@@ -7,7 +7,7 @@ import PasoFecha from './PasoFecha'
 import PasoHora from './PasoHora'
 import PasoDatos from './PasoDatos'
 import Confirmacion from './Confirmacion'
-import { getHorario } from '../../../lib/config'
+import { getHorario, getServicios } from '../../../lib/config'
 
 const PASOS = ['Servicio', 'Fecha', 'Hora', 'Tus datos']
 
@@ -22,12 +22,16 @@ export default function ReservaComponent() {
   const [fecha, setFecha] = useState(null)
   const [hora, setHora] = useState(null) // Date con la hora de inicio
   const [horario, setHorario] = useState(null)
+  const [servicios, setServicios] = useState(null)
 
-  // Carga el horario (de Supabase o estático) una vez.
+  // Carga horario y servicios (de Supabase o estático) una vez.
   useEffect(() => {
     let vivo = true
     getHorario().then((h) => {
       if (vivo) setHorario(h)
+    })
+    getServicios().then((ss) => {
+      if (vivo) setServicios(ss.filter((s) => s.activo !== false))
     })
     return () => {
       vivo = false
@@ -109,6 +113,7 @@ export default function ReservaComponent() {
         {/* Contenido del paso */}
         {paso === 1 && (
           <PasoServicio
+            servicios={servicios}
             servicio={servicio}
             onElegir={(s) => {
               setServicio(s)

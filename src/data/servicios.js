@@ -24,7 +24,7 @@ export const SERVICIOS = [
     descripcion: 'Mechas y corte en una misma sesión, con acabado y peinado.',
     duracion: 75,
     precio: 17,
-    icono: 'Sparkles',
+    icono: 'Paintbrush',
     destacado: false,
   },
   {
@@ -33,7 +33,7 @@ export const SERVICIOS = [
     descripcion: 'Coloración en blanco más corte completo.',
     duracion: 60,
     precio: 20,
-    icono: 'Palette',
+    icono: 'PaintBucket',
     destacado: false,
   },
 ]

@@ -1,22 +1,38 @@
+import { useState, useEffect } from 'react'
 import { Clock } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
 import RevealComponent from '../../ui/Reveal/RevealComponent'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
-import { SERVICIOS, PROMO } from '../../../data/servicios'
+import { PROMO } from '../../../data/servicios'
+import { getServicios } from '../../../lib/config'
 import { ICONOS } from '../../../theme/icons'
 
 /**
  * Listado de servicios con icono, descripción, duración y precio.
  * Tarjetas claras sobre fondo hueso; las destacadas llevan borde de acento.
+ * Los servicios se leen de Supabase (o del estático como fallback) y se
+ * muestran solo los activos.
  */
 export default function ServiciosComponent() {
+  const [servicios, setServicios] = useState([])
+
+  useEffect(() => {
+    let vivo = true
+    getServicios().then((ss) => {
+      if (vivo) setServicios(ss.filter((s) => s.activo !== false))
+    })
+    return () => {
+      vivo = false
+    }
+  }, [])
+
   return (
     <section id="servicios" className="bg-hueso py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <SectionHeadingComponent kicker="La carta" titulo="Servicios" />
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICIOS.map((s, i) => {
+          {servicios.map((s, i) => {
             const Icono = ICONOS[s.icono] || ICONOS.Scissors
             return (
               <RevealComponent key={s.id} delay={i * 70}>

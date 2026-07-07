@@ -4,10 +4,11 @@ import { useAuth } from '../../../hooks/useAuth'
 import LoginPanel from './LoginPanel'
 import AgendaPanel from './AgendaPanel'
 import AjustesHorario from './AjustesHorario'
+import AjustesServicios from './AjustesServicios'
 
 /**
- * Panel del barbero (Fase 3). Sin sesión → login. Con sesión → agenda u
- * horario, según la sección elegida.
+ * Panel del barbero (Fase 3). Sin sesión → login. Con sesión → agenda,
+ * horario o servicios, según la sección elegida.
  */
 export default function PanelComponent() {
   const { sesion, cargando } = useAuth()
@@ -23,9 +24,15 @@ export default function PanelComponent() {
 
   if (!sesion) return <LoginPanel />
 
-  return seccion === 'horario' ? (
-    <AjustesHorario onVolver={() => setSeccion('agenda')} />
-  ) : (
-    <AgendaPanel onAbrirHorario={() => setSeccion('horario')} />
+  const volver = () => setSeccion('agenda')
+
+  if (seccion === 'horario') return <AjustesHorario onVolver={volver} />
+  if (seccion === 'servicios') return <AjustesServicios onVolver={volver} />
+
+  return (
+    <AgendaPanel
+      onAbrirHorario={() => setSeccion('horario')}
+      onAbrirServicios={() => setSeccion('servicios')}
+    />
   )
 }

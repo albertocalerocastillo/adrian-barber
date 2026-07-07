@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
 import { X, Loader2 } from 'lucide-react'
-import { SERVICIOS } from '../../../data/servicios'
 import { generarRejilla, sumarMin } from '../../../utils/disponibilidad'
 import { hora as fmtHora, inicioDia } from '../../../utils/fechas'
 import { listarCitas, listarBloqueos, crearCitaManual } from '../../../lib/panel'
-import { getHorario } from '../../../lib/config'
+import { getHorario, getServicios } from '../../../lib/config'
 
 /** Devuelve "YYYY-MM-DD" en local para el <input type=date>. */
 function aInputDate(d) {
@@ -18,7 +17,8 @@ function aInputDate(d) {
  * teléfono/presencial.
  */
 export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
-  const [servicioId, setServicioId] = useState(SERVICIOS[0]?.id || '')
+  const [servicios, setServicios] = useState([])
+  const [servicioId, setServicioId] = useState('')
   const [fechaStr, setFechaStr] = useState(aInputDate(fechaInicial || new Date()))
   const [rejilla, setRejilla] = useState([])
   const [horaISO, setHoraISO] = useState('')
@@ -29,13 +29,19 @@ export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
   const [error, setError] = useState('')
   const [horario, setHorario] = useState(null)
 
-  const servicio = SERVICIOS.find((s) => s.id === servicioId)
+  const servicio = servicios.find((s) => String(s.id) === String(servicioId))
 
-  // Carga el horario una vez.
+  // Carga horario y servicios una vez (para citas manuales se ofrecen los activos).
   useEffect(() => {
     let vivo = true
     getHorario().then((h) => {
       if (vivo) setHorario(h)
+    })
+    getServicios().then((ss) => {
+      if (!vivo) return
+      const activos = ss.filter((s) => s.activo !== false)
+      setServicios(activos)
+      setServicioId(activos[0]?.id ?? '')
     })
     return () => {
       vivo = false
@@ -44,7 +50,7 @@ export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
 
   // Recalcula huecos libres cuando cambia servicio, fecha u horario.
   useEffect(() => {
-    const svc = SERVICIOS.find((s) => s.id === servicioId)
+    const svc = servicios.find((s) => String(s.id) === String(servicioId))
     if (!svc || !horario) return
     const f = new Date(`${fechaStr}T00:00:00`)
     let vivo = true
@@ -70,7 +76,7 @@ export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
     return () => {
       vivo = false
     }
-  }, [servicioId, fechaStr, horario])
+  }, [servicioId, fechaStr, horario, servicios])
 
   async function onGuardar(e) {
     e.preventDefault()
@@ -117,7 +123,7 @@ export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
               onChange={(e) => setServicioId(e.target.value)}
               className="w-full rounded-xl border border-hueso-200 bg-white px-3 py-2.5 outline-none focus:border-acento"
             >
-              {SERVICIOS.map((s) => (
+              {servicios.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.nombre} · {s.duracion} min · {s.precio} €
                 </option>

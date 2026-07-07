@@ -18,14 +18,18 @@ y en modo localStorage (sin Supabase). El `.env` local (gitignored, en la máqui
 tiene las claves de Supabase + CallMeBot (móvil de PRUEBA de Alberto).
 
 **PRÓXIMAS TAREAS (por orden):**
-1. **Editar servicios/precios desde el panel** (lo pidió el usuario). Hacerlo IGUAL
-   que la sección "Horario": añadir a `lib/config.js` un `getServicios()` (lee de
-   Supabase tabla `servicios`, mapea `duracion_min`→`duracion`; fallback al estático
-   `data/servicios.js`) + CRUD (crear/actualizar/borrar). Crear
-   `components/pages/Panel/AjustesServicios.jsx` (lista + editar nombre/duración/
-   precio/activo + añadir/borrar), añadir sección 'servicios' en `PanelComponent`
-   y un botón "Servicios" en la cabecera de `AgendaPanel`. Que `ReservaComponent`
-   (→PasoServicio), `NuevaCitaModal` y la home `ServiciosComponent` lean de Supabase.
+1. ✅ **HECHO — Editar servicios/precios desde el panel.** `lib/config.js` tiene
+   `getServicios()` (lee tabla `servicios`, mapea `duracion_min`→`duracion`, fallback
+   al estático `data/servicios.js`) y `guardarServicios()` (full-replace igual que
+   `guardarHorario`, fija `orden` por posición). Nuevo
+   `components/pages/Panel/AjustesServicios.jsx` (editar nombre/descripción/duración/
+   precio/icono/activo/destacado + añadir/borrar). Sección `'servicios'` en
+   `PanelComponent` + botón "Servicios" en la cabecera de `AgendaPanel`.
+   `ReservaComponent`→`PasoServicio`, `NuevaCitaModal` y la home `ServiciosComponent`
+   ya leen de Supabase (solo activos en reserva/home). Verificado con `npm run
+   build` + `npm run lint` (limpios). ⬜ Falta verificar en vivo en el panel logueado.
+   Nota: las citas guardan `servicio_nombre` (no el id), así que regenerar ids al
+   guardar no afecta al histórico.
 2. **Subir todo online:** `git push` (pedir OK) + en Vercel → Settings → Environment
    Variables añadir `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_CALLMEBOT_PHONE`,
    `VITE_CALLMEBOT_APIKEY` (valores en el `.env` local) y redeploy.
@@ -67,7 +71,9 @@ Supabase + Vercel (mismo que el proyecto `paco.vago`).
   (antes "bloquear", renombrado) y **sección "Horario"** para editar días y
   tramos (se guarda en Supabase → la web recalcula huecos). El horario ahora se
   lee de Supabase en reserva, panel y home (`lib/config.js`, fallback estático).
-  ⬜ Pendiente: editar servicios/precios desde el panel, usuario de Adrián.
+  ✅ **Sección "Servicios"** en el panel (editar nombre/descripción/duración/
+  precio/icono/activo/destacado + añadir/borrar), y la reserva/home los leen de
+  Supabase. ⬜ Pendiente: usuario de Adrián.
   Para probar: crear usuario en Supabase → Authentication → Add user.
 - ✅ **Aviso WhatsApp de cita nueva** (CallMeBot): al reservar por la web se manda
   un WhatsApp automático. Configurado en `.env` LOCAL con el móvil de PRUEBA de

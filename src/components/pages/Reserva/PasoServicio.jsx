@@ -1,12 +1,20 @@
-import { Clock, ChevronRight } from 'lucide-react'
-import { SERVICIOS } from '../../../data/servicios'
+import { Clock, ChevronRight, Loader2 } from 'lucide-react'
 import { ICONOS } from '../../../theme/icons'
 
 /**
  * Paso 1: elegir servicio. Muestra los servicios activos con duración y precio.
+ * Recibe la lista ya filtrada (activos) desde ReservaComponent; `null` mientras
+ * se cargan de Supabase.
  */
-export default function PasoServicio({ servicio, onElegir }) {
-  const activos = SERVICIOS.filter((s) => s.activo !== false)
+export default function PasoServicio({ servicios, servicio, onElegir }) {
+  if (servicios === null) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-16 text-tinta/50">
+        <Loader2 size={26} className="animate-spin" />
+        <p className="text-sm">Cargando servicios…</p>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -15,7 +23,7 @@ export default function PasoServicio({ servicio, onElegir }) {
       </h2>
 
       <div className="space-y-3">
-        {activos.map((s) => {
+        {servicios.map((s) => {
           const Icono = ICONOS[s.icono] || ICONOS.Scissors
           const sel = servicio?.id === s.id
           return (
