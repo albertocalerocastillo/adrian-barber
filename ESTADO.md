@@ -5,17 +5,22 @@
 
 ## 🔖 HANDOFF (leer esto primero al abrir chat nuevo)
 
-**Estado:** el producto está COMPLETO y funcionando de punta a punta EN LOCAL:
-web pública (logo nuevo + colores), reserva online → Supabase (anti-doble-reserva),
-**aviso automático por WhatsApp** al reservar (CallMeBot), y panel `/admin` (login,
-agenda día/semana, atendida/deshacer/cancelar, nueva cita manual, "Día libre",
-y sección "Horario" editable). Verificado por el usuario (reserva real → WhatsApp
-recibido → aparece en panel y Supabase).
+**Estado:** el producto está COMPLETO y DESPLEGADO ONLINE, funcionando de punta a
+punta: web pública (logo nuevo + colores), reserva online → Supabase
+(anti-doble-reserva), **aviso automático por WhatsApp** al reservar (CallMeBot), y
+panel `/admin` (login, agenda día/semana, atendida/deshacer/cancelar, nueva cita
+manual, "Día libre", y secciones "Horario" y **"Servicios"** editables). Verificado
+por el usuario en local (reserva real → WhatsApp recibido → aparece en panel y
+Supabase).
 
-**⚠️ IMPORTANTE — SIN DESPLEGAR:** hay ~12 commits en `main` LOCAL sin `git push`
-(a petición del usuario). La web ONLINE (Vercel) sigue mostrando la versión vieja
-y en modo localStorage (sin Supabase). El `.env` local (gitignored, en la máquina)
-tiene las claves de Supabase + CallMeBot (móvil de PRUEBA de Alberto).
+**✅ YA DESPLEGADO (7 jul 2026):** todo subido a `main` (commit `73e5eed`) y en vivo
+en **https://adrian-barber.vercel.app** (Production, Ready). Las 4 variables de
+entorno están puestas en Vercel → Production (`VITE_SUPABASE_URL`,
+`VITE_SUPABASE_ANON_KEY`, `VITE_CALLMEBOT_PHONE`, `VITE_CALLMEBOT_APIKEY`).
+Verificado desde CLI que el bundle online incluye Supabase + CallMeBot (ya no es
+modo localStorage). El `.env` local (gitignored) tiene los mismos valores. El
+aviso WhatsApp sigue apuntando al **móvil de PRUEBA de Alberto** (34684059380).
+La idea aún NO se le ha enseñado a Adrián (Alberto se lo comenta esta noche).
 
 **PRÓXIMAS TAREAS (por orden):**
 1. ✅ **HECHO — Editar servicios/precios desde el panel.** `lib/config.js` tiene
@@ -23,21 +28,26 @@ tiene las claves de Supabase + CallMeBot (móvil de PRUEBA de Alberto).
    al estático `data/servicios.js`) y `guardarServicios()` (full-replace igual que
    `guardarHorario`, fija `orden` por posición). Nuevo
    `components/pages/Panel/AjustesServicios.jsx` (editar nombre/descripción/duración/
-   precio/icono/activo/destacado + añadir/borrar). Sección `'servicios'` en
-   `PanelComponent` + botón "Servicios" en la cabecera de `AgendaPanel`.
-   `ReservaComponent`→`PasoServicio`, `NuevaCitaModal` y la home `ServiciosComponent`
-   ya leen de Supabase (solo activos en reserva/home). Verificado con `npm run
-   build` + `npm run lint` (limpios). ⬜ Falta verificar en vivo en el panel logueado.
-   Nota: las citas guardan `servicio_nombre` (no el id), así que regenerar ids al
-   guardar no afecta al histórico.
-2. **Subir todo online:** `git push` (pedir OK) + en Vercel → Settings → Environment
-   Variables añadir `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_CALLMEBOT_PHONE`,
-   `VITE_CALLMEBOT_APIKEY` (valores en el `.env` local) y redeploy.
-3. **Datos reales de Adrián:** horario/duraciones ya se editan desde el panel; falta
-   su **móvil** para el aviso (que active CallMeBot en su tel) y su **email**.
-4. **Producción del aviso:** mover la apikey de CallMeBot a una Edge Function (ahora
+   precio/activo + añadir/borrar; el icono y "destacado" NO se editan, se fijan en
+   código/seed). Sección `'servicios'` en `PanelComponent` + botón "Servicios" en
+   `AgendaPanel`. Reserva/panel/home ya leen de Supabase (solo activos en
+   reserva/home). Iconos más claros: Mechas→`Paintbrush`, Tinte→`PaintBucket`
+   (aplicado en BD con `supabase/migracion-iconos.sql`, verificado). Nota: las citas
+   guardan `servicio_nombre` (no el id), así que regenerar ids al guardar no afecta
+   al histórico.
+2. ✅ **HECHO — Desplegado online** (ver bloque de arriba).
+3. **Datos reales de Adrián** (cuando diga que sí): su **móvil** + activar CallMeBot
+   en su tel para obtener SU apikey → cambiar `VITE_CALLMEBOT_PHONE` +
+   `VITE_CALLMEBOT_APIKEY` en Vercel (van en par). Su **email**. Confirmar
+   precios/duraciones/horario reales (editables desde el panel).
+4. **Dominio propio** (recomendado): comprar `asbarberia.es` o similar (~10 €/año) y
+   conectarlo en Vercel ANTES de enlazar la web en su ficha de Google.
+5. **Google:** su ficha "A.S Peluquería y Barbería" (5,0⭐, 56 reseñas) NO tiene botón
+   "Sitio web". Cuando haya URL definitiva, Adrián la añade en su Perfil de Empresa
+   de Google (Editar perfil → Sitio web); si no es dueño, reclamar y verificar.
+6. **Producción del aviso:** mover la apikey de CallMeBot a una Edge Function (ahora
    va en el frontend vía VITE_, aceptable para pruebas).
-5. Crear el **usuario de Adrián** en Supabase → Authentication (Alberto ya creó uno de prueba).
+7. Crear el **usuario de Adrián** en Supabase → Authentication (Alberto ya creó uno de prueba).
 
 **Datos clave:** Supabase URL `https://ydzeqcujmohupzcmhrbk.supabase.co`, org
 "A.S Barbería". Panel en `/admin`. Aviso WhatsApp de prueba al 34684059380.
