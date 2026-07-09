@@ -32,6 +32,8 @@ export default function GaleriaComponent() {
                 <img
                   src={foto.src}
                   alt={foto.alt}
+                  width={foto.w}
+                  height={foto.h}
                   loading="lazy"
                   className="block h-auto w-full transition-transform duration-500 group-hover:scale-105"
                 />
