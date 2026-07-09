@@ -23,7 +23,7 @@ export const INSTAGRAM_URL = 'https://www.instagram.com/adriansanchee/'
 export const INSTAGRAM_PERSONAL = 'adriansanchezarandaa1'
 
 // Mensaje por defecto para el enlace de WhatsApp (Fase 1; en Fase 2 reservará online)
-export const WHATSAPP_MENSAJE = 'Hola Adrián, me gustaría pedir una cita 💈'
+export const WHATSAPP_MENSAJE = 'Hola Adrián, me gustaría pedir una cita'
 
 // Enlace de Google Maps (placeholder: se afina con la ubicación exacta de Adrián)
 export const MAPS_QUERY = encodeURIComponent('C/ 28 de Febrero 2, La Rinconada, Sevilla')

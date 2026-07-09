@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { CalendarCheck } from 'lucide-react'
 import WhatsAppIcon from '../WhatsAppIcon/WhatsAppIcon'
+import { RESERVAS_ONLINE } from '../../../data/features'
 import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
 
 /**
@@ -9,8 +10,8 @@ import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
  * Aparecen tras desplazar un poco la página para no tapar el hero.
  * Cómodas en móvil, que es donde más se usará.
  *
- * FASE 1: "Pedir cita" abre WhatsApp con el mensaje predefinido.
- * FASE 2: pasará a enrutar a /reserva (reserva online).
+ * FASE 1 (RESERVAS_ONLINE = false): "Pedir cita" abre WhatsApp.
+ * FASE 2 (RESERVAS_ONLINE = true):  "Pedir cita" enruta a /reserva.
  */
 export default function FloatingActionsComponent() {
   const [visible, setVisible] = useState(false)
@@ -42,13 +43,25 @@ export default function FloatingActionsComponent() {
       </a>
 
       {/* Pedir cita (acción principal) */}
-      <Link
-        to="/reserva"
-        className="flex items-center gap-2 rounded-full bg-acento px-5 py-3.5 text-sm font-semibold text-tinta shadow-xl shadow-acento/30 transition-transform hover:scale-105"
-      >
-        <CalendarCheck size={18} strokeWidth={2} />
-        Pedir cita
-      </Link>
+      {RESERVAS_ONLINE ? (
+        <Link
+          to="/reserva"
+          className="flex items-center gap-2 rounded-full bg-acento px-5 py-3.5 text-sm font-semibold text-tinta shadow-xl shadow-acento/30 transition-transform hover:scale-105"
+        >
+          <CalendarCheck size={18} strokeWidth={2} />
+          Pedir cita
+        </Link>
+      ) : (
+        <a
+          href={wa}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 rounded-full bg-acento px-5 py-3.5 text-sm font-semibold text-tinta shadow-xl shadow-acento/30 transition-transform hover:scale-105"
+        >
+          <CalendarCheck size={18} strokeWidth={2} />
+          Pedir cita
+        </a>
+      )}
     </div>
   )
 }

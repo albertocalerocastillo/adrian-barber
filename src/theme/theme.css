@@ -58,6 +58,12 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Al saltar a una sección con el menú, deja hueco para la barra fija
+     (~76px) para que el título no quede tapado. */
+  section[id] {
+    scroll-margin-top: 84px;
+  }
 }
 
 /* ─── UTILIDADES PROPIAS ────────────────────────────────────── */
