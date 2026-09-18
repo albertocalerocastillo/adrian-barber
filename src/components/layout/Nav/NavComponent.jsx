@@ -8,6 +8,7 @@ const ENLACES = [
   { href: '#servicios', texto: 'Servicios' },
   { href: '#galeria', texto: 'Galería' },
   { href: '#sobre-mi', texto: 'Sobre mí' },
+  { href: '#resenas', texto: 'Reseñas' },
   { href: '#horario', texto: 'Horario' },
   { href: '#ubicacion', texto: 'Dónde estamos' },
 ]
