@@ -1,17 +1,32 @@
 # Estado del proyecto — A.S Barbería (Adrián Sánchez)
 
 > Documento de continuación. Si abres un chat nuevo, léelo para ponerte al día.
-> Última actualización: 1 julio 2026.
+> Última actualización: 18 septiembre 2026.
 
 ## 🔖 HANDOFF (leer esto primero al abrir chat nuevo)
 
-**Estado:** el producto está COMPLETO y DESPLEGADO ONLINE, funcionando de punta a
-punta: web pública (logo nuevo + colores), reserva online → Supabase
-(anti-doble-reserva), **aviso automático por WhatsApp** al reservar (CallMeBot), y
-panel `/admin` (login, agenda día/semana, atendida/deshacer/cancelar, nueva cita
-manual, "Día libre", y secciones "Horario" y **"Servicios"** editables). Verificado
-por el usuario en local (reserva real → WhatsApp recibido → aparece en panel y
-Supabase).
+**Estado:** la web funciona como **INFORMATIVA**. Adrián dijo que **no quiere la
+reserva online hasta 2027**, así que está oculta tras el flag `RESERVAS_ONLINE`
+(`src/data/features.js` = `false`): "Pedir cita" abre **WhatsApp** y `/reserva`
+redirige a la home. Todo el motor de reserva y el panel `/admin` siguen intactos:
+con poner el flag a `true` vuelve a estar en pie.
+
+**⚠️ HAY TRABAJO SIN FUSIONAR.** La rama `feature/rediseno-identidad` (9 commits,
+subida a GitHub) lleva el rediseño y arreglos importantes, y **NO está en `main`**,
+así que no está en producción. Contiene:
+ - **Rediseño de identidad**: el cuerpo pasa de Inter (sans) a **Lora (serif)**,
+   botones rectangulares en mayúsculas (fuera las píldoras) y **hero con foto real
+   de fondo** + el nombre como protagonista tipográfico. Inspirado en `paco.vago`
+   ("moderno con alma antigua"), que es la referencia que le gusta al usuario.
+ - **Reseñas de Google visibles** (5,0 ★ · 56), sección nueva. Los testimonios
+   están vacíos a propósito: hay que copiar los REALES de la ficha, no inventarlos.
+   OJO: se muestran pero NO se marcan con `aggregateRating` (Google penaliza las
+   valoraciones autopuestas).
+ - **Barra de contacto fija en móvil** (Llamar · WhatsApp · Cómo llegar), siempre
+   visible, y badge **"Abierto ahora / Cerrado"** en el hero (hook
+   `useEstadoNegocio`, compartido con la sección Horario).
+ - **Seguridad**: la apikey de CallMeBot sale del frontend a una Edge Function.
+ - **Fix del horario** (ver abajo).
 
 **✅ YA DESPLEGADO (7 jul 2026):** todo subido a `main` (commit `73e5eed`) y en vivo
 en **https://adrian-barber.vercel.app** (Production, Ready). Las 4 variables de
@@ -22,7 +37,34 @@ modo localStorage). El `.env` local (gitignored) tiene los mismos valores. El
 aviso WhatsApp sigue apuntando al **móvil de PRUEBA de Alberto** (34684059380).
 La idea aún NO se le ha enseñado a Adrián (Alberto se lo comenta esta noche).
 
-**PRÓXIMAS TAREAS (por orden):**
+**HORARIO REAL (verificado en la ficha de Google, 18/09/2026):**
+**Lunes a viernes 10:00–22:00 · sábado y domingo CERRADO.** La web anunciaba mal
+dos días (lunes abría a las 15:00 y el sábado salía abierto de 10 a 16). Corregido
+en `data/horarios.js`, en el JSON-LD de `index.html` y en `seed.sql`, y el usuario
+ya lo ha cambiado en **Supabase** (que es de donde lee la web en producción).
+⚠️ El JSON-LD corregido **sigue sin desplegar** hasta fusionar la rama, así que
+Google aún lee el horario viejo de la web.
+
+**LO QUE TOCA AHORA (por orden):**
+1. **Fusionar `feature/rediseno-identidad` a `main` y desplegar.** Es lo que hace
+   que todo lo de arriba (y el fix del horario para Google) llegue a producción.
+2. **Desplegar la Edge Function** del aviso: `supabase secrets set
+   CALLMEBOT_PHONE=… CALLMEBOT_APIKEY=…` + `supabase functions deploy aviso-cita`,
+   y **borrar** `VITE_CALLMEBOT_*` de Vercel. (No corre prisa: sin reserva online
+   el aviso no se dispara, pero conviene dejarlo cerrado.)
+3. **Limpieza pendiente**: queda un `stash` y la rama `backup/local-antes-sync-20260709`
+   de un lío de sincronización de julio. Ya no hacen falta.
+
+**IDEAS SIGUIENTES (sin depender de Adrián):**
+ - **FAQ con marcado `FAQPage`**: el mejor SEO que se puede escribir sin él; sale
+   desplegada en los resultados de Google.
+ - **Pies en las fotos de la galería**: palabras clave reales + el cliente puede
+   pedir señalando una foto.
+ - La **promo de 5 €/semana** está enterrada al final de Servicios.
+ - Unificar el horario en **una sola fuente** (hoy vive en Supabase, en el
+   estático y en el JSON-LD: pueden volver a contradecirse).
+
+**TAREAS ANTIGUAS (contexto):**
 1. ✅ **HECHO — Editar servicios/precios desde el panel.** `lib/config.js` tiene
    `getServicios()` (lee tabla `servicios`, mapea `duracion_min`→`duracion`, fallback
    al estático `data/servicios.js`) y `guardarServicios()` (full-replace igual que
@@ -162,18 +204,27 @@ la (Recomendado) y tirar por ella; ir poco a poco.
 
 ## ⚠️ PENDIENTE DE DATOS REALES (de Adrián)
 
-1. **Logo:** soltar el archivo en `public/logo.png`. IDEAL: PNG con **fondo
-   transparente** y trazo blanco (luce sobre nav/hero/footer oscuros). Si solo
-   está la versión sobre mármol, sirve igual pero se verá el recuadro de fondo.
-2. **Duraciones de los servicios** — ahora SON ESTIMADAS (corte 30 min,
-   mechas+corte 75 min, tinte+corte 60 min). Críticas para los huecos de la Fase 2.
-3. **Horario exacto** — editar `src/data/horarios.js`. Ahora de ejemplo: L–V 10–14
-   y 17–21, sábado 10–14, domingo cerrado.
-4. **Fotos reales** de trabajos — soltar en `src/assets/galeria/` (se detectan
-   solas vía `import.meta.glob`; orden por nombre descendente, p. ej. 2026-01.jpg).
-   Tiene 4 historias destacadas en IG: 2026, 2025, 2024 y "Cortes".
-5. **Foto de Adrián** para "Sobre mí" (`SobreMiComponent.jsx`).
-6. **Coordenadas exactas** para el mapa (la dirección ya está bien).
+A 18/09/2026 **Adrián aún no ha contestado**. Todo esto está provisional y marcado
+con comentarios en el código para cambiarlo en una línea:
+
+1. 🔴 **Foto del LOCAL** (fachada e interior), **en horizontal**. Es el fondo del
+   hero y ahora hay una foto de la galería haciendo el apaño
+   (`HeroComponent.jsx`, import `fondoHero`). Es lo que más cambiaría la web.
+2. 🔴 **Foto suya** para "Sobre mí". Había una foto de stock de un desconocido;
+   ahora se usa un trabajo real suyo como apaño (`SobreMiComponent.jsx`).
+3. **Una frase suya** para el lema del hero (ahora hay una escrita por nosotros).
+4. **2-3 reseñas reales** de su ficha para `TESTIMONIOS` (`data/contacto.js`).
+   Esto lo puede copiar Alberto sin esperar a Adrián.
+5. **Su móvil + apikey de CallMeBot** y su **email**.
+6. **Año de apertura** (para un "DESDE 20XX" en la marca).
+7. **Coordenadas exactas** (lat/lng) para el `geo` del JSON-LD: clic derecho en
+   Google Maps sobre el local y copiar.
+8. Que **añada la categoría "Barbería"** en su ficha de Google (hoy solo está como
+   "Peluquería"): es **lo que más mueve el ranking local**.
+9. Si quiere **dominio propio** (~10 €/año).
+
+✅ **Ya resueltos:** fotos de trabajos (hay 7 reales en `src/assets/galeria/`),
+horario real, y la ficha de Google **ya tiene el enlace al sitio web**.
 
 ## Datos del negocio (de su Instagram)
 
