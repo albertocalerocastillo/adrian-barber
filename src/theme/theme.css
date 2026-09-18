@@ -94,6 +94,11 @@
       transform: none;
       transition: none;
     }
+    /* Punto del badge "Abierto ahora" y flecha del hero. */
+    .animate-ping,
+    .animate-bounce {
+      animation: none;
+    }
     html {
       scroll-behavior: auto;
     }
