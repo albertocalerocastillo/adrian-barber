@@ -33,7 +33,7 @@ export default function UbicacionComponent() {
           <RevealComponent className="flex flex-col justify-center">
             <ul className="space-y-6">
               <li className="flex items-start gap-4">
-                <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-tinta-800 text-acento">
+                <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center bg-tinta-800 text-acento">
                   <MapPin size={20} />
                 </span>
                 <div>
@@ -45,7 +45,7 @@ export default function UbicacionComponent() {
                 </div>
               </li>
               <li className="flex items-start gap-4">
-                <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-tinta-800 text-acento">
+                <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center bg-tinta-800 text-acento">
                   <Phone size={20} />
                 </span>
                 <div>
@@ -73,7 +73,7 @@ export default function UbicacionComponent() {
 
           {/* Mapa */}
           <RevealComponent delay={120}>
-            <div className="overflow-hidden rounded-2xl border border-tinta-700">
+            <div className="overflow-hidden border border-tinta-700">
               <iframe
                 title="Ubicación de A.S Barbería en Google Maps"
                 src={MAPS_EMBED}

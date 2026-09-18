@@ -61,7 +61,7 @@ export default function SobreMiComponent() {
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {VALORES.map((v, i) => (
               <RevealComponent key={v.titulo} delay={150 + i * 80}>
-                <div className="rounded-xl border border-tinta-700 bg-tinta-800 p-4">
+                <div className="border border-tinta-700 bg-tinta-800 p-4">
                   <v.icono size={20} className="text-acento" strokeWidth={1.75} />
                   <h3 className="mt-3 font-display text-base font-semibold">
                     {v.titulo}

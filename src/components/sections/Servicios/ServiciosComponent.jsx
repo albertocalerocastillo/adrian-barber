@@ -37,12 +37,12 @@ export default function ServiciosComponent() {
             return (
               <RevealComponent key={s.id} delay={i * 70}>
                 <article
-                  className={`group flex h-full flex-col rounded-2xl border bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-tinta/5 ${
+                  className={`group flex h-full flex-col border bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-tinta/5 ${
                     s.destacado ? 'border-acento/40' : 'border-hueso-200'
                   }`}
                 >
                   <div className="mb-5 flex items-center justify-between">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-tinta text-acento transition-colors group-hover:bg-acento group-hover:text-tinta">
+                    <span className="flex h-12 w-12 items-center justify-center bg-tinta text-acento transition-colors group-hover:bg-acento group-hover:text-tinta">
                       <Icono size={22} strokeWidth={1.75} />
                     </span>
                     <span className="font-display text-2xl font-bold text-tinta">
@@ -69,7 +69,7 @@ export default function ServiciosComponent() {
 
         {/* Promo destacada */}
         <RevealComponent className="mt-6">
-          <div className="grain flex flex-col items-center gap-4 overflow-hidden rounded-2xl bg-vino px-6 py-8 text-center text-hueso ring-1 ring-acento/30 sm:flex-row sm:justify-between sm:text-left">
+          <div className="grain flex flex-col items-center gap-4 overflow-hidden bg-vino px-6 py-8 text-center text-hueso ring-1 ring-acento/30 sm:flex-row sm:justify-between sm:text-left">
             <div className="relative">
               <p className="text-xs tracking-kicker text-acento">{PROMO.titulo}</p>
               <p className="mt-2 max-w-md font-display text-xl font-semibold sm:text-2xl">
