@@ -1,30 +1,27 @@
 // ════════════════════════════════════════════════════════════
-//  Aviso de cita nueva por WhatsApp (vía CallMeBot, servicio gratuito).
-//  Si están configuradas las variables VITE_CALLMEBOT_PHONE y
-//  VITE_CALLMEBOT_APIKEY, al reservar por la web se manda un WhatsApp
-//  automático al barbero (o al número de prueba). Si no, no hace nada.
+//  Aviso de cita nueva por WhatsApp.
 //
-//  Nota: es "fire-and-forget" (no bloquea la confirmación) y usa mode:no-cors
-//  porque CallMeBot no expone CORS; el mensaje se envía igualmente.
+//  La llamada a CallMeBot se hace en una Edge Function de Supabase
+//  (supabase/functions/aviso-cita), NO aquí: así la apikey vive como secreto
+//  del servidor y nunca llega al navegador. Antes iba en VITE_CALLMEBOT_APIKEY
+//  y Vite la incrustaba en el JS público.
+//
+//  Es "fire-and-forget": no bloquea la confirmación y, si falla, la cita ya
+//  está guardada igualmente.
 // ════════════════════════════════════════════════════════════
-import { fechaLarga, hora } from '../utils/fechas'
+import { supabase } from './supabase'
 
 export function avisarNuevaCita({ servicioNombre, clienteNombre, clienteMovil, inicio }) {
-  const phone = import.meta.env.VITE_CALLMEBOT_PHONE
-  const apikey = import.meta.env.VITE_CALLMEBOT_APIKEY
-  if (!phone || !apikey) return // aviso no configurado
+  if (!supabase) return // sin Supabase no hay función a la que llamar
 
-  const cuando = `${fechaLarga(inicio)} a las ${hora(inicio)}`
-  const texto =
-    `💈 Nueva cita A.S\n` +
-    `${servicioNombre}\n` +
-    `${cuando}\n` +
-    `${clienteNombre}${clienteMovil ? ' · ' + clienteMovil : ''}`
-
-  const url =
-    `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(phone)}` +
-    `&apikey=${encodeURIComponent(apikey)}&text=${encodeURIComponent(texto)}`
-
-  // No esperamos la respuesta: si falla, la cita ya está guardada igualmente.
-  fetch(url, { mode: 'no-cors' }).catch(() => {})
+  supabase.functions
+    .invoke('aviso-cita', {
+      body: {
+        servicioNombre,
+        clienteNombre,
+        clienteMovil,
+        inicio: inicio instanceof Date ? inicio.toISOString() : inicio,
+      },
+    })
+    .catch(() => {})
 }
