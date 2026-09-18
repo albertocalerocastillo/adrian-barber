@@ -84,11 +84,11 @@ export default function HeroComponent() {
         {/* ¿Puedo ir ya? Es la primera pregunta del cliente: se responde aquí
             arriba, sin obligarle a bajar hasta el horario. */}
         <div className="mt-7">
-          <EstadoBadgeComponent estado={estado} claro />
+          <EstadoBadgeComponent estado={estado} claro href="#horario" />
         </div>
 
         {/* CTAs */}
-        <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
           <CitaButtonComponent tamano="lg" />
           <a
             href={INSTAGRAM_URL}
@@ -100,6 +100,15 @@ export default function HeroComponent() {
             @{INSTAGRAM}
           </a>
         </div>
+
+        {/* Cerrado: en vez de dejar al cliente colgado (y que se vaya a otra
+            barbería), se le dice que escriba igualmente. */}
+        {!estado.abierto && (
+          <p className="mt-5 text-xs text-hueso/55">
+            Está cerrado, pero puedes escribir igualmente: te contesta en cuanto
+            abra.
+          </p>
+        )}
       </div>
 
       {/* Indicador de scroll */}

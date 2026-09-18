@@ -7,8 +7,10 @@
  * Props:
  *  - estado: lo que devuelve useEstadoNegocio().
  *  - claro: true sobre fondos oscuros (hero).
+ *  - href: si se pasa, el badge lleva a esa ancla (p. ej. '#horario'). En la
+ *    propia sección de Horario se omite, que no tiene sentido enlazarse a sí.
  */
-export default function EstadoBadgeComponent({ estado, claro = false }) {
+export default function EstadoBadgeComponent({ estado, claro = false, href }) {
   const abierto = estado.abierto
 
   const colores = abierto
@@ -25,10 +27,8 @@ export default function EstadoBadgeComponent({ estado, claro = false }) {
       ? `Cerrado · abre ${estado.proximoDia ? estado.proximoDia.toLowerCase() : 'hoy'} a las ${estado.abreA}`
       : 'Cerrado'
 
-  return (
-    <span
-      className={`inline-flex items-center gap-2 border px-4 py-2 text-xs font-medium uppercase tracking-widest ${colores}`}
-    >
+  const contenido = (
+    <>
       {/* El punto parpadea solo cuando está abierto: llama la atención justo
           cuando el cliente puede venir ya. */}
       <span className="relative flex h-2 w-2">
@@ -42,6 +42,18 @@ export default function EstadoBadgeComponent({ estado, claro = false }) {
         />
       </span>
       {texto}
-    </span>
+    </>
   )
+
+  const clases = `inline-flex items-center gap-2 border px-4 py-2 text-xs font-medium uppercase tracking-widest ${colores}`
+
+  if (href) {
+    return (
+      <a href={href} className={`${clases} transition-opacity hover:opacity-80`}>
+        {contenido}
+      </a>
+    )
+  }
+
+  return <span className={clases}>{contenido}</span>
 }
