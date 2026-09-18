@@ -4,6 +4,7 @@ import HeroComponent from '../../sections/Hero/HeroComponent'
 import ServiciosComponent from '../../sections/Servicios/ServiciosComponent'
 import SobreMiComponent from '../../sections/SobreMi/SobreMiComponent'
 import GaleriaComponent from '../../sections/Galeria/GaleriaComponent'
+import ResenasComponent from '../../sections/Resenas/ResenasComponent'
 import HorarioComponent from '../../sections/Horario/HorarioComponent'
 import UbicacionComponent from '../../sections/Ubicacion/UbicacionComponent'
 import FloatingActionsComponent from '../../ui/FloatingActions/FloatingActionsComponent'
@@ -20,6 +21,7 @@ export default function HomeComponent() {
       <ServiciosComponent />
       <SobreMiComponent />
       <GaleriaComponent />
+      <ResenasComponent />
       <HorarioComponent />
       <UbicacionComponent />
       <FooterComponent />
