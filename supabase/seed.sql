@@ -12,10 +12,11 @@ insert into servicios (nombre, descripcion, duracion_min, precio, icono, destaca
   ('Tinte blanco + Corte', 'Coloración en blanco más corte completo.', 60, 20, 'PaintBucket', false, 3);
 
 -- ── Horario (0=domingo … 6=sábado) ──
+-- Real, verificado en la ficha de Google el 18/09/2026:
+-- lunes a viernes 10:00–22:00; sábado y domingo cerrado (no se insertan).
 insert into horario (dia_semana, hora_inicio, hora_fin) values
-  (1, '15:00', '22:00'),
+  (1, '10:00', '22:00'),
   (2, '10:00', '22:00'),
   (3, '10:00', '22:00'),
   (4, '10:00', '22:00'),
-  (5, '10:00', '22:00'),
-  (6, '10:00', '16:00');
+  (5, '10:00', '22:00');
