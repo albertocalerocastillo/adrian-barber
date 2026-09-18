@@ -1,38 +1,17 @@
-import { useState, useEffect } from 'react'
 import { Clock } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
 import RevealComponent from '../../ui/Reveal/RevealComponent'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
-import { HORARIO } from '../../../data/horarios'
-import { getHorario } from '../../../lib/config'
-import { estadoNegocio, diaHoy, formatoTramos } from '../../../utils/horario'
+import EstadoBadgeComponent from '../../ui/EstadoBadge/EstadoBadgeComponent'
+import { useEstadoNegocio } from '../../../hooks/useEstadoNegocio'
+import { diaHoy, formatoTramos } from '../../../utils/horario'
 
 /**
  * Tabla de horario semanal con el día de hoy resaltado y un badge en vivo
  * de "Abierto / Cerrado ahora".
  */
 export default function HorarioComponent() {
-  const [ahora, setAhora] = useState(() => new Date())
-  const [horario, setHorario] = useState(HORARIO)
-
-  // Refresca cada minuto para mantener el badge al día.
-  useEffect(() => {
-    const id = setInterval(() => setAhora(new Date()), 60_000)
-    return () => clearInterval(id)
-  }, [])
-
-  // Carga el horario real (Supabase); mientras, muestra el estático.
-  useEffect(() => {
-    let vivo = true
-    getHorario().then((h) => {
-      if (vivo) setHorario(h)
-    })
-    return () => {
-      vivo = false
-    }
-  }, [])
-
-  const estado = estadoNegocio(horario, ahora)
+  const { estado, horario, ahora } = useEstadoNegocio()
   const hoy = diaHoy(ahora)
 
   return (
@@ -42,24 +21,7 @@ export default function HorarioComponent() {
 
         {/* Badge de estado */}
         <RevealComponent className="mt-10 flex justify-center">
-          <span
-            className={`inline-flex items-center gap-2 border px-4 py-2 text-xs font-medium uppercase tracking-widest ${
-              estado.abierto
-                ? 'border-green-700/30 bg-green-100 text-green-800'
-                : 'border-tinta/15 bg-tinta/5 text-tinta/70'
-            }`}
-          >
-            <span
-              className={`h-2 w-2 rounded-full ${
-                estado.abierto ? 'bg-green-500' : 'bg-tinta/40'
-              }`}
-            />
-            {estado.abierto
-              ? `Abierto ahora · hasta las ${estado.cierraA}`
-              : estado.abreA
-                ? `Cerrado · abre ${estado.proximoDia ? estado.proximoDia.toLowerCase() : 'hoy'} a las ${estado.abreA}`
-                : 'Cerrado'}
-          </span>
+          <EstadoBadgeComponent estado={estado} />
         </RevealComponent>
 
         {/* Tabla de horario */}

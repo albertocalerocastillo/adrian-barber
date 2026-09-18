@@ -1,6 +1,8 @@
 import { MapPin, ChevronDown } from 'lucide-react'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
 import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
+import EstadoBadgeComponent from '../../ui/EstadoBadge/EstadoBadgeComponent'
+import { useEstadoNegocio } from '../../../hooks/useEstadoNegocio'
 import { NEGOCIO, INSTAGRAM, INSTAGRAM_URL } from '../../../data/contacto'
 
 // ⚠️ TEMPORAL: foto de fondo del hero. Cuando Adrián mande una foto del LOCAL
@@ -13,6 +15,8 @@ import fondoHero from '../../../assets/galeria/corte-2.jpg'
  * protagonista tipográfico, lema y CTA. El emblema de A.S va en pequeño encima.
  */
 export default function HeroComponent() {
+  const { estado } = useEstadoNegocio()
+
   return (
     <section
       id="inicio"
@@ -76,6 +80,12 @@ export default function HeroComponent() {
         <p className="mt-3 text-sm text-hueso/55">
           {NEGOCIO.barbero.split(' ').slice(0, 2).join(' ')} · {NEGOCIO.localidad}
         </p>
+
+        {/* ¿Puedo ir ya? Es la primera pregunta del cliente: se responde aquí
+            arriba, sin obligarle a bajar hasta el horario. */}
+        <div className="mt-7">
+          <EstadoBadgeComponent estado={estado} claro />
+        </div>
 
         {/* CTAs */}
         <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
