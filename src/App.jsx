@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import HomeComponent from './components/pages/Home/HomeComponent'
 import ReservaComponent from './components/pages/Reserva/ReservaComponent'
 import PanelComponent from './components/pages/Panel/PanelComponent'
+import NoEncontradaComponent from './components/pages/NoEncontrada/NoEncontradaComponent'
 import { RESERVAS_ONLINE } from './data/features'
 
 /**
@@ -24,6 +25,8 @@ export default function App() {
         />
         <Route path="/admin" element={<PanelComponent />} />
         <Route path="/panel" element={<PanelComponent />} />
+        {/* Comodín: sin esto, cualquier URL rara mostraba una página en blanco. */}
+        <Route path="*" element={<NoEncontradaComponent />} />
       </Routes>
     </BrowserRouter>
   )
