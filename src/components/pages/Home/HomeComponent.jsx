@@ -7,6 +7,7 @@ import GaleriaComponent from '../../sections/Galeria/GaleriaComponent'
 import ResenasComponent from '../../sections/Resenas/ResenasComponent'
 import HorarioComponent from '../../sections/Horario/HorarioComponent'
 import UbicacionComponent from '../../sections/Ubicacion/UbicacionComponent'
+import FaqComponent from '../../sections/Faq/FaqComponent'
 import FloatingActionsComponent from '../../ui/FloatingActions/FloatingActionsComponent'
 
 /**
@@ -25,6 +26,7 @@ export default function HomeComponent() {
       <ResenasComponent />
       <HorarioComponent />
       <UbicacionComponent />
+      <FaqComponent />
       <FooterComponent />
       <FloatingActionsComponent />
     </div>
