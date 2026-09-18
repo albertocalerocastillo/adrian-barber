@@ -43,10 +43,10 @@ export default function HorarioComponent() {
         {/* Badge de estado */}
         <RevealComponent className="mt-10 flex justify-center">
           <span
-            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${
+            className={`inline-flex items-center gap-2 border px-4 py-2 text-xs font-medium uppercase tracking-widest ${
               estado.abierto
-                ? 'bg-green-100 text-green-800'
-                : 'bg-tinta/5 text-tinta/70'
+                ? 'border-green-700/30 bg-green-100 text-green-800'
+                : 'border-tinta/15 bg-tinta/5 text-tinta/70'
             }`}
           >
             <span
@@ -64,7 +64,7 @@ export default function HorarioComponent() {
 
         {/* Tabla de horario */}
         <RevealComponent delay={120} className="mt-8">
-          <ul className="overflow-hidden rounded-2xl border border-hueso-200 bg-white">
+          <ul className="overflow-hidden border border-hueso-200 bg-white">
             {horario.map((d) => {
               const esHoy = d.dia === hoy
               const cerrado = d.tramos.length === 0

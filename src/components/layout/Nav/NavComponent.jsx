@@ -77,7 +77,7 @@ export default function NavComponent() {
               <a
                 href={e.href}
                 onClick={cerrar}
-                className="block rounded-lg px-3 py-3 text-base font-medium text-hueso/85 transition-colors hover:bg-tinta-800 hover:text-acento"
+                className="block px-3 py-3 text-base font-medium text-hueso/85 transition-colors hover:bg-tinta-800 hover:text-acento"
               >
                 {e.texto}
               </a>
