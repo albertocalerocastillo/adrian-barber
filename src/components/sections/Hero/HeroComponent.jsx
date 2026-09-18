@@ -3,10 +3,14 @@ import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
 import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
 import { NEGOCIO, INSTAGRAM, INSTAGRAM_URL } from '../../../data/contacto'
 
+// ⚠️ TEMPORAL: foto de fondo del hero. Cuando Adrián mande una foto del LOCAL
+// (fachada o interior, en HORIZONTAL), suéltala en src/assets/local.jpg y
+// cambia solo este import. Es el único cambio necesario.
+import fondoHero from '../../../assets/galeria/corte-2.jpg'
+
 /**
- * Hero a pantalla completa. Fondo de pizarra (a juego con el emblema, para que
- * los bordes del logo se fundan con el fondo) y el LOGO oficial de A.S como
- * protagonista. CTA principal "Pedir cita".
+ * Hero a pantalla completa: foto real de fondo con velo oscuro, el nombre como
+ * protagonista tipográfico, lema y CTA. El emblema de A.S va en pequeño encima.
  */
 export default function HeroComponent() {
   return (
@@ -14,53 +18,73 @@ export default function HeroComponent() {
       id="inicio"
       className="grain relative flex min-h-screen items-center justify-center overflow-hidden bg-tinta text-hueso"
     >
-      {/* Foco radial sutil detrás del emblema */}
+      {/* Foto de fondo */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${fondoHero})` }}
+      />
+
+      {/* Velo oscuro (legibilidad del texto) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-tinta/92 via-tinta/86 to-tinta/97" />
+
+      {/* Toque cálido dorado/granate, muy sutil */}
+      <div
+        className="absolute inset-0 opacity-40 mix-blend-multiply"
         style={{
-          background:
-            'radial-gradient(circle at 50% 42%, #24323f 0%, #1a2530 45%, #11181f 100%)',
+          backgroundImage:
+            'radial-gradient(circle at 20% 28%, rgba(196,160,90,0.35) 0%, transparent 55%), radial-gradient(circle at 80% 72%, rgba(110,35,41,0.45) 0%, transparent 55%)',
         }}
       />
 
       {/* Contenido */}
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center px-5 text-center">
-        {/* Kicker */}
-        <p className="mb-7 flex items-center gap-2 text-xs tracking-kicker text-acento">
+        {/* Kicker: ubicación */}
+        <p className="mb-6 flex items-center gap-2 text-xs tracking-kicker text-acento drop-shadow">
           <MapPin size={14} />
           {NEGOCIO.ciudad}
         </p>
 
-        {/* Emblema (logo oficial). El H1 lleva texto real (oculto en pantalla)
-            con las palabras clave para SEO; visualmente manda el logo. */}
-        <h1>
-          <span className="sr-only">
-            {NEGOCIO.nombreCompleto} en {NEGOCIO.ciudad} — {NEGOCIO.barbero}
+        {/* Emblema oficial, en pequeño */}
+        <img
+          src="/logo-adri.jpg"
+          alt=""
+          aria-hidden="true"
+          className="mb-7 w-20 rounded-lg shadow-2xl shadow-black/60 ring-1 ring-acento/25 sm:w-24"
+          fetchPriority="high"
+        />
+
+        {/* Nombre protagonista */}
+        <h1 className="flex flex-col items-center">
+          <span className="font-display text-7xl font-bold leading-none tracking-tight drop-shadow-2xl sm:text-8xl md:text-9xl">
+            A.S
           </span>
-          <img
-            src="/logo-adri.jpg"
-            alt={`${NEGOCIO.nombreCompleto} — ${NEGOCIO.barbero}`}
-            className="w-64 max-w-[80vw] rounded-2xl shadow-2xl shadow-black/50 ring-1 ring-acento/20 sm:w-72 md:w-80"
-            fetchPriority="high"
-            aria-hidden="true"
-          />
+          <span className="mt-5 text-[0.7rem] uppercase tracking-[0.35em] text-hueso/85 sm:text-xs">
+            Peluquería y Barbería
+          </span>
+          <span className="sr-only">
+            en {NEGOCIO.ciudad} — {NEGOCIO.barbero}
+          </span>
         </h1>
 
-        {/* Subtítulo */}
-        <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-hueso/70 sm:text-lg">
-          Peluquería y barbería en {NEGOCIO.ciudad}. Cortes con carácter, barba a
-          navaja y un buen rato en la silla, de la mano de{' '}
-          {NEGOCIO.barbero.split(' ').slice(0, 2).join(' ')}.
+        {/* Filete dorado */}
+        <span className="mt-7 block h-px w-24 bg-acento" />
+
+        {/* Lema */}
+        <p className="mt-7 max-w-xl text-lg italic leading-relaxed text-hueso/85 drop-shadow sm:text-xl">
+          «Cortes con carácter, barba a navaja y un buen rato en la silla»
+        </p>
+        <p className="mt-3 text-sm text-hueso/55">
+          {NEGOCIO.barbero.split(' ').slice(0, 2).join(' ')} · {NEGOCIO.localidad}
         </p>
 
         {/* CTAs */}
-        <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
           <CitaButtonComponent tamano="lg" />
           <a
             href={INSTAGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2.5 rounded-full border border-hueso/30 px-7 py-4 text-sm font-medium text-hueso/90 transition-colors hover:border-acento hover:text-acento"
+            className="inline-flex items-center gap-2.5 border border-hueso/30 px-9 py-4 text-sm font-medium uppercase tracking-widest text-hueso/90 backdrop-blur-sm transition-colors hover:border-acento hover:text-acento"
           >
             <InstagramIcon size={18} />
             @{INSTAGRAM}

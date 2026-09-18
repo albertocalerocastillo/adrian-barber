@@ -29,7 +29,7 @@ export default function WhatsAppButtonComponent({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center justify-center gap-2.5 rounded-full px-6 py-3 text-sm font-medium transition-colors ${estilos[variante]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2.5 px-7 py-3.5 text-xs font-medium uppercase tracking-widest transition-colors ${estilos[variante]} ${className}`}
     >
       <WhatsAppIcon size={18} />
       {texto}

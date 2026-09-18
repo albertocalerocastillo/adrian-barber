@@ -16,7 +16,7 @@
 @theme {
   /* Tipografía */
   --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
-  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Lora", Georgia, "Times New Roman", serif;
   --font-script: "Great Vibes", "Brush Script MT", cursive; /* eco del logo manuscrito */
 
   /* Paleta tomada del logo: pizarra azulada + dorado + granate */
@@ -85,6 +85,18 @@
   .reveal-visible {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  /* Accesibilidad: si el usuario pide reducir movimiento, sin animación. */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   /* Grano sutil de textura (overlay premium sobre fondos oscuros) */
