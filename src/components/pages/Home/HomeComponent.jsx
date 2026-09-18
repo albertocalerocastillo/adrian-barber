@@ -15,7 +15,8 @@ import FloatingActionsComponent from '../../ui/FloatingActions/FloatingActionsCo
  */
 export default function HomeComponent() {
   return (
-    <div className="min-h-screen bg-hueso text-tinta">
+    // pb-16 en móvil: hueco para la barra fija de contacto de abajo.
+    <div className="min-h-screen bg-hueso pb-16 text-tinta md:pb-0">
       <NavComponent />
       <HeroComponent />
       <ServiciosComponent />

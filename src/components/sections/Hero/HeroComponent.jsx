@@ -96,7 +96,7 @@ export default function HeroComponent() {
       <a
         href="#servicios"
         aria-label="Ver servicios"
-        className="absolute bottom-7 left-1/2 -translate-x-1/2 text-hueso/50 transition-colors hover:text-acento"
+        className="absolute bottom-24 left-1/2 -translate-x-1/2 text-hueso/50 transition-colors hover:text-acento md:bottom-7"
       >
         <ChevronDown size={28} className="animate-bounce" />
       </a>
