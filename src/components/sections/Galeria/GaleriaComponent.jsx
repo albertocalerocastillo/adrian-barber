@@ -27,7 +27,7 @@ export default function GaleriaComponent() {
               <button
                 type="button"
                 onClick={() => abrir(i)}
-                className="group relative block w-full overflow-hidden rounded-2xl"
+                className="group relative block w-full overflow-hidden"
               >
                 <img
                   src={foto.src}
