@@ -46,7 +46,7 @@ export default function FloatingActionsComponent() {
       {RESERVAS_ONLINE ? (
         <Link
           to="/reserva"
-          className="flex items-center gap-2 rounded-full bg-acento px-5 py-3.5 text-sm font-semibold text-tinta shadow-xl shadow-acento/30 transition-transform hover:scale-105"
+          className="flex items-center gap-2 bg-acento px-5 py-3.5 text-xs font-semibold uppercase tracking-widest text-tinta shadow-xl shadow-acento/30 transition-transform hover:scale-105"
         >
           <CalendarCheck size={18} strokeWidth={2} />
           Pedir cita
@@ -56,7 +56,7 @@ export default function FloatingActionsComponent() {
           href={wa}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 rounded-full bg-acento px-5 py-3.5 text-sm font-semibold text-tinta shadow-xl shadow-acento/30 transition-transform hover:scale-105"
+          className="flex items-center gap-2 bg-acento px-5 py-3.5 text-xs font-semibold uppercase tracking-widest text-tinta shadow-xl shadow-acento/30 transition-transform hover:scale-105"
         >
           <CalendarCheck size={18} strokeWidth={2} />
           Pedir cita

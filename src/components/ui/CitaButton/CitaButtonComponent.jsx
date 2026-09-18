@@ -26,11 +26,11 @@ export default function CitaButtonComponent({
       'border border-hueso/40 text-hueso hover:bg-hueso hover:text-tinta',
   }
   const tamanos = {
-    md: 'px-6 py-3 text-sm',
-    lg: 'px-8 py-4 text-base',
+    md: 'px-7 py-3.5 text-xs',
+    lg: 'px-9 py-4 text-sm',
   }
 
-  const clases = `group inline-flex items-center justify-center gap-2.5 rounded-full font-semibold tracking-wide transition-all duration-300 ${variantes[variante]} ${tamanos[tamano]} ${className}`
+  const clases = `group inline-flex items-center justify-center gap-2.5 font-semibold uppercase tracking-widest transition-all duration-300 ${variantes[variante]} ${tamanos[tamano]} ${className}`
   const icono = <CalendarCheck size={tamano === 'lg' ? 20 : 18} strokeWidth={2} />
 
   // FASE 1: sin reserva online → el botón contacta por WhatsApp.

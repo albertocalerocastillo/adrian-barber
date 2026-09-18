@@ -3,6 +3,11 @@ import RevealComponent from '../../ui/Reveal/RevealComponent'
 import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
 import { NEGOCIO, INSTAGRAM, INSTAGRAM_URL } from '../../../data/contacto'
 
+// ⚠️ TEMPORAL: hasta que Adrián mande una foto suya, usamos un trabajo real
+// suyo (antes había una foto de stock de un desconocido).
+// Para ponerla: suelta la foto en src/assets/adrian.jpg y cambia este import.
+import fotoSobreMi from '../../../assets/galeria/corte-3.jpg'
+
 const VALORES = [
   { icono: Scissors, titulo: 'Oficio', texto: 'Técnica cuidada en cada corte, sin prisas.' },
   { icono: Award, titulo: 'Detalle', texto: 'El acabado importa: barba, perfilado y remate.' },
@@ -21,12 +26,15 @@ export default function SobreMiComponent() {
         <RevealComponent className="order-1 md:order-none">
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=900&q=80"
-              alt={`${NEGOCIO.barbero}, barbero`}
-              className="aspect-[4/5] w-full rounded-2xl object-cover"
+              src={fotoSobreMi}
+              alt={`Trabajo de ${NEGOCIO.barbero}, barbero en ${NEGOCIO.localidad}`}
+              width={640}
+              height={800}
+              loading="lazy"
+              className="aspect-[4/5] w-full object-cover"
             />
             {/* Marco de acento */}
-            <span className="pointer-events-none absolute -bottom-3 -right-3 h-24 w-24 rounded-br-2xl border-b-2 border-r-2 border-acento" />
+            <span className="pointer-events-none absolute -bottom-3 -right-3 h-24 w-24 border-b-2 border-r-2 border-acento" />
           </div>
         </RevealComponent>
 

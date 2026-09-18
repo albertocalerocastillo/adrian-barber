@@ -64,7 +64,7 @@ export default function UbicacionComponent() {
               href={MAPS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-8 inline-flex w-fit items-center gap-2.5 rounded-full bg-acento px-6 py-3 text-sm font-semibold text-tinta transition-colors hover:bg-acento-claro"
+              className="mt-8 inline-flex w-fit items-center gap-2.5 bg-acento px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-tinta transition-colors hover:bg-acento-claro"
             >
               <Navigation size={18} />
               Cómo llegar
