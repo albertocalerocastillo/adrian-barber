@@ -25,6 +25,21 @@ export const INSTAGRAM_PERSONAL = 'adriansanchezarandaa1'
 // Mensaje por defecto para el enlace de WhatsApp (Fase 1; en Fase 2 reservará online)
 export const WHATSAPP_MENSAJE = 'Hola Adrián, me gustaría pedir una cita'
 
+// ─── Valoración de Google ───────────────────────────────────
+// ⚠️ DATO MANUAL: no se actualiza solo. Repásalo de vez en cuando en la ficha.
+export const GOOGLE_VALORACION = { nota: '5,0', resenas: 56 }
+
+// Ficha de Google, para leer o dejar reseñas.
+export const GOOGLE_RESENAS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  'A.S Peluquería y Barbería, La Rinconada, Sevilla'
+)}`
+
+// Testimonios REALES copiados de la ficha de Google.
+// ⛔ NO inventar ninguno. Si el array está vacío, la web muestra solo la nota
+// y el enlace, que sigue siendo verdad.
+// Formato: { texto: 'Lo que escribió', autor: 'Nombre' }
+export const TESTIMONIOS = []
+
 // Enlace de Google Maps (placeholder: se afina con la ubicación exacta de Adrián)
 export const MAPS_QUERY = encodeURIComponent('C/ 28 de Febrero 2, La Rinconada, Sevilla')
 export const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${MAPS_QUERY}`
