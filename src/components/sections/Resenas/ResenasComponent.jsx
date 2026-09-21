@@ -1,7 +1,12 @@
-import { Star, ExternalLink } from 'lucide-react'
+import { Star, ExternalLink, PenLine } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
 import RevealComponent from '../../ui/Reveal/RevealComponent'
-import { GOOGLE_VALORACION, GOOGLE_RESENAS_URL, TESTIMONIOS } from '../../../data/contacto'
+import {
+  GOOGLE_VALORACION,
+  GOOGLE_RESENAS_URL,
+  GOOGLE_RESENA_URL,
+  TESTIMONIOS,
+} from '../../../data/contacto'
 
 /**
  * Prueba social: la valoración real de la ficha de Google.
@@ -32,15 +37,31 @@ export default function ResenasComponent() {
             {resenas} reseñas en Google
           </p>
 
-          <a
-            href={GOOGLE_RESENAS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-8 inline-flex items-center gap-2.5 border border-hueso/30 px-9 py-4 text-xs font-medium uppercase tracking-widest text-hueso/90 transition-colors hover:border-acento hover:text-acento"
-          >
-            Ver reseñas en Google
-            <ExternalLink size={15} />
-          </a>
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
+            <a
+              href={GOOGLE_RESENAS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 border border-hueso/30 px-9 py-4 text-xs font-medium uppercase tracking-widest text-hueso/90 transition-colors hover:border-acento hover:text-acento"
+            >
+              Ver reseñas en Google
+              <ExternalLink size={15} />
+            </a>
+
+            {/* Pedir la reseña justo después de leer las buenas es cuando más
+                funciona. Solo sale si hay enlace directo configurado. */}
+            {GOOGLE_RESENA_URL && (
+              <a
+                href={GOOGLE_RESENA_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 bg-acento px-9 py-4 text-xs font-semibold uppercase tracking-widest text-tinta transition-colors hover:bg-acento-claro"
+              >
+                <PenLine size={15} strokeWidth={2} />
+                Deja la tuya
+              </a>
+            )}
+          </div>
         </RevealComponent>
 
         {/* Testimonios (solo si hay reales copiados de la ficha) */}
