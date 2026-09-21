@@ -45,22 +45,39 @@ ya lo ha cambiado en **Supabase** (que es de donde lee la web en producción).
 ⚠️ El JSON-LD corregido **sigue sin desplegar** hasta fusionar la rama, así que
 Google aún lee el horario viejo de la web.
 
+**TODO LO ANTERIOR YA ESTÁ EN PRODUCCIÓN.** Se fusionó a `main` el 18/09 y el
+repo quedó limpio (solo `main`, sin stash ni ramas de respaldo).
+
+**HECHO EL 21/09/2026:**
+ - **Reseñas reales** (3, copiadas de la ficha) y enlace **estable** a Google:
+   `https://maps.google.com/?cid=1997138300547444733` (48 caracteres, sacado del
+   CID del enlace largo de Maps). El de antes era una búsqueda genérica.
+   ⚠️ Los enlaces que da Google al navegar llevan marca de tiempo y sesión:
+   CADUCAN. No usarlos nunca para un QR impreso.
+ - **Promo de 5 €** en la propia tarjeta del Corte (donde se mira el precio) y
+   el banner con botón propio.
+ - **FAQ con `FAQPage`**, generada desde los datos reales; el horario sale del
+   mismo sitio que la sección Horario para que no puedan contradecirse.
+ - **Fixes**: los metadatos prometían "cita online" (que no existe) y "afeitado
+   clásico" (que no ofrece); la galería no se deslizaba en móvil; el hero se
+   rompía en portátiles poco altos; hueco feo en la galería en escritorio
+   (columnas CSS con fotos de proporción idéntica → ahora rejilla); página en
+   blanco en cualquier URL inexistente → ahora hay 404.
+ - **qr-resenas/tarjeta-mostrador.html**: tarjeta A6 para el mostrador. Basta
+   dejar `qr-resena.png` en esa carpeta y se completa sola.
+
 **LO QUE TOCA AHORA (por orden):**
-1. **Fusionar `feature/rediseno-identidad` a `main` y desplegar.** Es lo que hace
-   que todo lo de arriba (y el fix del horario para Google) llegue a producción.
+1. **Generar el QR de reseñas** con el enlace de arriba (qrcode-monkey, mismos
+   ajustes que el de la web) y guardarlo como `qr-resenas/qr-resena.png`.
 2. **Desplegar la Edge Function** del aviso: `supabase secrets set
    CALLMEBOT_PHONE=… CALLMEBOT_APIKEY=…` + `supabase functions deploy aviso-cita`,
    y **borrar** `VITE_CALLMEBOT_*` de Vercel. (No corre prisa: sin reserva online
    el aviso no se dispara, pero conviene dejarlo cerrado.)
-3. **Limpieza pendiente**: queda un `stash` y la rama `backup/local-antes-sync-20260709`
-   de un lío de sincronización de julio. Ya no hacen falta.
 
 **IDEAS SIGUIENTES (sin depender de Adrián):**
- - **FAQ con marcado `FAQPage`**: el mejor SEO que se puede escribir sin él; sale
-   desplegada en los resultados de Google.
  - **Pies en las fotos de la galería**: palabras clave reales + el cliente puede
-   pedir señalando una foto.
- - La **promo de 5 €/semana** está enterrada al final de Servicios.
+   pedir señalando una foto. ⏸️ EN PAUSA: puede que Adrián mande fotos nuevas y
+   haya que rehacerlo.
  - Unificar el horario en **una sola fuente** (hoy vive en Supabase, en el
    estático y en el JSON-LD: pueden volver a contradecirse).
 
