@@ -34,11 +34,29 @@ export const GOOGLE_RESENAS_URL = `https://www.google.com/maps/search/?api=1&que
   'A.S Peluquería y Barbería, La Rinconada, Sevilla'
 )}`
 
-// Testimonios REALES copiados de la ficha de Google.
-// ⛔ NO inventar ninguno. Si el array está vacío, la web muestra solo la nota
-// y el enlace, que sigue siendo verdad.
-// Formato: { texto: 'Lo que escribió', autor: 'Nombre' }
-export const TESTIMONIOS = []
+// Testimonios REALES copiados literalmente de la ficha de Google (21/09/2026).
+// ⛔ NO inventar ninguno ni retocar la redacción: son palabras de clientes.
+//
+// ⚠️ Si algún día se automatiza esto, hay que FILTRAR: entre las reseñas de 5
+// estrellas hay bromas de amigos (una dice que el barbero va borracho los
+// lunes, otra insinúa un "final feliz"). Suman a la media, pero puestas como
+// testimonio hunden la imagen del negocio.
+export const TESTIMONIOS = [
+  {
+    texto:
+      'Sin lugar a duda mi peluquería de confianza. Muy buenos precios y salgo siempre muy satisfecho; no se le puede pedir nada más.',
+    autor: 'Julián Vd',
+  },
+  {
+    // Nombra San José y La Rinconada: justo lo que busca la gente de la zona.
+    texto: 'El mejor peluquero de todo San José y rinconada, y muy amable y buena gente',
+    autor: 'coronel cops',
+  },
+  {
+    texto: 'Peluquero joven con mucho talento y mucha formalidad y de confianza.',
+    autor: 'Guillermo Faraco Tabares',
+  },
+]
 
 // Enlace de Google Maps (placeholder: se afina con la ubicación exacta de Adrián)
 export const MAPS_QUERY = encodeURIComponent('C/ 28 de Febrero 2, La Rinconada, Sevilla')

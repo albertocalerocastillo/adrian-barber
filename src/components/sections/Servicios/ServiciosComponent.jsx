@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Clock } from 'lucide-react'
+import { Clock, Repeat } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
 import RevealComponent from '../../ui/Reveal/RevealComponent'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
@@ -61,25 +61,41 @@ export default function ServiciosComponent() {
                     <Clock size={14} />
                     {s.duracion} min
                   </p>
+
+                  {/* La oferta, justo donde se mira el precio y se decide.
+                      Antes solo estaba en un banner al final, que mucha gente
+                      no llegaba a ver. */}
+                  {s.destacado && (
+                    <p className="mt-4 flex items-center gap-2 border-t border-acento/30 pt-4 text-xs font-semibold uppercase tracking-widest text-acento">
+                      <Repeat size={14} strokeWidth={2} />
+                      {PROMO.precio} € si vienes cada semana
+                    </p>
+                  )}
                 </article>
               </RevealComponent>
             )
           })}
         </div>
 
-        {/* Promo destacada */}
-        <RevealComponent className="mt-6">
-          <div className="grain flex flex-col items-center gap-4 overflow-hidden bg-vino px-6 py-8 text-center text-hueso ring-1 ring-acento/30 sm:flex-row sm:justify-between sm:text-left">
+        {/* Promo destacada. Es la oferta que más fideliza (un cliente semanal
+            son unos 260 € al año), así que se le da peso de anuncio y su
+            propio botón, en vez de dejarla como nota al pie. */}
+        <RevealComponent className="mt-8">
+          <div className="grain flex flex-col items-center gap-7 overflow-hidden bg-vino px-6 py-10 text-center text-hueso ring-1 ring-acento/30 md:flex-row md:justify-between md:px-12 md:py-12 md:text-left">
             <div className="relative">
               <p className="text-xs tracking-kicker text-acento">{PROMO.titulo}</p>
-              <p className="mt-2 max-w-md font-display text-xl font-semibold sm:text-2xl">
+              <p className="mt-3 max-w-md font-display text-2xl font-semibold sm:text-3xl">
                 {PROMO.texto}
               </p>
             </div>
-            <span className="relative flex shrink-0 items-baseline gap-1 font-display text-5xl font-bold text-acento">
-              {PROMO.precio}
-              <span className="text-2xl">€</span>
-            </span>
+
+            <div className="relative flex shrink-0 flex-col items-center gap-4">
+              <span className="flex items-baseline gap-1 font-display text-7xl font-bold leading-none text-acento">
+                {PROMO.precio}
+                <span className="text-3xl">€</span>
+              </span>
+              <CitaButtonComponent texto="La quiero" />
+            </div>
           </div>
         </RevealComponent>
 
