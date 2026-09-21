@@ -21,9 +21,14 @@ export default function GaleriaComponent() {
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <SectionHeadingComponent kicker="El trabajo" titulo="Galería" />
 
-        <div className="mt-12 columns-2 gap-4 lg:columns-3 [&>*]:mb-4">
+        {/* Rejilla, no "masonry" de columnas: las fotos son todas verticales
+            con la misma proporción, así que las columnas CSS solo conseguían
+            repartirlas 3+2+2 y dejar un hueco feo al final. Con rejilla, las
+            filas cuadran solas.
+            (Si algún día entran fotos apaisadas, habría que revisarlo.) */}
+        <div className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-3">
           {GALERIA.map((foto, i) => (
-            <RevealComponent key={foto.id} delay={(i % 3) * 80} className="break-inside-avoid">
+            <RevealComponent key={foto.id} delay={(i % 3) * 80}>
               <button
                 type="button"
                 onClick={() => abrir(i)}
