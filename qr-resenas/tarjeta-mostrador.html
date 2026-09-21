@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>A.S — Tarjeta de reseñas para el mostrador</title>
+    <!--
+      TARJETA PARA EL MOSTRADOR (tamaño A6, 105×148 mm).
+
+      CÓMO USARLA:
+        1. Genera el QR en qrcode-monkey con el enlace de DEJAR reseña
+           (el que abre directamente la ventana de escribir).
+        2. Guarda el PNG en esta misma carpeta con el nombre  qr-resena.png
+        3. Abre este archivo en el navegador y dale a Imprimir (Ctrl+P).
+           Elige tamaño A6, o A4 y recorta.
+
+      Fondo claro a propósito: gasta mucha menos tinta que uno oscuro y se lee
+      mejor bajo la luz del local.
+    -->
+    <style>
+      @page {
+        size: 105mm 148mm;
+        margin: 0;
+      }
+
+      :root {
+        --tinta: #16202a;
+        --acento: #c4a05a;
+        --hueso: #f5f3ee;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        background: #999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .tarjeta {
+        width: 105mm;
+        height: 148mm;
+        background: var(--hueso);
+        color: var(--tinta);
+        border: 2.5mm solid var(--tinta);
+        padding: 8mm 7mm;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        text-align: center;
+      }
+
+      .logo { width: 22mm; border-radius: 2mm; }
+
+      .kicker {
+        margin: 4mm 0 0;
+        font-size: 2.8mm;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--acento);
+      }
+
+      h1 {
+        margin: 2mm 0 0;
+        font-size: 7mm;
+        line-height: 1.15;
+        font-weight: 700;
+      }
+
+      .filete {
+        width: 18mm;
+        height: 0.4mm;
+        background: var(--acento);
+        margin: 3mm auto;
+      }
+
+      .estrellas { color: var(--acento); font-size: 6mm; letter-spacing: 1mm; }
+
+      .qr {
+        width: 52mm;
+        height: 52mm;
+        object-fit: contain;
+        border: 0.3mm solid rgba(22, 32, 42, 0.15);
+      }
+
+      .falta-qr {
+        width: 52mm;
+        height: 52mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0.6mm dashed var(--acento);
+        color: var(--tinta);
+        opacity: 0.55;
+        font-size: 3mm;
+        padding: 4mm;
+        line-height: 1.5;
+      }
+
+      .instruccion { margin: 0; font-size: 3.4mm; line-height: 1.5; }
+      .instruccion strong { color: var(--acento); }
+
+      .pie {
+        margin: 0;
+        font-size: 2.8mm;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        opacity: 0.6;
+      }
+
+      /* Al imprimir: sin fondo gris y respetando los colores de marca. */
+      @media print {
+        body { background: none; display: block; }
+        .tarjeta { border-width: 2mm; }
+        * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tarjeta">
+      <div>
+        <img class="logo" src="../public/logo-adri.jpg" alt="A.S Peluquería y Barbería" />
+        <p class="kicker">A.S Peluquería y Barbería</p>
+        <h1>¿Te ha gustado<br />el corte?</h1>
+        <div class="filete"></div>
+        <div class="estrellas">★★★★★</div>
+      </div>
+
+      <!--
+        Cuando exista qr-resena.png en esta carpeta, sustituye el bloque
+        .falta-qr por:   <img class="qr" src="qr-resena.png" alt="Código QR" />
+      -->
+      <div class="falta-qr">
+        Pega aquí el QR:<br />guarda el PNG en esta carpeta como
+        <strong>qr-resena.png</strong> y cambia este bloque por la imagen
+      </div>
+
+      <div>
+        <p class="instruccion">
+          Enfoca el código con la cámara<br />y <strong>déjanos tu reseña</strong>.
+          Nos ayuda muchísimo.
+        </p>
+        <div class="filete"></div>
+        <p class="pie">Gracias · La Rinconada</p>
+      </div>
+    </div>
+  </body>
+</html>

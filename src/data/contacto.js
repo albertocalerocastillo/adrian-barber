@@ -29,10 +29,24 @@ export const WHATSAPP_MENSAJE = 'Hola Adrián, me gustaría pedir una cita'
 // ⚠️ DATO MANUAL: no se actualiza solo. Repásalo de vez en cuando en la ficha.
 export const GOOGLE_VALORACION = { nota: '5,0', resenas: 56 }
 
-// Ficha de Google, para leer o dejar reseñas.
+// Ficha de Google, para LEER reseñas.
 export const GOOGLE_RESENAS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
   'A.S Peluquería y Barbería, La Rinconada, Sevilla'
 )}`
+
+// Enlace para DEJAR una reseña (abre directamente la ventana de escribir).
+//
+// 📌 CÓMO CONSEGUIRLO (30 segundos):
+//    1. Abre la ficha en Google Maps y pulsa "Escribir una reseña".
+//    2. Copia la URL que se abre: es de la forma
+//       https://search.google.com/local/writereview?placeid=ChIJ...
+//    3. Pégala aquí.
+//    (Si Adrián entra en su Perfil de Empresa → "Pedir reseñas", Google le da
+//     un enlace corto tipo https://g.page/r/XXXX/review, que también vale.)
+//
+// Mientras esté vacío, la web no enseña el botón de dejar reseña: es mejor no
+// enseñarlo que mandar al cliente a una búsqueda genérica y que se pierda.
+export const GOOGLE_RESENA_URL = ''
 
 // Testimonios REALES copiados literalmente de la ficha de Google (21/09/2026).
 // ⛔ NO inventar ninguno ni retocar la redacción: son palabras de clientes.
