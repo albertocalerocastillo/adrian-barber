@@ -87,19 +87,22 @@
         border: 0.3mm solid rgba(22, 32, 42, 0.15);
       }
 
+      /* Solo se ve si falta el PNG del QR (lo activa el onerror de la imagen). */
       .falta-qr {
         width: 52mm;
         height: 52mm;
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: center;
+        text-align: center;
         border: 0.6mm dashed var(--acento);
         color: var(--tinta);
         opacity: 0.55;
-        font-size: 3mm;
-        padding: 4mm;
-        line-height: 1.5;
+        font-size: 3.2mm;
+        padding: 5mm;
+        line-height: 1.6;
       }
+      .falta-qr strong { color: var(--tinta); }
 
       .instruccion { margin: 0; font-size: 3.4mm; line-height: 1.5; }
       .instruccion strong { color: var(--acento); }
@@ -123,7 +126,14 @@
   <body>
     <div class="tarjeta">
       <div>
-        <img class="logo" src="../public/logo-adri.jpg" alt="A.S Peluquería y Barbería" />
+        <!-- Abierto como archivo local vale la ruta relativa; servido por el
+             servidor de desarrollo, el logo cuelga de la raíz. -->
+        <img
+          class="logo"
+          src="../public/logo-adri.jpg"
+          onerror="this.onerror=null; this.src='/logo-adri.jpg';"
+          alt="A.S Peluquería y Barbería"
+        />
         <p class="kicker">A.S Peluquería y Barbería</p>
         <h1>¿Te ha gustado<br />el corte?</h1>
         <div class="filete"></div>
@@ -131,12 +141,20 @@
       </div>
 
       <!--
-        Cuando exista qr-resena.png en esta carpeta, sustituye el bloque
-        .falta-qr por:   <img class="qr" src="qr-resena.png" alt="Código QR" />
+        No hay que tocar nada: en cuanto exista qr-resena.png en esta carpeta,
+        se muestra sola. Mientras no esté, sale el recuadro de aviso.
       -->
-      <div class="falta-qr">
-        Pega aquí el QR:<br />guarda el PNG en esta carpeta como
-        <strong>qr-resena.png</strong> y cambia este bloque por la imagen
+      <img
+        class="qr"
+        src="qr-resena.png"
+        alt="Código QR para dejar la reseña"
+        onerror="this.style.display='none'; document.getElementById('falta-qr').style.display='flex';"
+      />
+      <div class="falta-qr" id="falta-qr">
+        <span>
+          Falta el QR.<br />Guarda el PNG en esta carpeta
+          como <strong>qr-resena.png</strong>
+        </span>
       </div>
 
       <div>
