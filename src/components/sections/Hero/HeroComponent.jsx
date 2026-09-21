@@ -12,7 +12,11 @@ import fondoHero from '../../../assets/galeria/corte-2.jpg'
 
 /**
  * Hero a pantalla completa: foto real de fondo con velo oscuro, el nombre como
- * protagonista tipográfico, lema y CTA. El emblema de A.S va en pequeño encima.
+ * protagonista tipográfico, lema y CTA. El emblema de A.S va encima.
+ *
+ * El `pt-28 pb-28` de la sección reserva el sitio de la barra fija de arriba y
+ * de la flecha de abajo: sin eso, en portátiles poco altos el emblema quedaba
+ * tapado por la barra y el texto chocaba con la flecha.
  */
 export default function HeroComponent() {
   const { estado } = useEstadoNegocio()
@@ -20,7 +24,7 @@ export default function HeroComponent() {
   return (
     <section
       id="inicio"
-      className="grain relative flex min-h-screen items-center justify-center overflow-hidden bg-tinta text-hueso"
+      className="grain relative flex min-h-screen items-center justify-center overflow-hidden bg-tinta pb-28 pt-28 text-hueso [@media(max-height:820px)]:pb-20 [@media(max-height:820px)]:pt-24"
     >
       {/* Foto de fondo */}
       <div
@@ -48,18 +52,18 @@ export default function HeroComponent() {
           {NEGOCIO.ciudad}
         </p>
 
-        {/* Emblema oficial, en pequeño */}
+        {/* Emblema oficial */}
         <img
           src="/logo-adri.jpg"
           alt=""
           aria-hidden="true"
-          className="mb-7 w-20 rounded-lg shadow-2xl shadow-black/60 ring-1 ring-acento/25 sm:w-24"
+          className="mb-6 w-24 rounded-lg shadow-2xl shadow-black/60 ring-1 ring-acento/25 sm:w-28 md:mb-7 md:w-32 lg:w-36 [@media(max-height:820px)]:mb-4 [@media(max-height:820px)]:w-24"
           fetchPriority="high"
         />
 
         {/* Nombre protagonista */}
         <h1 className="flex flex-col items-center">
-          <span className="font-display text-7xl font-bold leading-none tracking-tight drop-shadow-2xl sm:text-8xl md:text-9xl">
+          <span className="font-display text-7xl font-bold leading-none tracking-tight drop-shadow-2xl sm:text-8xl md:text-9xl [@media(max-height:820px)]:text-7xl">
             A.S
           </span>
           <span className="mt-5 text-[0.7rem] uppercase tracking-[0.35em] text-hueso/85 sm:text-xs">
@@ -71,10 +75,10 @@ export default function HeroComponent() {
         </h1>
 
         {/* Filete dorado */}
-        <span className="mt-7 block h-px w-24 bg-acento" />
+        <span className="mt-7 block h-px w-24 bg-acento [@media(max-height:820px)]:mt-4" />
 
         {/* Lema */}
-        <p className="mt-7 max-w-xl text-lg italic leading-relaxed text-hueso/85 drop-shadow sm:text-xl">
+        <p className="mt-7 max-w-xl text-lg italic leading-relaxed text-hueso/85 drop-shadow sm:text-xl [@media(max-height:820px)]:mt-4">
           «Cortes con carácter, barba a navaja y un buen rato en la silla»
         </p>
         <p className="mt-3 text-sm text-hueso/55">
@@ -83,12 +87,12 @@ export default function HeroComponent() {
 
         {/* ¿Puedo ir ya? Es la primera pregunta del cliente: se responde aquí
             arriba, sin obligarle a bajar hasta el horario. */}
-        <div className="mt-7">
+        <div className="mt-7 [@media(max-height:820px)]:mt-4">
           <EstadoBadgeComponent estado={estado} claro href="#horario" />
         </div>
 
         {/* CTAs */}
-        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row [@media(max-height:820px)]:mt-5">
           <CitaButtonComponent tamano="lg" />
           <a
             href={INSTAGRAM_URL}
