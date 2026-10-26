@@ -1,8 +1,17 @@
-import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
-import { useScrolled } from '../../../hooks/useScrolled'
+import { useEffect, useState } from 'react'
+import { AnimatePresence, m, useMotionValueEvent, useScroll } from 'motion/react'
+import { Menu, X, Phone, MapPin } from 'lucide-react'
 import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
+import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
+import { EASE_SUAVE } from '../../../theme/animacion'
+import {
+  NEGOCIO,
+  TELEFONO,
+  TELEFONO_VISIBLE,
+  INSTAGRAM,
+  INSTAGRAM_URL,
+} from '../../../data/contacto'
 
 const ENLACES = [
   { href: '#servicios', texto: 'Servicios' },
@@ -15,80 +24,158 @@ const ENLACES = [
 
 /**
  * Barra de navegación fija.
- * Transparente sobre el hero; al hacer scroll se vuelve sólida (tinta) con
- * blur. Menú lateral en móvil.
+ *  - Arriba del todo es transparente y deja respirar al hero; al bajar se
+ *    vuelve pizarra sólida y más compacta.
+ *  - Al bajar se esconde (más pantalla para el contenido) y al subir vuelve,
+ *    que es justo cuando el usuario busca el menú.
+ *  - En móvil y tablet, menú a pantalla completa con los enlaces escalonados.
  */
 export default function NavComponent() {
-  const scrolled = useScrolled(40)
+  const { scrollY } = useScroll()
+  const [solida, setSolida] = useState(false)
+  const [oculta, setOculta] = useState(false)
   const [menuAbierto, setMenuAbierto] = useState(false)
+
+  useMotionValueEvent(scrollY, 'change', (y) => {
+    const anterior = scrollY.getPrevious() ?? 0
+    setSolida(y > 40)
+    setOculta(y > 500 && y > anterior + 4)
+    if (y < anterior - 4) setOculta(false)
+  })
+
+  // Con el menú abierto, la página de debajo no debe moverse.
+  useEffect(() => {
+    document.body.style.overflow = menuAbierto ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [menuAbierto])
 
   const cerrar = () => setMenuAbierto(false)
 
   return (
-    <header
-      className={`pizarra fixed inset-x-0 top-0 z-40 border-b border-acento/15 transition-shadow duration-300 ${
-        scrolled ? 'shadow-lg shadow-black/40' : ''
-      }`}
-    >
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">
-        {/* Logo */}
-        <a href="#inicio" className="shrink-0" aria-label="Inicio">
-          <LogoAdriComponent className="h-12 w-12" />
-        </a>
-
-        {/* Enlaces escritorio */}
-        <ul className="hidden items-center gap-8 md:flex">
-          {ENLACES.map((e) => (
-            <li key={e.href}>
-              <a
-                href={e.href}
-                className="text-sm font-medium text-hueso/80 transition-colors hover:text-acento"
-              >
-                {e.texto}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        {/* CTA escritorio */}
-        <div className="hidden md:block">
-          <CitaButtonComponent />
-        </div>
-
-        {/* Botón menú móvil */}
-        <button
-          type="button"
-          onClick={() => setMenuAbierto((v) => !v)}
-          className="text-hueso md:hidden"
-          aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
-        >
-          {menuAbierto ? <X size={26} /> : <Menu size={26} />}
-        </button>
-      </nav>
-
-      {/* Menú móvil desplegable */}
-      <div
-        className={`overflow-hidden bg-tinta/95 backdrop-blur-md transition-[max-height] duration-300 md:hidden ${
-          menuAbierto ? 'max-h-96' : 'max-h-0'
+    <>
+      <m.header
+        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color] duration-500 ${
+          solida || menuAbierto
+            ? 'border-b border-acento/15 bg-tinta-900/90 shadow-lg shadow-black/30 backdrop-blur-md'
+            : 'border-b border-transparent bg-transparent'
         }`}
+        animate={{ y: oculta && !menuAbierto ? '-100%' : '0%' }}
+        transition={{ duration: 0.45, ease: EASE_SUAVE }}
       >
-        <ul className="flex flex-col gap-1 px-5 pb-5 pt-1">
-          {ENLACES.map((e) => (
-            <li key={e.href}>
-              <a
-                href={e.href}
-                onClick={cerrar}
-                className="block px-3 py-3 text-base font-medium text-hueso/85 transition-colors hover:bg-tinta-800 hover:text-acento"
-              >
-                {e.texto}
-              </a>
-            </li>
-          ))}
-          <li className="mt-2 px-1">
-            <CitaButtonComponent className="w-full" />
-          </li>
-        </ul>
-      </div>
-    </header>
+        <nav
+          className={`mx-auto flex max-w-7xl items-center justify-between px-5 transition-[padding] duration-500 md:px-8 ${
+            solida ? 'py-2.5' : 'py-4 lg:py-5'
+          }`}
+        >
+          {/* Logo */}
+          <a href="#inicio" className="al-tocar shrink-0" aria-label="Inicio" onClick={cerrar}>
+            <LogoAdriComponent
+              variante="monograma"
+              className={`w-auto transition-[height] duration-500 ${solida ? 'h-9' : 'h-10 lg:h-12'}`}
+            />
+          </a>
+
+          {/* Enlaces escritorio (en tablet no caben bien: van al menú) */}
+          <ul className="hidden items-center gap-7 lg:flex xl:gap-9">
+            {ENLACES.map((e) => (
+              <li key={e.href}>
+                <a
+                  href={e.href}
+                  className="subrayado pb-1 text-[0.8rem] font-medium uppercase tracking-[0.14em] text-hueso/80 hover:text-acento"
+                >
+                  {e.texto}
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex items-center gap-3">
+            {/* CTA (tablet y escritorio) */}
+            <div className="hidden md:block">
+              <CitaButtonComponent />
+            </div>
+
+            {/* Botón menú (móvil y tablet) */}
+            <button
+              type="button"
+              onClick={() => setMenuAbierto((v) => !v)}
+              className="al-tocar -mr-2 flex h-11 w-11 items-center justify-center text-hueso lg:hidden"
+              aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
+              aria-expanded={menuAbierto}
+            >
+              {menuAbierto ? <X size={26} /> : <Menu size={26} />}
+            </button>
+          </div>
+        </nav>
+      </m.header>
+
+      {/* Menú a pantalla completa (móvil y tablet) */}
+      <AnimatePresence>
+        {menuAbierto && (
+          <m.div
+            className="grain fixed inset-0 z-40 flex flex-col overflow-y-auto bg-tinta-900 px-6 pb-28 pt-24 text-hueso md:px-12 lg:hidden"
+            initial={{ clipPath: 'circle(0% at 100% 0%)' }}
+            animate={{ clipPath: 'circle(150% at 100% 0%)' }}
+            exit={{ clipPath: 'circle(0% at 100% 0%)' }}
+            transition={{ duration: 0.6, ease: EASE_SUAVE }}
+          >
+            {/* Sello de fondo, muy tenue */}
+            <img
+              src="/logo-sello.webp"
+              alt=""
+              aria-hidden="true"
+              className="gira-lento pointer-events-none absolute -bottom-24 -right-24 w-80 opacity-[0.07] md:w-[28rem]"
+            />
+
+            <ul className="relative flex flex-col">
+              {ENLACES.map((e, i) => (
+                <m.li
+                  key={e.href}
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.15 + i * 0.06, duration: 0.5, ease: EASE_SUAVE }}
+                >
+                  <a
+                    href={e.href}
+                    onClick={cerrar}
+                    className="group flex items-baseline gap-4 border-b border-hueso/10 py-4 font-display text-3xl font-semibold transition-colors hover:text-acento md:text-4xl"
+                  >
+                    <span className="font-body text-xs text-acento">0{i + 1}</span>
+                    {e.texto}
+                  </a>
+                </m.li>
+              ))}
+            </ul>
+
+            <m.div
+              className="relative mt-10 flex flex-col gap-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55, duration: 0.5, ease: EASE_SUAVE }}
+            >
+              <CitaButtonComponent tamano="lg" className="w-full md:w-auto md:self-start" />
+              <div className="flex flex-col gap-3 text-sm text-hueso/65">
+                <a href={`tel:${TELEFONO}`} className="flex items-center gap-3 hover:text-acento">
+                  <Phone size={16} className="text-acento" /> {TELEFONO_VISIBLE}
+                </a>
+                <p className="flex items-center gap-3">
+                  <MapPin size={16} className="text-acento" /> {NEGOCIO.direccion}, {NEGOCIO.localidad}
+                </p>
+                <a
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 hover:text-acento"
+                >
+                  <InstagramIcon size={16} /> @{INSTAGRAM}
+                </a>
+              </div>
+            </m.div>
+          </m.div>
+        )}
+      </AnimatePresence>
+    </>
   )
 }

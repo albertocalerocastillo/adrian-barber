@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+import { m, useScroll, useTransform } from 'motion/react'
 import { Scissors, Award, Heart } from 'lucide-react'
 import RevealComponent from '../../ui/Reveal/RevealComponent'
 import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
@@ -14,61 +16,115 @@ const VALORES = [
   { icono: Heart, titulo: 'Cercanía', texto: 'Ambiente de barrio, trato de siempre.' },
 ]
 
+// La frase grande se "enciende" palabra a palabra según se baja.
+const FRASE = 'Me gusta que salgas de la silla con la cabeza alta.'
+
+function Palabra({ texto, progreso, rango }) {
+  const opacity = useTransform(progreso, rango, [0.18, 1])
+  return (
+    <m.span style={{ opacity }} className="motion-reduce:opacity-100!">
+      {texto}{' '}
+    </m.span>
+  )
+}
+
 /**
- * Presentación del barbero. Foto a un lado, texto e ideas clave al otro.
+ * Presentación del barbero. Foto con parallax y sello a un lado; al otro, una
+ * frase que se ilumina con el scroll, el texto y sus valores.
  * Fondo tinta (oscuro) para contraste con las secciones claras.
  */
 export default function SobreMiComponent() {
+  const seccion = useRef(null)
+  const frase = useRef(null)
+
+  const { scrollYProgress } = useScroll({ target: seccion, offset: ['start end', 'end start'] })
+  const fotoY = useTransform(scrollYProgress, [0, 1], ['-8%', '8%'])
+  const selloGiro = useTransform(scrollYProgress, [0, 1], [-40, 40])
+
+  const { scrollYProgress: progresoFrase } = useScroll({
+    target: frase,
+    offset: ['start 85%', 'end 45%'],
+  })
+  const palabras = FRASE.split(' ')
+
   return (
-    <section id="sobre-mi" className="bg-tinta py-20 text-hueso md:py-28">
-      <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 md:grid-cols-2 md:px-8">
+    <section ref={seccion} id="sobre-mi" className="grain relative overflow-hidden bg-tinta py-24 text-hueso md:py-32">
+      <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 md:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
         {/* Foto */}
-        <RevealComponent className="order-1 md:order-none">
-          <div className="relative">
-            <img
+        <RevealComponent desde="izquierda" className="relative mx-auto w-full max-w-md lg:max-w-none">
+          <div className="relative overflow-hidden">
+            <m.img
               src={fotoSobreMi}
               alt={`Trabajo de ${NEGOCIO.barbero}, barbero en ${NEGOCIO.localidad}`}
               width={640}
               height={800}
               loading="lazy"
-              className="aspect-[4/5] w-full object-cover"
+              className="aspect-[4/5] w-full scale-[1.18] object-cover"
+              style={{ y: fotoY }}
             />
-            {/* Marco de acento */}
-            <span className="pointer-events-none absolute -bottom-3 -right-3 h-24 w-24 border-b-2 border-r-2 border-acento" />
+            <div className="absolute inset-0 bg-gradient-to-t from-tinta/60 via-transparent to-transparent" />
           </div>
+          {/* Marco de acento */}
+          <span className="pointer-events-none absolute -bottom-4 -left-4 h-28 w-28 border-b-2 border-l-2 border-acento" />
+          <span className="pointer-events-none absolute -right-4 -top-4 h-28 w-28 border-r-2 border-t-2 border-acento/40" />
+          {/* Sello que gira con el scroll */}
+          <m.img
+            src="/logo-sello.webp"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            className="absolute -bottom-10 -right-6 w-32 drop-shadow-2xl sm:w-36 md:-right-10 md:w-40"
+            style={{ rotate: selloGiro }}
+          />
         </RevealComponent>
 
         {/* Texto */}
         <div>
           <RevealComponent>
-            <p className="mb-3 text-xs tracking-kicker text-acento">Sobre mí</p>
-            <h2 className="font-display text-3xl font-bold sm:text-4xl md:text-5xl">
-              Hola, soy Adrián
+            <p className="mb-4 flex items-center gap-3 text-xs tracking-kicker text-acento">
+              <span className="h-px w-6 bg-acento/60" />
+              Sobre mí
+            </p>
+            <h2 className="font-display text-4xl font-bold sm:text-5xl md:text-6xl">
+              Hola, soy <span className="italic text-acento">Adrián</span>
             </h2>
-            <span className="mt-5 block h-px w-16 bg-acento" />
           </RevealComponent>
 
+          <p
+            ref={frase}
+            className="mt-8 font-display text-2xl leading-snug sm:text-3xl"
+          >
+            <span className="sr-only">{FRASE}</span>
+            <span aria-hidden="true">
+              {palabras.map((p, i) => (
+                <Palabra
+                  key={p + i}
+                  texto={p}
+                  progreso={progresoFrase}
+                  rango={[i / palabras.length, (i + 1) / palabras.length]}
+                />
+              ))}
+            </span>
+          </p>
+
           <RevealComponent delay={100}>
-            <p className="mt-6 text-base leading-relaxed text-hueso/75">
+            <p className="mt-6 text-base leading-relaxed text-hueso/70">
               Barbero y peluquero en {NEGOCIO.localidad} ({NEGOCIO.provincia}). Me
-              gusta el corte clásico tanto como las tendencias, pero sobre todo me
-              gusta que salgas de la silla con la cabeza alta. Aquí no hay líneas de
+              gusta el corte clásico tanto como las tendencias. Aquí no hay líneas de
               montaje: hay tiempo, conversación y trabajo bien hecho.
             </p>
           </RevealComponent>
 
           {/* Valores */}
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {VALORES.map((v, i) => (
-              <RevealComponent key={v.titulo} delay={150 + i * 80}>
-                <div className="border border-tinta-700 bg-tinta-800 p-4">
-                  <v.icono size={20} className="text-acento" strokeWidth={1.75} />
-                  <h3 className="mt-3 font-display text-base font-semibold">
-                    {v.titulo}
-                  </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-hueso/55">
-                    {v.texto}
-                  </p>
+              <RevealComponent key={v.titulo} delay={150 + i * 90}>
+                <div className="group h-full border border-tinta-700 bg-tinta-800/70 p-5 transition-colors duration-300 hover:border-acento/50">
+                  <span className="flex h-10 w-10 items-center justify-center border border-acento/30 text-acento transition-colors duration-300 group-hover:bg-acento group-hover:text-tinta">
+                    <v.icono size={18} strokeWidth={1.75} />
+                  </span>
+                  <h3 className="mt-4 font-display text-lg font-semibold">{v.titulo}</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-hueso/55">{v.texto}</p>
                 </div>
               </RevealComponent>
             ))}
@@ -79,7 +135,7 @@ export default function SobreMiComponent() {
               href={INSTAGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-8 inline-flex items-center gap-2.5 text-sm font-medium text-hueso/80 transition-colors hover:text-acento"
+              className="subrayado mt-10 inline-flex items-center gap-2.5 pb-1 text-sm font-medium text-hueso/80 hover:text-acento"
             >
               <InstagramIcon size={18} />
               Sígueme en @{INSTAGRAM}

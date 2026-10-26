@@ -41,6 +41,7 @@ export const SERVICIOS = [
 // Promoción destacada (de sus historias).
 export const PROMO = {
   titulo: 'Clientes de cada semana',
-  texto: 'Si te pelas una vez por semana, el corte se queda en 5 €.',
+  // Espacio duro entre el 5 y el €: que nunca se queden en líneas distintas.
+  texto: 'Si te pelas una vez por semana, el corte se queda en 5 €.',
   precio: 5,
 }

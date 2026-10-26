@@ -35,6 +35,49 @@
   /* Acento granate (la cinta del logo), para detalles puntuales */
   --color-vino:         #6e2329;
   --color-vino-claro:   #8a2f37;
+
+  /* Curva de toda la web (la misma que EASE_SUAVE en theme/animacion.js) */
+  --ease-suave: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@keyframes entra {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes palabra-sube {
+  to { transform: none; }
+}
+@keyframes sello-entra {
+  from { opacity: 0; transform: scale(0.72) rotate(-28deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ken-burns {
+  from { transform: scale(1.04); }
+  to { transform: scale(1.16) translate(-1.5%, -1%); }
+}
+@keyframes gira {
+  to { transform: rotate(360deg); }
+}
+@keyframes destello {
+  0%, 60% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Acordeones (<details>) que se despliegan con suavidad. Solo en navegadores
+   que saben animar hasta "auto"; en el resto se abren al instante. */
+@supports (interpolate-size: allow-keywords) {
+  :root { interpolate-size: allow-keywords; }
+  details::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition: block-size 0.45s var(--ease-suave), content-visibility 0.45s allow-discrete;
+  }
+  details[open]::details-content {
+    block-size: auto;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    details::details-content { transition: none; }
+  }
 }
 
 /* ─── ESTILOS BASE ──────────────────────────────────────────
@@ -47,6 +90,14 @@
     color: var(--color-tinta);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Lo que se anima desde los lados (sello, cinta) no debe crear scroll
+       horizontal en el móvil. "clip" y no "hidden" para no romper sticky. */
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-acento);
+    color: var(--color-tinta);
   }
 
   h1, h2, h3, h4 {
@@ -74,27 +125,102 @@
     text-transform: uppercase;
   }
 
-  /* Animación de aparición al hacer scroll.
-     Acelerada por GPU (opacity + transform) → fluida en móvil. */
-  .reveal {
+  /* ─── Motion por CSS ───────────────────────────────────────
+     Lo que se ve al cargar va por CSS (no espera a React) y lo que
+     reacciona al scroll o al ratón, con Motion (theme/animacion.js). */
+
+  /* Bloques del hero que aparecen al cargar, escalonados con --orden. */
+  .entra {
     opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
-    will-change: opacity, transform;
+    animation: entra 0.9s var(--ease-suave) forwards;
+    animation-delay: calc(var(--orden, 0) * 110ms + 150ms);
   }
-  .reveal-visible {
-    opacity: 1;
-    transform: translateY(0);
+
+  /* Palabras del titular: suben desde debajo de su propia línea. */
+  .palabra {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+  .palabra > span {
+    display: inline-block;
+    transform: translateY(110%);
+    animation: palabra-sube 1s var(--ease-suave) forwards;
+    animation-delay: calc(var(--orden, 0) * 70ms + 250ms);
+  }
+
+  /* El sello del hero entra girando y creciendo. */
+  .sello-entra {
+    opacity: 0;
+    animation: sello-entra 1.4s var(--ease-suave) 0.2s forwards;
+  }
+
+  /* Zoom lento de la foto de fondo del hero ("Ken Burns"). */
+  .ken-burns {
+    animation: ken-burns 22s ease-in-out infinite alternate;
+  }
+
+  /* Anillo de puntos que gira despacio detrás del sello. */
+  .gira-lento {
+    animation: gira 60s linear infinite;
+  }
+  .gira-lento-inverso {
+    animation: gira 90s linear infinite reverse;
+  }
+
+  /* Destello que cruza un elemento cada pocos segundos (promo). */
+  .destello {
+    position: relative;
+    overflow: hidden;
+  }
+  .destello::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.14) 50%, transparent 65%);
+    transform: translateX(-100%);
+    animation: destello 5s ease-in-out 1.5s infinite;
+  }
+
+  /* Subrayado dorado que crece desde la izquierda (enlaces del menú). */
+  .subrayado {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.4s var(--ease-suave), color 0.3s;
+  }
+  .subrayado:hover,
+  .subrayado:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* Botones táctiles: se hunden un poco al pulsarlos. */
+  .al-tocar {
+    transition-property: transform, box-shadow, background-color, color, border-color, opacity;
+    transition-duration: 0.25s;
+  }
+  .al-tocar:active {
+    transform: scale(0.97);
   }
 
   /* Accesibilidad: si el usuario pide reducir movimiento, sin animación. */
   @media (prefers-reduced-motion: reduce) {
-    .reveal {
+    .entra,
+    .sello-entra,
+    .palabra > span {
+      animation: none;
       opacity: 1;
       transform: none;
-      transition: none;
     }
-    /* Punto del badge "Abierto ahora" y flecha del hero. */
+    .ken-burns,
+    .gira-lento,
+    .gira-lento-inverso,
+    .destello::before,
     .animate-ping,
     .animate-bounce {
       animation: none;

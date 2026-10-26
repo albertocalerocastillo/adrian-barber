@@ -34,10 +34,10 @@ export default function CitaButtonComponent({
   }
   const tamanos = {
     md: 'px-7 py-3.5 text-xs',
-    lg: 'px-9 py-4 text-sm',
+    lg: 'px-6 py-4 text-xs min-[400px]:px-8 sm:px-9 sm:text-sm lg:px-7 xl:px-9',
   }
 
-  const clases = `group inline-flex items-center justify-center gap-2.5 font-semibold uppercase tracking-widest transition-all duration-300 ${variantes[variante]} ${tamanos[tamano]} ${className}`
+  const clases = `group inline-flex items-center justify-center gap-2.5 whitespace-nowrap al-tocar font-semibold uppercase tracking-widest transition-all duration-300 hover:-translate-y-0.5 ${variantes[variante]} ${tamanos[tamano]} ${className}`
   const medida = tamano === 'lg' ? 20 : 18
 
   // FASE 1: sin reserva online → el botón contacta por WhatsApp. Se usa el
