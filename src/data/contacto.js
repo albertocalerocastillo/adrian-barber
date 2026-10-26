@@ -76,3 +76,15 @@ export const TESTIMONIOS = [
 export const MAPS_QUERY = encodeURIComponent('C/ 28 de Febrero 2, La Rinconada, Sevilla')
 export const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${MAPS_QUERY}`
 export const MAPS_EMBED = `https://www.google.com/maps?q=${MAPS_QUERY}&output=embed`
+
+// ─── Datos legales (aviso legal LSSI y política de privacidad) ───
+// ⚠️ PENDIENTES DE ADRIÁN: la LSSI obliga a poner el NIF y un email de
+//    contacto del titular. Mientras estén vacíos, esas líneas no salen en la
+//    web (mejor que poner datos inventados), pero hay que rellenarlos.
+export const LEGAL = {
+  titular: 'Adrián Sánchez Aranda',
+  nif: '', // p. ej. '12345678Z'
+  email: '', // p. ej. 'adrian@ejemplo.com'
+  domicilio: `${NEGOCIO.direccion}, 41309 ${NEGOCIO.localidad} (${NEGOCIO.provincia})`,
+  actualizado: '26 de octubre de 2026',
+}

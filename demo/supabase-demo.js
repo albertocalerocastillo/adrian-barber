@@ -151,7 +151,7 @@ function consulta(nombre) {
 }
 
 // ─── Sesión ─────────────────────────────────────────────────────────────────
-const SESION = { user: { email: 'adrian@demo.es' } }
+const SESION = { user: { id: 'demo-barbero', email: 'adrian@demo.es' } }
 let sesion = new URLSearchParams(location.search).has('login') ? null : SESION
 const oyentes = new Set()
 const avisar = () => oyentes.forEach((f) => f('CAMBIO', sesion))
@@ -165,6 +165,7 @@ export const supabase = {
     },
   },
   async rpc(nombre, { p_desde, p_hasta } = {}) {
+    if (nombre === 'es_barbero') return { data: true, error: null }
     if (nombre !== 'citas_ocupadas') return { data: [], error: null }
     const ocupados = [
       ...tablas.citas.filter((c) => c.estado !== 'cancelada'),

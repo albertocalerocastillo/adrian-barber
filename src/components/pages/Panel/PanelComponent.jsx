@@ -8,7 +8,7 @@ import AgendaPanel from './AgendaPanel'
 import AjustesHorario from './AjustesHorario'
 import AjustesServicios from './AjustesServicios'
 import { AvisoProvider } from './Aviso'
-import { logout } from '../../../lib/panel'
+import { logout, esBarbero } from '../../../lib/panel'
 
 const SECCIONES = [
   { id: 'agenda', texto: 'Agenda', Icono: CalendarDays },
@@ -30,6 +30,19 @@ const SECCIONES = [
  */
 export default function PanelComponent() {
   const { sesion, cargando } = useAuth()
+  // null = comprobando; se guarda junto al usuario comprobado para no
+  // arrastrar el resultado de otra sesión.
+  const [permiso, setPermiso] = useState({ usuario: null, ok: null })
+  const usuario = sesion?.user?.id ?? sesion?.user?.email ?? null
+
+  useEffect(() => {
+    if (!usuario) return
+    let vivo = true
+    esBarbero().then((ok) => vivo && setPermiso({ usuario, ok }))
+    return () => {
+      vivo = false
+    }
+  }, [usuario])
 
   // El panel no debe salir en Google.
   useEffect(() => {
@@ -44,7 +57,9 @@ export default function PanelComponent() {
     }
   }, [])
 
-  if (cargando) {
+  const comprobando = usuario && permiso.usuario !== usuario
+
+  if (cargando || comprobando) {
     return (
       <div className="grain flex min-h-screen items-center justify-center bg-tinta-900">
         <LogoAdriComponent className="h-24 w-24 animate-pulse" />
@@ -53,6 +68,27 @@ export default function PanelComponent() {
   }
 
   if (!sesion) return <LoginPanel />
+
+  // Sesión iniciada, pero la cuenta no está en la lista de barberos: la BD no
+  // le enseña nada, así que se le dice claro en vez de mostrar un panel vacío.
+  if (!permiso.ok) {
+    return (
+      <div className="grain flex min-h-screen flex-col items-center justify-center bg-tinta-900 px-6 text-center text-hueso">
+        <LogoAdriComponent className="h-24 w-24" />
+        <h1 className="mt-6 font-display text-3xl font-bold">Esta cuenta no tiene acceso</h1>
+        <p className="mt-3 max-w-sm text-hueso/60">
+          {sesion.user?.email} no está autorizada para usar el panel. Si es tuya, pide que la añadan.
+        </p>
+        <button
+          type="button"
+          onClick={logout}
+          className="mt-8 rounded-full bg-acento px-6 py-3 font-semibold text-tinta transition-colors hover:bg-acento-claro"
+        >
+          Salir
+        </button>
+      </div>
+    )
+  }
 
   return (
     <AvisoProvider>

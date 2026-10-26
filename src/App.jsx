@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { LazyMotion, MotionConfig, domAnimation } from 'motion/react'
 import HomeComponent from './components/pages/Home/HomeComponent'
 import NoEncontradaComponent from './components/pages/NoEncontrada/NoEncontradaComponent'
+import LegalComponent from './components/pages/Legal/LegalComponent'
 import { RESERVAS_ONLINE } from './data/features'
 
 // La reserva y el panel van en su propio paquete: quien entra a la home (casi
@@ -36,6 +37,9 @@ export default function App() {
               />
               <Route path="/admin" element={<PanelComponent />} />
               <Route path="/panel" element={<PanelComponent />} />
+              <Route path="/aviso-legal" element={<LegalComponent tipo="aviso-legal" />} />
+              <Route path="/privacidad" element={<LegalComponent tipo="privacidad" />} />
+              <Route path="/cookies" element={<LegalComponent tipo="cookies" />} />
               {/* Comodín: sin esto, cualquier URL rara mostraba una página en blanco. */}
               <Route path="*" element={<NoEncontradaComponent />} />
             </Routes>

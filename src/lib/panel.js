@@ -17,6 +17,18 @@ export async function login(email, password) {
   return { ok: true }
 }
 
+/**
+ * ¿La cuenta con sesión es un barbero autorizado? (lista `barberos` de la BD,
+ * ver supabase/migracion-seguridad.sql). Si la función aún no existe en la BD
+ * se da por buena, para no dejar fuera a nadie antes de la migración.
+ */
+export async function esBarbero() {
+  if (!supabase) return true
+  const { data, error } = await supabase.rpc('es_barbero')
+  if (error) return error.code === 'PGRST202' || /not find|does not exist/i.test(error.message)
+  return data === true
+}
+
 /** Cierra la sesión. */
 export async function logout() {
   if (supabase) await supabase.auth.signOut()
