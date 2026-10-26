@@ -102,6 +102,30 @@ repo quedó limpio (solo `main`, sin stash ni ramas de respaldo).
    con `/admin?login` empieza en la pantalla de acceso, entra con cualquier
    cosa). No forma parte del build publicado.
 
+**RESERVA ONLINE REVISADA Y ACTIVA PARA 2027 (26/10/2026)** (rama
+`feature/reservas-2027`):
+ - `RESERVAS_ONLINE = true` y reglas en `RESERVA` (data/features.js): desde el
+   **1/1/2027**, 60 min de antelación, 60 días vista, horas cada 30 min (más la
+   hora justo al acabar otra cita), hora de España aunque el cliente esté fuera.
+ - Hasta el 1/1/2027 "Pedir cita" sigue abriendo WhatsApp y sale el enlace
+   "¿Para enero o después? Resérvalo online". **El 1 de enero cambia solo.**
+ - Fallos arreglados: los DÍAS LIBRES no contaban en la web (se podía reservar
+   en vacaciones); el motivo de los días libres era público; sin validación en
+   la BD (citas a las 3 am, de 10 h, o llenar la agenda con un script); el
+   ATRÁS del móvil sacaba de la reserva; si fallaba la carga se veía todo
+   libre; si fallaba el aviso de WhatsApp el cliente veía error con la cita
+   ya guardada; el móvil con +34 no valía; el enlace de WhatsApp de la
+   confirmación se rompía con algunos caracteres; el aviso a Adrián se podía
+   falsificar llamando a la función.
+ - Nuevo: calendario de mes con días "completo/cerrado", rejilla de horas,
+   confirmación con "añadir al calendario" (Google e .ics), etiqueta "Web" en
+   el panel para las citas que vienen de la reserva online. Ya no se pide email.
+ - **ANTES DE PUBLICAR:** ejecutar `supabase/migracion-reservas-2027.sql` en el
+   SQL Editor (probada en PGlite con 21 casos) y redesplegar la función:
+   `supabase functions deploy aviso-cita`.
+ - **Festivos:** 1 y 6 de enero salen como días normales: Adrián tiene que
+   cerrarlos con "Día libre" en el panel.
+
 **LO QUE TOCA AHORA (por orden):**
 1. **Generar el QR de reseñas** con el enlace de arriba (qrcode-monkey, mismos
    ajustes que el de la web) y guardarlo como `qr-resenas/qr-resena.png`.

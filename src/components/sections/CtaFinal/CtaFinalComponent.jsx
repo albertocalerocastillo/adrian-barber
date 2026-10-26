@@ -4,7 +4,9 @@ import { Phone } from 'lucide-react'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
 import MagneticComponent from '../../ui/Magnetic/MagneticComponent'
 import RevealComponent from '../../ui/Reveal/RevealComponent'
+import ReservaOnlineComponent from '../../ui/ReservaOnline/ReservaOnlineComponent'
 import { TELEFONO, TELEFONO_VISIBLE } from '../../../data/contacto'
+import { reservaEmpezada } from '../../../data/features'
 
 /**
  * Último empujón antes del pie: quien ha llegado hasta aquí ya está
@@ -37,8 +39,9 @@ export default function CtaFinalComponent() {
             <span className="block italic text-acento">a un mensaje.</span>
           </h2>
           <p className="mx-auto mt-7 max-w-lg text-base leading-relaxed text-hueso/75 sm:text-lg">
-            Escríbeme por WhatsApp, dime cuándo te viene bien y te guardo hueco.
-            Así de fácil.
+            {reservaEmpezada()
+              ? 'Elige día y hora en un minuto, o escríbeme por WhatsApp y te guardo hueco.'
+              : 'Escríbeme por WhatsApp, dime cuándo te viene bien y te guardo hueco. Así de fácil.'}
           </p>
         </RevealComponent>
 
@@ -54,6 +57,8 @@ export default function CtaFinalComponent() {
             {TELEFONO_VISIBLE}
           </a>
         </RevealComponent>
+
+        <ReservaOnlineComponent claro className="mt-8" />
       </div>
     </section>
   )

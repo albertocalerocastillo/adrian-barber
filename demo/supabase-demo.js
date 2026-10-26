@@ -21,6 +21,7 @@ const el = (dias, hhmm) => {
   d.setHours(h, m, 0, 0)
   return d.toISOString()
 }
+const diasHasta = (y, m, d) => Math.round((new Date(y, m, d) - hoy) / 864e5)
 const mas = (iso, min) => new Date(new Date(iso).getTime() + min * 60000).toISOString()
 
 let ultimoId = 1000
@@ -76,11 +77,21 @@ const tablas = {
     cita(3, '10:00', 'Corte', 'Carlos Pérez', '699000111'),
     cita(4, '17:00', 'Tinte blanco + Corte', 'Fernando Ramos', '600222333'),
     cita(-1, '18:30', 'Corte', 'Miguel Torres', '600444555', 'atendida'),
+    // Primeras reservas de la web en enero de 2027 (para ver la reserva online)
+    ...['10:00', '10:30', '11:00', '12:00', '17:00', '18:30'].map((h, i) =>
+      ({ ...cita(diasHasta(2027, 0, 4), h, 'Corte', `Cliente web ${i + 1}`, `61000000${i}`), origen: 'web' })
+    ),
+    { ...cita(diasHasta(2027, 0, 5), '10:00', 'Mechas + Corte', 'Óscar Web', '612000000'), origen: 'web' },
   ],
   bloqueos: [
     { id: nuevoId(), inicio: el(3, '16:00'), fin: el(3, '22:00'), motivo: 'Médico', todo_el_dia: false },
+    // Reyes: cerrado todo el día
+    { id: nuevoId(), inicio: el(diasHasta(2027, 0, 6), '00:00'), fin: el(diasHasta(2027, 0, 7), '00:00'), motivo: 'Reyes', todo_el_dia: true },
   ],
 }
+
+// Para las pruebas automáticas (simular que otro cliente reserva a la vez).
+window.__demoTablas = tablas
 
 // ─── Constructor de consultas mínimo (lo que usa la app) ───────────────────
 function consulta(nombre) {
@@ -147,7 +158,21 @@ const avisar = () => oyentes.forEach((f) => f('CAMBIO', sesion))
 
 export const supabase = {
   from: consulta,
-  rpc: async () => ({ data: [], error: null }),
+  functions: {
+    async invoke(nombre, { body }) {
+      console.info('[demo] aviso por WhatsApp a Adrián:', nombre, body)
+      return { data: { avisado: false, motivo: 'demo' }, error: null }
+    },
+  },
+  async rpc(nombre, { p_desde, p_hasta } = {}) {
+    if (nombre !== 'citas_ocupadas') return { data: [], error: null }
+    const ocupados = [
+      ...tablas.citas.filter((c) => c.estado !== 'cancelada'),
+      ...tablas.bloqueos,
+    ].filter((o) => o.inicio < p_hasta && o.fin > p_desde)
+    await new Promise((r) => setTimeout(r, 300))
+    return { data: ocupados.map(({ inicio, fin }) => ({ inicio, fin })), error: null }
+  },
   auth: {
     getSession: async () => ({ data: { session: sesion } }),
     onAuthStateChange(f) {

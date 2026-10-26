@@ -4,6 +4,7 @@ import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingCompo
 import RevealComponent from '../../ui/Reveal/RevealComponent'
 import TiltCardComponent from '../../ui/TiltCard/TiltCardComponent'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
+import ReservaOnlineComponent from '../../ui/ReservaOnline/ReservaOnlineComponent'
 import { useCountUp } from '../../../hooks/useCountUp'
 import { PROMO } from '../../../data/servicios'
 import { getServicios } from '../../../lib/config'
@@ -148,6 +149,7 @@ export default function ServiciosComponent() {
             ¿No lo tienes claro? Escríbeme y lo vemos.
           </p>
           <CitaButtonComponent tamano="lg" />
+          <ReservaOnlineComponent />
         </RevealComponent>
       </div>
     </section>

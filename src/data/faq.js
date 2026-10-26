@@ -9,6 +9,15 @@
 // confirme Adrián. Una FAQ que miente es peor que no tenerla.
 import { NEGOCIO, TELEFONO_VISIBLE } from './contacto'
 import { SERVICIOS, PROMO } from './servicios'
+import { RESERVAS_ONLINE, inicioReservas } from './features'
+
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+
+// "1 de enero de 2027"
+function fechaInicioTexto() {
+  const d = inicioReservas()
+  return `${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`
+}
 
 const ORDEN_SEMANA = [1, 2, 3, 4, 5, 6, 0]
 
@@ -82,7 +91,9 @@ export function construirFaq(horario) {
     },
     {
       pregunta: '¿Cómo pido cita?',
-      respuesta: `Por WhatsApp o llamando al ${TELEFONO_VISIBLE}. Escríbenos y te decimos el primer hueco libre.`,
+      respuesta: RESERVAS_ONLINE
+        ? `Por WhatsApp o llamando al ${TELEFONO_VISIBLE}. Y a partir del ${fechaInicioTexto()} también online, desde esta web: eliges servicio, día y hora en un minuto.`
+        : `Por WhatsApp o llamando al ${TELEFONO_VISIBLE}. Escríbenos y te decimos el primer hueco libre.`,
     },
   ]
 }

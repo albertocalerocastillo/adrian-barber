@@ -1,35 +1,28 @@
 import { useState } from 'react'
-import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react'
+import { Loader2, AlertCircle, User, Phone, ShieldCheck } from 'lucide-react'
 import { crearCita } from '../../../lib/citas'
 import { sumarMin } from '../../../utils/disponibilidad'
-import { fechaLarga, hora as fmtHora } from '../../../utils/fechas'
+import { limpiarMovil } from './reglas'
 
-/** Móvil español: 9 dígitos empezando por 6, 7, 8 o 9 (ignorando espacios). */
-function movilValido(v) {
-  return /^[6789]\d{8}$/.test(v.replace(/\s+/g, ''))
-}
-function emailValido(v) {
-  return v === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
-}
+const claseCampo =
+  'w-full rounded-2xl border bg-white py-4 pl-12 pr-4 text-base text-tinta outline-none transition-all placeholder:text-tinta/30 focus:border-acento focus:ring-4 focus:ring-acento/15'
 
 /**
- * Paso 4: datos del cliente y confirmación final.
- * Al confirmar, guarda la cita (Supabase o localStorage). Si el hueco se
- * acaba de ocupar, avisa para que elija otra hora.
+ * Paso 4: nombre y móvil, y confirmar.
+ * Solo se pide lo imprescindible (nada de email: no se usaba para nada).
+ * Si la base de datos rechaza la hora (alguien la ha cogido justo antes, o se
+ * ha cerrado ese rato), se vuelve a la elección de hora con el aviso.
  */
-export default function PasoDatos({ servicio, fecha, hora, onConfirmado, onAtras }) {
+export default function PasoDatos({ servicio, hora, onConfirmado, onHoraPerdida }) {
   const [nombre, setNombre] = useState('')
   const [movil, setMovil] = useState('')
-  const [email, setEmail] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [error, setError] = useState('')
   const [tocado, setTocado] = useState(false)
 
-  const fin = sumarMin(hora, servicio.duracion)
   const nombreOk = nombre.trim().length >= 2
-  const movilOk = movilValido(movil)
-  const emailOk = emailValido(email)
-  const formOk = nombreOk && movilOk && emailOk
+  const movilLimpio = limpiarMovil(movil)
+  const formOk = nombreOk && !!movilLimpio
 
   async function onSubmit(e) {
     e.preventDefault()
@@ -38,64 +31,69 @@ export default function PasoDatos({ servicio, fecha, hora, onConfirmado, onAtras
 
     setEnviando(true)
     setError('')
-    const res = await crearCita({
+    const datos = {
       servicioId: servicio.id,
       servicioNombre: servicio.nombre,
-      clienteNombre: nombre.trim(),
-      clienteMovil: movil.replace(/\s+/g, ''),
-      clienteEmail: email.trim(),
+      clienteNombre: nombre.trim().replace(/\s+/g, ' '),
+      clienteMovil: movilLimpio,
       inicio: hora,
-      fin,
-    })
+      fin: sumarMin(hora, servicio.duracion),
+    }
+    const res = await crearCita(datos)
     setEnviando(false)
 
-    if (res.ok) onConfirmado()
+    if (res.ok) onConfirmado(datos)
+    else if (res.volverAHoras) onHoraPerdida(res.error)
     else setError(res.error)
   }
 
   return (
     <div>
-      {/* Resumen de la cita */}
-      <div className="mb-6 rounded-2xl bg-tinta p-5 text-hueso">
-        <p className="text-xs tracking-kicker text-acento">Tu cita</p>
-        <p className="mt-2 font-display text-xl font-semibold capitalize">
-          {fechaLarga(fecha)}
-        </p>
-        <p className="text-hueso/80">
-          {fmtHora(hora)} – {fmtHora(fin)} h
-        </p>
-        <p className="mt-2 text-sm text-hueso/60">
-          {servicio.nombre} · {servicio.duracion} min · {servicio.precio} €
-        </p>
-      </div>
+      <h2 className="mb-6 text-center font-display text-2xl font-semibold sm:text-3xl">¿A nombre de quién?</h2>
 
-      <form onSubmit={onSubmit} className="space-y-4" noValidate>
-        <Campo
-          label="Nombre"
-          value={nombre}
-          onChange={setNombre}
-          placeholder="Tu nombre"
-          error={tocado && !nombreOk ? 'Dinos tu nombre' : ''}
-        />
-        <Campo
-          label="Móvil"
-          value={movil}
-          onChange={setMovil}
-          type="tel"
-          placeholder="600 00 00 00"
-          error={tocado && !movilOk ? 'Móvil no válido (9 dígitos)' : ''}
-        />
-        <Campo
-          label="Email (opcional)"
-          value={email}
-          onChange={setEmail}
-          type="email"
-          placeholder="tucorreo@email.com"
-          error={tocado && !emailOk ? 'Email no válido' : ''}
-        />
+      <form onSubmit={onSubmit} className="mx-auto max-w-md space-y-4" noValidate>
+        <label className="block">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-widest text-tinta/50">Nombre</span>
+          <span className="relative block">
+            <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-tinta/30" />
+            <input
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              autoComplete="given-name"
+              maxLength={60}
+              placeholder="Tu nombre"
+              aria-invalid={tocado && !nombreOk}
+              className={`${claseCampo} ${tocado && !nombreOk ? 'border-red-300' : 'border-hueso-200'}`}
+            />
+          </span>
+          {tocado && !nombreOk && <span className="mt-1.5 block text-xs text-red-600">Dinos tu nombre</span>}
+        </label>
+
+        <label className="block">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-widest text-tinta/50">Móvil</span>
+          <span className="relative block">
+            <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-tinta/30" />
+            <input
+              value={movil}
+              onChange={(e) => setMovil(e.target.value)}
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              maxLength={20}
+              placeholder="600 00 00 00"
+              aria-invalid={tocado && !movilLimpio}
+              className={`${claseCampo} ${tocado && !movilLimpio ? 'border-red-300' : 'border-hueso-200'}`}
+            />
+          </span>
+          <span className={`mt-1.5 block text-xs ${tocado && !movilLimpio ? 'text-red-600' : 'text-tinta/45'}`}>
+            {tocado && !movilLimpio
+              ? 'Pon un móvil español de 9 cifras'
+              : 'Por si hay que avisarte de algún cambio. No te vamos a escribir para nada más.'}
+          </span>
+        </label>
 
         {error && (
-          <div className="flex items-start gap-2 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+          <div role="alert" className="flex items-start gap-2 rounded-2xl bg-red-50 p-4 text-sm text-red-700">
             <AlertCircle size={18} className="mt-0.5 shrink-0" />
             <span>{error}</span>
           </div>
@@ -104,45 +102,23 @@ export default function PasoDatos({ servicio, fecha, hora, onConfirmado, onAtras
         <button
           type="submit"
           disabled={enviando}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-acento py-4 font-semibold text-tinta transition-colors hover:bg-acento-claro disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-acento py-4 text-base font-semibold text-tinta shadow-lg shadow-acento/30 transition-all hover:bg-acento-claro active:scale-[0.98] disabled:opacity-60"
         >
           {enviando ? (
             <>
               <Loader2 size={18} className="animate-spin" />
-              Confirmando…
+              Reservando…
             </>
           ) : (
             'Confirmar cita'
           )}
         </button>
+
+        <p className="flex items-start justify-center gap-2 text-center text-xs leading-relaxed text-tinta/45">
+          <ShieldCheck size={15} className="mt-px shrink-0 text-acento-oscuro" />
+          Tu nombre y tu móvil solo los ve Adrián, para gestionar esta cita.
+        </p>
       </form>
-
-      <button
-        type="button"
-        onClick={onAtras}
-        className="mt-6 flex items-center gap-1.5 text-sm text-tinta/60 transition-colors hover:text-tinta"
-      >
-        <ArrowLeft size={16} />
-        Cambiar hora
-      </button>
     </div>
-  )
-}
-
-function Campo({ label, value, onChange, error, type = 'text', placeholder }) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-tinta/80">{label}</span>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={`w-full rounded-xl border bg-white px-4 py-3 text-tinta outline-none transition-colors placeholder:text-tinta/30 focus:border-acento ${
-          error ? 'border-red-300' : 'border-hueso-200'
-        }`}
-      />
-      {error && <span className="mt-1 block text-xs text-red-600">{error}</span>}
-    </label>
   )
 }

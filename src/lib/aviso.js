@@ -7,21 +7,28 @@
 //  y Vite la incrustaba en el JS público.
 //
 //  Es "fire-and-forget": no bloquea la confirmación y, si falla, la cita ya
-//  está guardada igualmente.
+//  está guardada igualmente. NUNCA debe lanzar un error: si lo hiciera, el
+//  cliente vería "no se pudo guardar" con la cita YA guardada, y reservaría
+//  otra vez.
+//
+//  Solo manda móvil + hora: la función busca la cita en la BD y compone el
+//  mensaje con lo guardado (ver supabase/functions/aviso-cita).
 // ════════════════════════════════════════════════════════════
 import { supabase } from './supabase'
 
-export function avisarNuevaCita({ servicioNombre, clienteNombre, clienteMovil, inicio }) {
+export function avisarNuevaCita({ clienteMovil, inicio }) {
   if (!supabase) return // sin Supabase no hay función a la que llamar
 
-  supabase.functions
-    .invoke('aviso-cita', {
-      body: {
-        servicioNombre,
-        clienteNombre,
-        clienteMovil,
-        inicio: inicio instanceof Date ? inicio.toISOString() : inicio,
-      },
-    })
-    .catch(() => {})
+  try {
+    Promise.resolve(
+      supabase.functions.invoke('aviso-cita', {
+        body: {
+          clienteMovil,
+          inicio: inicio instanceof Date ? inicio.toISOString() : inicio,
+        },
+      })
+    ).catch(() => {})
+  } catch {
+    // Sin aviso, pero la cita sigue guardada.
+  }
 }
