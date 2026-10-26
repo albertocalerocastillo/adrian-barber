@@ -17,10 +17,15 @@ import ProgresoScrollComponent from '../../ui/ProgresoScroll/ProgresoScrollCompo
  * Página pública (landing). El orden de secciones alterna fondos claros (hueso)
  * y oscuros (tinta) para dar ritmo visual, y acaba con un último empujón
  * (CtaFinal) antes del pie.
+ *
+ * overflow-x-clip: lo que entra animado desde un lado arranca fuera de su
+ * sitio. Recortarlo en el <body> no basta en el móvil (Safari lo ignora y la
+ * página se ensanchaba, con un hueco blanco a la derecha), así que se recorta
+ * aquí. "clip" y no "hidden" para no romper los position: sticky.
  */
 export default function HomeComponent() {
   return (
-    <div className="min-h-screen bg-hueso text-tinta">
+    <div className="min-h-screen overflow-x-clip bg-hueso text-tinta">
       <ProgresoScrollComponent />
       <NavComponent />
       <main>

@@ -18,7 +18,7 @@ export default function HorarioComponent() {
   const resumen = `${resumenHorario(horario)}. Escríbeme antes y te digo hueco.`
 
   return (
-    <section id="horario" className="bg-hueso py-24 md:py-32">
+    <section id="horario" className="overflow-x-clip bg-hueso py-24 md:py-32">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 md:px-8 lg:grid-cols-2 lg:gap-20">
         <div className="text-center lg:text-left">
           {/* Centrado en móvil y alineado a la izquierda en escritorio. El
