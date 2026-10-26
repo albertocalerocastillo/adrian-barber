@@ -129,7 +129,10 @@ migración ya ejecutada en Supabase y comprobada):
  - **Festivos:** 1 y 6 de enero salen como días normales: Adrián tiene que
    cerrarlos con "Día libre" en el panel.
 
-**REVISIÓN DE SEGURIDAD Y LEGAL (26/10/2026)** (rama `fix/seguridad-legal`):
+**REVISIÓN DE SEGURIDAD Y LEGAL (26/10/2026)** (✅ EN PRODUCCIÓN; registro de
+Supabase CERRADO, `migracion-seguridad.sql` ejecutada y la cuenta de Alberto
+añadida a `barberos`. Al crear la cuenta de Adrián: invitarle y añadir su
+email a `barberos` con el bloque del final del SQL):
  - 🔴 **Fallo grave encontrado:** el registro de Supabase estaba ABIERTO y las
    normas daban permiso total a cualquier usuario con sesión. Cualquiera podía
    crearse cuenta y leer nombres/móviles de clientes o borrar citas.
