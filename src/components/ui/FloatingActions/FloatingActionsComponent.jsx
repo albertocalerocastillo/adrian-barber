@@ -1,4 +1,7 @@
 import { Link } from 'react-router-dom'
+import { m } from 'motion/react'
+import { useScrolled } from '../../../hooks/useScrolled'
+import { EASE_SUAVE } from '../../../theme/animacion'
 import { CalendarCheck, Phone, MapPin } from 'lucide-react'
 import WhatsAppIcon from '../WhatsAppIcon/WhatsAppIcon'
 import { RESERVAS_ONLINE } from '../../../data/features'
@@ -20,6 +23,7 @@ import {
  * espacio abajo (ver HomeComponent).
  */
 export default function FloatingActionsComponent() {
+  const visible = useScrolled(600)
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MENSAJE)}`
 
   const claseCita =
@@ -45,7 +49,7 @@ export default function FloatingActionsComponent() {
           href={wa}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col items-center gap-1 bg-acento py-2.5 text-[0.6rem] font-semibold uppercase tracking-widest text-tinta transition-colors"
+          className="flex flex-col items-center gap-1 bg-acento py-2.5 active:bg-acento-claro text-[0.6rem] font-semibold uppercase tracking-widest text-tinta transition-colors"
         >
           <WhatsAppIcon size={19} />
           WhatsApp
@@ -62,8 +66,14 @@ export default function FloatingActionsComponent() {
         </a>
       </nav>
 
-      {/* ─── ESCRITORIO: grupo flotante ─────────────────────── */}
-      <div className="fixed bottom-5 right-5 z-50 hidden items-center gap-3 md:flex">
+      {/* ─── ESCRITORIO: grupo flotante ─────────────────────────
+          Aparece al dejar atrás el hero: arriba ya están sus botones. */}
+      <m.div
+        className="fixed bottom-5 right-5 z-50 hidden items-center gap-3 md:flex"
+        initial={false}
+        animate={visible ? { opacity: 1, y: 0, pointerEvents: 'auto' } : { opacity: 0, y: 24, pointerEvents: 'none' }}
+        transition={{ duration: 0.45, ease: EASE_SUAVE }}
+      >
         <a
           href={`tel:${TELEFONO}`}
           aria-label={`Llamar al ${TELEFONO_VISIBLE}`}
@@ -93,7 +103,7 @@ export default function FloatingActionsComponent() {
             Pedir cita
           </a>
         )}
-      </div>
+      </m.div>
     </>
   )
 }

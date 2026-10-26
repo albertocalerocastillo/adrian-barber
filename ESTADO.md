@@ -66,6 +66,25 @@ repo quedó limpio (solo `main`, sin stash ni ramas de respaldo).
  - **qr-resenas/tarjeta-mostrador.html**: tarjeta A6 para el mostrador. Basta
    dejar `qr-resena.png` en esa carpeta y se completa sola.
 
+**HECHO EL 26/10/2026 — LOGO NUEVO + REDISEÑO CON MOTION** (rama
+`feature/logo-nuevo-motion`, **sin fusionar ni subir**):
+ - **Logo definitivo**: sello circular (pizarra, aro dorado, "La Rinconada") +
+   monograma "A.S" con navaja dorada. Fuente en `logo-propuesta/logo-final.webp`
+   (hecho con ChatGPT, PNG con transparencia real). `scripts/generar-logo-final.py`
+   saca `public/logo-sello.*`, `logo-as.*`, favicon, icono iOS y `og-imagen.jpg`
+   (la imagen al compartir por WhatsApp). `logo-adri.jpg` ya NO se usa.
+ - **Motion** (librería `motion`, igual que en myf.asesorias): titular palabra a
+   palabra, sello que entra girando con parallax, cinta dorada que reacciona al
+   scroll, tarjetas que se inclinan con el ratón, contadores (5,0 · 56 reseñas ·
+   5 €), frase de "Sobre mí" que se ilumina al bajar, barra de progreso, menú
+   móvil a pantalla completa, nav que se esconde al bajar. Respeta "reducir
+   movimiento".
+ - **Marketing**: hero con titular "Cortes con carácter en La Rinconada", precio
+   y prueba social (★ 5,0 · 56 reseñas) arriba; Corte destacado como "El más
+   pedido"; sección final "Tu próximo corte, a un mensaje"; footer completo.
+ - **Fix**: Ubicación decía "pide tu cita online" (no hay reserva online).
+ - Revisado sin scroll horizontal a 1920, 1366, 1024, 768, 430 y 360 px.
+
 **LO QUE TOCA AHORA (por orden):**
 1. **Generar el QR de reseñas** con el enlace de arriba (qrcode-monkey, mismos
    ajustes que el de la web) y guardarlo como `qr-resenas/qr-resena.png`.

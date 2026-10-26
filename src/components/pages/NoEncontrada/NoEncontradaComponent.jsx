@@ -40,10 +40,10 @@ export default function NoEncontradaComponent() {
   return (
     <main className="grain flex min-h-screen flex-col items-center justify-center bg-tinta px-5 text-center text-hueso">
       <img
-        src="/logo-adri.jpg"
+        src="/logo-sello.webp"
         alt=""
         aria-hidden="true"
-        className="w-20 rounded-lg shadow-2xl shadow-black/60 ring-1 ring-acento/25"
+        className="sello-entra w-40 drop-shadow-2xl sm:w-48"
       />
 
       <p className="mt-8 text-xs tracking-kicker text-acento">Página no encontrada</p>

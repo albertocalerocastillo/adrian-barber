@@ -1,12 +1,16 @@
 import { useState } from 'react'
+import { Expand } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
 import RevealComponent from '../../ui/Reveal/RevealComponent'
 import LightboxComponent from '../../ui/Lightbox/LightboxComponent'
+import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
 import { GALERIA } from '../../../data/galeria'
+import { INSTAGRAM, INSTAGRAM_URL } from '../../../data/contacto'
 
 /**
- * Mosaico de trabajos (masonry con CSS columns) + lightbox al pulsar.
- * Las fotos son placeholders en la Fase 1; se sustituyen por trabajos reales.
+ * Rejilla de trabajos + lightbox al pulsar. Cada foto entra creciendo un poco,
+ * escalonada por columnas; al pasar el ratón se acerca y aparece el icono de
+ * ampliar.
  */
 export default function GaleriaComponent() {
   const [indice, setIndice] = useState(null)
@@ -17,22 +21,33 @@ export default function GaleriaComponent() {
   const siguiente = () => setIndice((i) => (i + 1) % GALERIA.length)
 
   return (
-    <section id="galeria" className="bg-hueso py-20 md:py-28">
+    <section id="galeria" className="bg-hueso py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
-        <SectionHeadingComponent kicker="El trabajo" titulo="Galería" />
+        <SectionHeadingComponent
+          kicker="El trabajo"
+          titulo="Galería"
+          texto="Trabajos reales, recién salidos de la silla."
+        />
 
-        {/* Rejilla, no "masonry" de columnas: las fotos son todas verticales
-            con la misma proporción, así que las columnas CSS solo conseguían
-            repartirlas 3+2+2 y dejar un hueco feo al final. Con rejilla, las
-            filas cuadran solas.
+        {/* Filas que se rellenan en orden, no "masonry" de columnas: las fotos
+            son todas verticales con la misma proporción, y las columnas CSS
+            las repartían 3+2+2 con un hueco feo al final. Con flex centrado,
+            si la última fila queda corta (7 fotos = 3+3+1) se queda en medio
+            en vez de colgando a la izquierda, sea cual sea el número de fotos.
             (Si algún día entran fotos apaisadas, habría que revisarlo.) */}
-        <div className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-3">
+        <div className="mt-14 flex flex-wrap justify-center gap-3 sm:gap-4 lg:gap-5">
           {GALERIA.map((foto, i) => (
-            <RevealComponent key={foto.id} delay={(i % 3) * 80}>
+            <RevealComponent
+              key={foto.id}
+              delay={(i % 3) * 90}
+              desde="escala"
+              className="w-[calc((100%-0.75rem)/2)] sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
+            >
               <button
                 type="button"
                 onClick={() => abrir(i)}
-                className="group relative block w-full overflow-hidden"
+                aria-label={`Ampliar foto ${i + 1}`}
+                className="al-tocar group relative block w-full overflow-hidden bg-tinta"
               >
                 <img
                   src={foto.src}
@@ -40,13 +55,30 @@ export default function GaleriaComponent() {
                   width={foto.w}
                   height={foto.h}
                   loading="lazy"
-                  className="block h-auto w-full transition-transform duration-500 group-hover:scale-105"
+                  className="block h-auto w-full transition-transform duration-700 ease-[var(--ease-suave)] group-hover:scale-110"
                 />
-                <span className="absolute inset-0 bg-tinta/0 transition-colors duration-300 group-hover:bg-tinta/20" />
+                <span className="absolute inset-0 bg-gradient-to-t from-tinta/70 via-tinta/0 to-tinta/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <span className="absolute bottom-4 right-4 flex h-10 w-10 translate-y-3 items-center justify-center bg-acento text-tinta opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                  <Expand size={18} strokeWidth={2} />
+                </span>
+                {/* Esquinas doradas al pasar el ratón */}
+                <span className="pointer-events-none absolute left-3 top-3 h-6 w-6 border-l border-t border-acento opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               </button>
             </RevealComponent>
           ))}
         </div>
+
+        <RevealComponent className="mt-12 flex justify-center">
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="al-tocar inline-flex items-center gap-3 border border-tinta/20 px-8 py-4 text-sm font-medium uppercase tracking-widest text-tinta hover:border-tinta hover:bg-tinta hover:text-hueso"
+          >
+            <InstagramIcon size={18} />
+            Más trabajos en @{INSTAGRAM}
+          </a>
+        </RevealComponent>
       </div>
 
       <LightboxComponent
