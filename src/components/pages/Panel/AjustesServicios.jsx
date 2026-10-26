@@ -1,19 +1,32 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, LogOut, Plus, Trash2, Loader2, Check, Save } from 'lucide-react'
-import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
+import { AnimatePresence, m } from 'motion/react'
+import { Plus, Trash2, EyeOff, Sparkles } from 'lucide-react'
+import { useAviso } from './avisoContexto'
+import { CabeceraSeccion, Interruptor, Contador, BarraGuardar, Esqueleto } from './Controles'
 import { getServicios, guardarServicios } from '../../../lib/config'
-import { logout } from '../../../lib/panel'
+import { ICONOS } from '../../../theme/icons'
+import { EASE_SUAVE } from '../../../theme/animacion'
+
+// Para comparar si hay cambios, sin la clave interna de cada tarjeta.
+const huella = (lista) =>
+  JSON.stringify(
+    lista.map((s) => {
+      const limpio = { ...s }
+      delete limpio._key
+      return limpio
+    })
+  )
 
 /**
- * Ajuste de los SERVICIOS (nombre, descripción, duración, precio y activo). Se
- * editan en local y se guardan de golpe, igual que el horario. Al guardar, la
- * reserva, el panel y la home leen la nueva lista. El icono y el "destacado" se
- * mantienen tal cual (se fijan en el código/seed, no se editan aquí).
+ * SERVICIOS y PRECIOS (nombre, descripción, duración, precio y si se ve en la
+ * web). Se editan en local y se guardan de golpe con la barra de abajo, igual
+ * que el horario. El icono y el "destacado" se fijan en el código/seed.
  */
-export default function AjustesServicios({ onVolver }) {
+export default function AjustesServicios({ activa = true }) {
+  const avisar = useAviso()
   const [servicios, setServicios] = useState(null)
+  const [original, setOriginal] = useState('')
   const [guardando, setGuardando] = useState(false)
-  const [msg, setMsg] = useState('')
   const nextKey = useRef(0)
 
   // Cada servicio lleva una `_key` estable en local para el render (los ids de
@@ -23,192 +36,191 @@ export default function AjustesServicios({ onVolver }) {
   useEffect(() => {
     let vivo = true
     getServicios().then((lista) => {
-      if (vivo) setServicios(lista.map(conKey))
+      if (!vivo) return
+      setServicios(lista.map(conKey))
+      setOriginal(huella(lista))
     })
     return () => {
       vivo = false
     }
   }, [])
 
+  const cambiado = servicios && huella(servicios) !== original
+
   const editar = (key, campo, valor) =>
     setServicios((ss) => ss.map((s) => (s._key === key ? { ...s, [campo]: valor } : s)))
 
-  const borrar = (key) => setServicios((ss) => ss.filter((s) => s._key !== key))
+  const borrar = (s) => {
+    const posicion = servicios.indexOf(s)
+    setServicios((ss) => ss.filter((x) => x._key !== s._key))
+    avisar({
+      texto: `«${s.nombre || 'Servicio'}» quitado. Falta guardar.`,
+      deshacer: () =>
+        setServicios((ss) => {
+          const copia = [...ss]
+          copia.splice(posicion, 0, s)
+          return copia
+        }),
+    })
+  }
 
   const anadir = () =>
     setServicios((ss) => [
       ...ss,
-      conKey({
-        nombre: '',
-        descripcion: '',
-        duracion: 30,
-        precio: 0,
-        icono: 'Scissors',
-        destacado: false,
-        activo: true,
-      }),
+      conKey({ nombre: '', descripcion: '', duracion: 30, precio: 10, icono: 'Scissors', destacado: false, activo: true }),
     ])
 
   async function onGuardar() {
     if (guardando || !servicios) return
+    if (servicios.some((s) => !s.nombre.trim())) {
+      avisar({ texto: 'Hay un servicio sin nombre. Pónselo o quítalo.', tipo: 'error' })
+      return
+    }
     setGuardando(true)
-    setMsg('')
     const res = await guardarServicios(servicios)
     setGuardando(false)
-    setMsg(res.ok ? 'guardado' : res.error || 'Error al guardar')
+    if (res.ok) {
+      setOriginal(huella(servicios))
+      avisar({ texto: 'Servicios guardados. La web ya muestra los precios nuevos.' })
+    } else {
+      avisar({ texto: res.error || 'No se pudo guardar.', tipo: 'error' })
+    }
   }
 
   return (
-    <div className="min-h-screen bg-hueso text-tinta">
-      <header className="pizarra sticky top-0 z-20 border-b border-acento/20 text-hueso">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
-          <button
-            type="button"
-            onClick={onVolver}
-            className="flex items-center gap-1.5 text-sm text-hueso/70 transition-colors hover:text-acento"
-          >
-            <ArrowLeft size={16} /> Agenda
-          </button>
-          <div className="flex items-center gap-2.5">
-            <LogoAdriComponent className="h-9 w-9" />
-            <span className="text-sm tracking-kicker text-acento">Servicios</span>
-          </div>
-          <button
-            type="button"
-            onClick={logout}
-            className="flex items-center gap-1.5 text-sm text-hueso/70 transition-colors hover:text-acento"
-          >
-            <LogOut size={16} />
-          </button>
-        </div>
-      </header>
+    <>
+      <CabeceraSeccion
+        kicker="Ajustes"
+        titulo="Servicios y precios"
+        ayuda="Lo que ve el cliente en la web. Apaga uno para ocultarlo sin borrarlo. La duración sirve para calcular los huecos libres."
+      >
+        <button
+          type="button"
+          onClick={anadir}
+          className="hidden items-center gap-2 rounded-full border border-tinta/15 bg-white px-5 py-3 text-sm font-semibold transition-all hover:border-tinta hover:bg-tinta hover:text-hueso md:flex"
+        >
+          <Plus size={17} /> Añadir servicio
+        </button>
+      </CabeceraSeccion>
 
-      <main className="mx-auto max-w-3xl px-4 py-5">
-        <p className="mb-5 rounded-xl bg-tinta/5 px-4 py-3 text-sm text-tinta/70">
-          Estos son los servicios que ve el cliente al reservar y en la web. Desactiva
-          uno para <strong>ocultarlo</strong> sin borrarlo. La <strong>duración</strong> se
-          usa para calcular los huecos libres.
-        </p>
-
-        {servicios === null ? (
-          <div className="flex flex-col items-center gap-3 py-16 text-tinta/50">
-            <Loader2 size={26} className="animate-spin" />
-            <p className="text-sm">Cargando servicios…</p>
-          </div>
-        ) : (
-          <>
-            <div className="space-y-3">
-              {servicios.map((s) => (
-                <div
+      {servicios === null ? (
+        <Esqueleto filas={3} alto="h-48" />
+      ) : (
+        <div className="grid gap-4 pb-24 md:pb-20 lg:grid-cols-2">
+          <AnimatePresence initial={false}>
+            {servicios.map((s) => {
+              const Icono = ICONOS[s.icono] || ICONOS.Scissors
+              const visible = s.activo !== false
+              return (
+                <m.article
                   key={s._key}
-                  className={`rounded-2xl border bg-white p-4 ${
-                    s.activo === false ? 'border-hueso-200 opacity-60' : 'border-hueso-200'
+                  className={`relative flex flex-col rounded-3xl border bg-white p-5 shadow-sm transition-colors sm:p-6 ${
+                    visible ? 'border-hueso-200' : 'border-dashed border-tinta/20 bg-white/50'
                   }`}
+                  initial={{ opacity: 0, y: 14, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.35, ease: EASE_SUAVE }}
                 >
-                  {/* Nombre + activo */}
-                  <div className="flex items-center gap-3">
-                    <input
-                      value={s.nombre}
-                      onChange={(e) => editar(s._key, 'nombre', e.target.value)}
-                      placeholder="Nombre del servicio"
-                      className="min-w-0 flex-1 rounded-lg border border-hueso-200 bg-white px-3 py-2 font-display text-lg font-semibold outline-none focus:border-acento"
-                    />
-                    <label className="flex shrink-0 cursor-pointer items-center gap-2 text-sm">
-                      <span className={s.activo !== false ? 'text-tinta' : 'text-tinta/40'}>
-                        {s.activo !== false ? 'Activo' : 'Oculto'}
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={s.activo !== false}
-                        onChange={(e) => editar(s._key, 'activo', e.target.checked)}
-                        className="h-4 w-4 accent-acento"
-                      />
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => borrar(s._key)}
-                      className="shrink-0 text-tinta/40 transition-colors hover:text-red-600"
-                      aria-label="Borrar servicio"
+                  <div className="flex items-start gap-3">
+                    <span
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-colors ${
+                        visible ? 'bg-tinta text-acento' : 'bg-tinta/5 text-tinta/30'
+                      }`}
                     >
-                      <Trash2 size={18} />
-                    </button>
+                      <Icono size={22} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <input
+                        value={s.nombre}
+                        onChange={(e) => editar(s._key, 'nombre', e.target.value)}
+                        placeholder="Nombre del servicio"
+                        aria-label="Nombre del servicio"
+                        className="w-full rounded-lg border border-transparent bg-transparent px-2 py-1 -ml-2 font-display text-xl font-bold outline-none transition-colors placeholder:text-tinta/25 hover:border-hueso-200 focus:border-acento focus:bg-white"
+                      />
+                      <p className="flex items-center gap-1.5 text-xs text-tinta/45">
+                        {s.destacado && (
+                          <span className="flex items-center gap-1 text-acento-oscuro">
+                            <Sparkles size={12} /> Destacado ·
+                          </span>
+                        )}
+                        {visible ? 'Se ve en la web' : (
+                          <span className="flex items-center gap-1">
+                            <EyeOff size={12} /> Oculto en la web
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <Interruptor activo={visible} onCambio={(v) => editar(s._key, 'activo', v)} etiqueta={`Mostrar ${s.nombre} en la web`} />
                   </div>
 
-                  {/* Descripción */}
                   <textarea
                     value={s.descripcion || ''}
                     onChange={(e) => editar(s._key, 'descripcion', e.target.value)}
-                    placeholder="Descripción (se muestra en la web)"
+                    placeholder="Descripción corta (sale en la web)"
+                    aria-label="Descripción"
                     rows={2}
-                    className="mt-3 w-full resize-none rounded-lg border border-hueso-200 bg-white px-3 py-2 text-sm outline-none focus:border-acento"
+                    className="mt-4 w-full resize-none rounded-xl border border-hueso-200 bg-hueso/40 px-4 py-3 text-sm leading-relaxed outline-none transition-colors focus:border-acento focus:bg-white"
                   />
 
-                  {/* Duración · precio */}
-                  <div className="mt-3 flex flex-wrap items-end gap-4">
-                    <label className="block">
-                      <span className="mb-1 block text-xs font-medium text-tinta/60">Duración</span>
-                      <div className="flex items-center gap-1.5">
-                        <input
-                          type="number"
-                          min={5}
-                          step={5}
-                          value={s.duracion}
-                          onChange={(e) => editar(s._key, 'duracion', Number(e.target.value))}
-                          className="w-20 rounded-lg border border-hueso-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-acento"
-                        />
-                        <span className="text-sm text-tinta/50">min</span>
-                      </div>
-                    </label>
-
-                    <label className="block">
-                      <span className="mb-1 block text-xs font-medium text-tinta/60">Precio</span>
-                      <div className="flex items-center gap-1.5">
-                        <input
-                          type="number"
-                          min={0}
-                          step="0.5"
-                          value={s.precio}
-                          onChange={(e) => editar(s._key, 'precio', Number(e.target.value))}
-                          className="w-20 rounded-lg border border-hueso-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-acento"
-                        />
-                        <span className="text-sm text-tinta/50">€</span>
-                      </div>
-                    </label>
+                  <div className="mt-4 grid gap-3 min-[400px]:grid-cols-2">
+                    <div>
+                      <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-tinta/45">Precio</p>
+                      <Contador
+                        valor={Number(s.precio) || 0}
+                        onCambio={(v) => editar(s._key, 'precio', v)}
+                        paso={1}
+                        sufijo="€"
+                        etiqueta="precio"
+                      />
+                    </div>
+                    <div>
+                      <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-tinta/45">Duración</p>
+                      <Contador
+                        valor={Number(s.duracion) || 0}
+                        onCambio={(v) => editar(s._key, 'duracion', v)}
+                        paso={5}
+                        min={5}
+                        sufijo="min"
+                        etiqueta="duración"
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
 
-            <button
-              type="button"
-              onClick={anadir}
-              className="mt-4 flex items-center gap-1.5 text-sm font-medium text-acento hover:underline"
-            >
-              <Plus size={16} /> Añadir servicio
-            </button>
+                  <button
+                    type="button"
+                    onClick={() => borrar(s)}
+                    className="mt-4 flex items-center gap-1.5 self-end rounded-full px-3 py-2 text-xs font-medium text-tinta/40 transition-colors hover:bg-red-50 hover:text-red-600"
+                  >
+                    <Trash2 size={14} /> Quitar servicio
+                  </button>
+                </m.article>
+              )
+            })}
+          </AnimatePresence>
 
-            {/* Guardar (barra fija abajo) */}
-            <div className="sticky bottom-0 mt-6 flex items-center gap-3 bg-hueso/80 py-3 backdrop-blur">
-              <button
-                type="button"
-                onClick={onGuardar}
-                disabled={guardando}
-                className="flex flex-1 items-center justify-center gap-2 rounded-full bg-acento py-3.5 font-semibold text-tinta transition-colors hover:bg-acento-claro disabled:opacity-60"
-              >
-                {guardando ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-                Guardar servicios
-              </button>
-              {msg === 'guardado' ? (
-                <span className="flex items-center gap-1.5 text-sm font-medium text-green-600">
-                  <Check size={16} /> Guardado
-                </span>
-              ) : msg ? (
-                <span className="text-sm text-red-600">{msg}</span>
-              ) : null}
-            </div>
-          </>
-        )}
-      </main>
-    </div>
+          <button
+            type="button"
+            onClick={anadir}
+            className="flex min-h-40 flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-tinta/15 p-6 text-tinta/45 transition-all hover:border-acento hover:bg-acento/5 hover:text-acento-oscuro"
+          >
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-tinta/5">
+              <Plus size={22} />
+            </span>
+            <span className="text-sm font-semibold">Añadir servicio</span>
+          </button>
+        </div>
+      )}
+
+      <BarraGuardar
+        visible={activa && !!cambiado}
+        guardando={guardando}
+        onGuardar={onGuardar}
+        onDescartar={() => {
+          setServicios(JSON.parse(original).map(conKey))
+        }}
+        texto="Has cambiado los servicios"
+      />
+    </>
   )
 }

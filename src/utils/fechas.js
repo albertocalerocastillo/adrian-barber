@@ -26,6 +26,12 @@ export function hora(d) {
   return d.toTimeString().slice(0, 5)
 }
 
+/** "YYYY-MM-DD" en hora local, para los <input type="date">. */
+export function aInputDate(d) {
+  const p = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+}
+
 /** Medianoche del día de `d` (copia). */
 export function inicioDia(d) {
   const x = new Date(d)

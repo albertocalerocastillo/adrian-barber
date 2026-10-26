@@ -186,6 +186,11 @@
     animation: destello 5s ease-in-out 1.5s infinite;
   }
 
+  /* Panel: cada pantalla entra con un fundido al elegirla. */
+  .panel-entra {
+    animation: entra 0.5s var(--ease-suave) both;
+  }
+
   /* Subrayado dorado que crece desde la izquierda (enlaces del menú). */
   .subrayado {
     background-image: linear-gradient(currentColor, currentColor);
@@ -212,6 +217,7 @@
   @media (prefers-reduced-motion: reduce) {
     .entra,
     .sello-entra,
+    .panel-entra,
     .palabra > span {
       animation: none;
       opacity: 1;
