@@ -704,8 +704,14 @@ function CitaCard({ cita, ahora, precios, onEstado }) {
           <p className="mb-0.5 font-display text-sm font-bold tabular-nums text-acento-oscuro sm:hidden">
             {fmtHora(ini)} – {fmtHora(fin)}
           </p>
-          <p className={`truncate font-display text-lg font-bold sm:text-xl ${atendida ? 'text-tinta/55' : ''}`}>
-            {cita.cliente_nombre}
+          <p className={`flex items-center gap-2 font-display text-lg font-bold sm:text-xl ${atendida ? 'text-tinta/55' : ''}`}>
+            <span className="truncate">{cita.cliente_nombre}</span>
+            {/* Reservada por el cliente desde la web (no metida a mano) */}
+            {cita.origen === 'web' && (
+              <span title="Reservada desde la web" className="shrink-0 rounded-full bg-tinta px-2 py-0.5 font-body text-[0.6rem] font-semibold uppercase tracking-wider text-acento">
+                Web
+              </span>
+            )}
           </p>
           <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-sm text-tinta/55">
             <span>{cita.servicio_nombre}</span>

@@ -32,6 +32,11 @@ export function aInputDate(d) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 
+/** "10:30" del instante `d` en la zona horaria dada (la del negocio). */
+export function horaEn(d, zona) {
+  return new Intl.DateTimeFormat('es-ES', { timeZone: zona, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(d)
+}
+
 /** Medianoche del día de `d` (copia). */
 export function inicioDia(d) {
   const x = new Date(d)

@@ -27,17 +27,61 @@ export function solapan(aIni, aFin, bIni, bFin) {
 }
 
 /**
+ * Minutos que la zona `zona` va por delante de UTC en el instante dado
+ * (60 en invierno en España, 120 en verano).
+ */
+function desfaseMin(zona, instante) {
+  const partes = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: zona,
+      hourCycle: 'h23',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+      .formatToParts(instante)
+      .map((p) => [p.type, p.value])
+  )
+  const comoUtc = Date.UTC(partes.year, partes.month - 1, partes.day, partes.hour, partes.minute)
+  return Math.round((comoUtc - Math.floor(instante.getTime() / 60000) * 60000) / 60000)
+}
+
+/**
+ * Como aHora, pero la hora "HH:MM" es la del reloj de `zona` (p. ej. las
+ * 10:00 de Sevilla), sea cual sea el huso del navegador. El día se toma de
+ * `fecha` (año/mes/día locales, que es lo que el cliente pulsó).
+ */
+export function aHoraZona(fecha, hhmm, zona) {
+  const [h, m] = hhmm.split(':').map(Number)
+  const comoUtc = Date.UTC(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), h, m)
+  let t = comoUtc - desfaseMin(zona, new Date(comoUtc)) * 60000
+  // Segunda pasada por si justo ese día cambia la hora (marzo/octubre).
+  t = comoUtc - desfaseMin(zona, new Date(t)) * 60000
+  return new Date(t)
+}
+
+/**
  * Genera los huecos de inicio disponibles para una fecha.
+ *
+ * Las horas candidatas son las de la rejilla (cada `granularidadMin`) MÁS el
+ * momento exacto en que acaba cada cita o rato cerrado: si unas mechas acaban
+ * a las 11:15, se ofrece justo las 11:15 en vez de dejar un hueco perdido
+ * hasta las 11:30.
  *
  * @param {Object} opts
  * @param {Date}   opts.fecha          Día a calcular (la hora se ignora).
  * @param {number} opts.duracionMin    Duración del servicio en minutos.
  * @param {Array}  opts.horario        Estructura de src/data/horarios.js.
- * @param {Array}  opts.citas          Citas activas: [{inicio, fin}] (ISO o Date).
- * @param {Array}  opts.bloqueos       Bloqueos: [{inicio, fin}] (ISO o Date).
+ * @param {Array}  opts.citas          Ocupado: [{inicio, fin}] (ISO o Date).
+ * @param {Array}  opts.bloqueos       Ratos cerrados: [{inicio, fin}].
  * @param {Date}   opts.ahora          Momento actual (para descartar pasado).
- * @param {number} opts.granularidadMin Paso del rejilla de inicios (def. 15).
+ * @param {number} opts.granularidadMin Paso de la rejilla de inicios (def. 15).
  * @param {number} opts.margenMin      Antelación mínima para reservar (def. 0).
+ * @param {string} opts.zona           Si se pasa, el horario se lee en esa
+ *                                     zona horaria (la web pública usa la de
+ *                                     España). Sin ella, en la del navegador.
  * @returns {Array<{inicio:Date, estado:'libre'|'ocupado'}>} Rejilla de horas.
  *   Se EXCLUYEN las horas en pasado (no tiene sentido mostrarlas). Las que
  *   solapan con una cita/bloqueo salen como 'ocupado' (para mostrarlas en gris
@@ -52,9 +96,12 @@ export function generarRejilla({
   ahora = new Date(),
   granularidadMin = 15,
   margenMin = 0,
+  zona,
 }) {
   const def = horario.find((h) => h.dia === fecha.getDay())
   if (!def || !def.tramos || def.tramos.length === 0) return []
+
+  const enHora = (hhmm) => (zona ? aHoraZona(fecha, hhmm, zona) : aHora(fecha, hhmm))
 
   // Normaliza citas/bloqueos a {ini:Date, fin:Date} una sola vez.
   const ocupados = [...citas, ...bloqueos].map((o) => ({
@@ -66,28 +113,34 @@ export function generarRejilla({
   const rejilla = []
 
   for (const [horaIni, horaFin] of def.tramos) {
-    const apertura = aHora(fecha, horaIni)
-    const cierre = aHora(fecha, horaFin)
+    const apertura = enHora(horaIni)
+    const cierre = enHora(horaFin)
 
-    let cursor = new Date(apertura)
-    while (true) {
-      const fin = sumarMin(cursor, duracionMin)
-      if (fin > cierre) break // el servicio no cabe entero en el tramo
+    // Candidatas: la rejilla + el final de cada cita/bloqueo dentro del tramo.
+    const candidatas = new Set()
+    for (let c = apertura; c < cierre; c = sumarMin(c, granularidadMin)) candidatas.add(c.getTime())
+    for (const o of ocupados) {
+      if (o.fin > apertura && o.fin < cierre) candidatas.add(o.fin.getTime())
+    }
 
-      if (cursor >= limite) {
-        // No mostramos el pasado; las solapadas van como 'ocupado'.
-        const chocaOcupado = ocupados.some((o) => solapan(cursor, fin, o.ini, o.fin))
-        rejilla.push({
-          inicio: new Date(cursor),
-          estado: chocaOcupado ? 'ocupado' : 'libre',
-        })
-      }
-      cursor = sumarMin(cursor, granularidadMin)
+    for (const t of [...candidatas].sort((a, b) => a - b)) {
+      const inicio = new Date(t)
+      const fin = sumarMin(inicio, duracionMin)
+      if (fin > cierre) continue // el servicio no cabe entero en el tramo
+      if (inicio < limite) continue // no mostramos el pasado
+      const chocaOcupado = ocupados.some((o) => solapan(inicio, fin, o.ini, o.fin))
+      // Las horas "pegadas" solo se ofrecen si están libres: ocupadas no
+      // aportan nada y desordenarían la rejilla.
+      const deRejilla = minutosDesde(apertura, inicio) % granularidadMin === 0
+      if (chocaOcupado && !deRejilla) continue
+      rejilla.push({ inicio, estado: chocaOcupado ? 'ocupado' : 'libre' })
     }
   }
 
   return rejilla
 }
+
+const minutosDesde = (a, b) => Math.round((b - a) / 60000)
 
 /**
  * Solo las horas LIBRES (atajo sobre generarRejilla). Mismos parámetros.

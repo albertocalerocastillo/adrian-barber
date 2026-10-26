@@ -4,7 +4,7 @@ import { useScrolled } from '../../../hooks/useScrolled'
 import { EASE_SUAVE } from '../../../theme/animacion'
 import { CalendarCheck, Phone, MapPin } from 'lucide-react'
 import WhatsAppIcon from '../WhatsAppIcon/WhatsAppIcon'
-import { RESERVAS_ONLINE } from '../../../data/features'
+import { reservaEmpezada } from '../../../data/features'
 import {
   WHATSAPP,
   WHATSAPP_MENSAJE,
@@ -92,7 +92,7 @@ export default function FloatingActionsComponent() {
           <WhatsAppIcon size={26} />
         </a>
 
-        {RESERVAS_ONLINE ? (
+        {reservaEmpezada() ? (
           <Link to="/reserva" className={claseCita}>
             <CalendarCheck size={18} strokeWidth={2} />
             Pedir cita

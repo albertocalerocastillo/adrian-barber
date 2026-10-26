@@ -1,13 +1,15 @@
 import { Link } from 'react-router-dom'
 import { CalendarCheck } from 'lucide-react'
 import WhatsAppIcon from '../WhatsAppIcon/WhatsAppIcon'
-import { RESERVAS_ONLINE } from '../../../data/features'
+import { reservaEmpezada } from '../../../data/features'
 import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
 
 /**
  * Botón principal "Pedir cita" — la acción estrella de toda la web.
- *  - FASE 2 (RESERVAS_ONLINE = true):  lleva a la reserva online (/reserva).
- *  - FASE 1 (RESERVAS_ONLINE = false): abre WhatsApp con el mensaje predefinido.
+ *  - Con la reserva online ya en marcha: lleva a /reserva.
+ *  - Antes (o con la reserva apagada): abre WhatsApp con el mensaje
+ *    predefinido. El cambio es automático el día que empieza la reserva
+ *    (RESERVA.desde en data/features.js).
  *
  * Props:
  *  - variante: 'acento' (dorado, por defecto) | 'contorno' (borde claro).
@@ -22,9 +24,9 @@ export default function CitaButtonComponent({
 }) {
   // Con la reserva apagada, los botones grandes dicen que se abre WhatsApp;
   // en el pequeño (menú) no cabe y basta con el icono.
-  const etiqueta =
-    texto ??
-    (!RESERVAS_ONLINE && tamano === 'lg' ? 'Pedir cita por WhatsApp' : 'Pedir cita')
+  const online = reservaEmpezada()
+  const porDefecto = tamano !== 'lg' ? 'Pedir cita' : online ? 'Reservar cita' : 'Pedir cita por WhatsApp'
+  const etiqueta = texto ?? porDefecto
 
   const variantes = {
     acento:
@@ -40,10 +42,10 @@ export default function CitaButtonComponent({
   const clases = `group inline-flex items-center justify-center gap-2.5 whitespace-nowrap al-tocar font-semibold uppercase tracking-widest transition-all duration-300 hover:-translate-y-0.5 ${variantes[variante]} ${tamanos[tamano]} ${className}`
   const medida = tamano === 'lg' ? 20 : 18
 
-  // FASE 1: sin reserva online → el botón contacta por WhatsApp. Se usa el
+  // Sin reserva online (aún) → el botón contacta por WhatsApp. Se usa el
   // icono de WhatsApp (y no un calendario) para que se vea de antemano que
   // se abre el chat, y no una pantalla de reserva.
-  if (!RESERVAS_ONLINE) {
+  if (!online) {
     const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MENSAJE)}`
     return (
       <a
@@ -58,7 +60,7 @@ export default function CitaButtonComponent({
     )
   }
 
-  // FASE 2: reserva online activa.
+  // Reserva online en marcha.
   return (
     <Link to="/reserva" className={clases}>
       <CalendarCheck size={medida} strokeWidth={2} />

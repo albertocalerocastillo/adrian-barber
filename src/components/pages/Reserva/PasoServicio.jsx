@@ -1,5 +1,7 @@
-import { Clock, ChevronRight, Loader2 } from 'lucide-react'
+import { m } from 'motion/react'
+import { Clock, ChevronRight, Sparkles } from 'lucide-react'
 import { ICONOS } from '../../../theme/icons'
+import { EASE_SUAVE } from '../../../theme/animacion'
 
 /**
  * Paso 1: elegir servicio. Muestra los servicios activos con duración y precio.
@@ -9,48 +11,60 @@ import { ICONOS } from '../../../theme/icons'
 export default function PasoServicio({ servicios, servicio, onElegir }) {
   if (servicios === null) {
     return (
-      <div className="flex flex-col items-center gap-3 py-16 text-tinta/50">
-        <Loader2 size={26} className="animate-spin" />
-        <p className="text-sm">Cargando servicios…</p>
+      <div className="space-y-3" aria-label="Cargando servicios">
+        {Array.from({ length: 3 }, (_, i) => (
+          <div key={i} className="h-24 animate-pulse rounded-2xl bg-tinta/[0.06]" />
+        ))}
       </div>
     )
   }
 
   return (
     <div>
-      <h2 className="mb-5 text-center font-display text-xl font-semibold">
-        ¿Qué te quieres hacer?
-      </h2>
+      <h2 className="mb-6 text-center font-display text-2xl font-semibold sm:text-3xl">¿Qué te hacemos?</h2>
 
       <div className="space-y-3">
-        {servicios.map((s) => {
+        {servicios.map((s, i) => {
           const Icono = ICONOS[s.icono] || ICONOS.Scissors
           const sel = servicio?.id === s.id
           return (
-            <button
+            <m.button
               key={s.id}
               type="button"
               onClick={() => onElegir(s)}
-              className={`group flex w-full items-center gap-4 rounded-2xl border bg-white p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-tinta/5 ${
-                sel ? 'border-acento' : 'border-hueso-200'
+              aria-pressed={sel}
+              className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-acento hover:shadow-lg hover:shadow-tinta/5 active:scale-[0.99] sm:p-5 ${
+                sel ? 'border-acento ring-2 ring-acento/25' : 'border-hueso-200'
               }`}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: i * 0.07, ease: EASE_SUAVE }}
             >
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-tinta text-acento">
-                <Icono size={22} strokeWidth={1.75} />
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-tinta text-acento transition-colors group-hover:bg-acento group-hover:text-tinta">
+                <Icono size={24} strokeWidth={1.75} />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="font-display text-lg font-semibold">{s.nombre}</p>
-                <p className="flex items-center gap-1.5 text-xs text-tinta/50">
+                {s.destacado && (
+                  <p className="mb-0.5 flex items-center gap-1 text-[0.65rem] font-semibold uppercase tracking-widest text-acento-oscuro">
+                    <Sparkles size={11} /> El más pedido
+                  </p>
+                )}
+                <p className="font-display text-lg font-semibold leading-tight sm:text-xl">{s.nombre}</p>
+                {s.descripcion && <p className="mt-0.5 line-clamp-2 text-sm text-tinta/55">{s.descripcion}</p>}
+                <p className="mt-1.5 flex items-center gap-1.5 text-xs text-tinta/45">
                   <Clock size={13} />
                   {s.duracion} min
                 </p>
               </div>
-              <span className="font-display text-xl font-bold">{s.precio} €</span>
+              <span className="flex shrink-0 items-baseline gap-0.5 font-display font-bold">
+                <span className="text-3xl">{s.precio}</span>
+                <span className="text-lg text-tinta/50">€</span>
+              </span>
               <ChevronRight
                 size={20}
-                className="text-tinta/30 transition-transform group-hover:translate-x-0.5 group-hover:text-acento"
+                className="hidden shrink-0 text-tinta/25 transition-transform group-hover:translate-x-0.5 group-hover:text-acento sm:block"
               />
-            </button>
+            </m.button>
           )
         })}
       </div>

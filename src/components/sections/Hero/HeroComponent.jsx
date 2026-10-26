@@ -4,6 +4,7 @@ import { MapPin, Star, ArrowDown } from 'lucide-react'
 import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
 import MagneticComponent from '../../ui/Magnetic/MagneticComponent'
 import EstadoBadgeComponent from '../../ui/EstadoBadge/EstadoBadgeComponent'
+import ReservaOnlineComponent from '../../ui/ReservaOnline/ReservaOnlineComponent'
 import { useEstadoNegocio } from '../../../hooks/useEstadoNegocio'
 import { NEGOCIO, GOOGLE_VALORACION } from '../../../data/contacto'
 import { SERVICIOS } from '../../../data/servicios'
@@ -180,6 +181,10 @@ export default function HeroComponent() {
             </a>
             <span className="hidden h-5 w-px bg-hueso/20 sm:block lg:hidden xl:block" />
             <EstadoBadgeComponent estado={estado} claro href="#horario" />
+          </div>
+
+          <div className="entra mt-5" style={ordenEntrada(6)}>
+            <ReservaOnlineComponent claro />
           </div>
 
           {/* Cerrado: en vez de dejar al cliente colgado (y que se vaya a otra
