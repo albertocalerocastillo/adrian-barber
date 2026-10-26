@@ -66,8 +66,8 @@ repo quedó limpio (solo `main`, sin stash ni ramas de respaldo).
  - **qr-resenas/tarjeta-mostrador.html**: tarjeta A6 para el mostrador. Basta
    dejar `qr-resena.png` en esa carpeta y se completa sola.
 
-**HECHO EL 26/10/2026 — LOGO NUEVO + REDISEÑO CON MOTION** (rama
-`feature/logo-nuevo-motion`, **sin fusionar ni subir**):
+**HECHO EL 26/10/2026 — LOGO NUEVO + REDISEÑO CON MOTION** (✅ fusionado a
+`main` y EN PRODUCCIÓN):
  - **Logo definitivo**: sello circular (pizarra, aro dorado, "La Rinconada") +
    monograma "A.S" con navaja dorada. Fuente en `logo-propuesta/logo-final.webp`
    (hecho con ChatGPT, PNG con transparencia real). `scripts/generar-logo-final.py`
