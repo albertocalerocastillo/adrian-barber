@@ -34,7 +34,7 @@ entorno están puestas en Vercel → Production (`VITE_SUPABASE_URL`,
 `VITE_SUPABASE_ANON_KEY`, `VITE_CALLMEBOT_PHONE`, `VITE_CALLMEBOT_APIKEY`).
 Verificado desde CLI que el bundle online incluye Supabase + CallMeBot (ya no es
 modo localStorage). El `.env` local (gitignored) tiene los mismos valores. El
-aviso WhatsApp sigue apuntando al **móvil de PRUEBA de Alberto** (34684059380).
+aviso WhatsApp sigue apuntando al **móvil de PRUEBA de Alberto**.
 La idea aún NO se le ha enseñado a Adrián (Alberto se lo comenta esta noche).
 
 **HORARIO REAL (verificado en la ficha de Google, 18/09/2026):**
@@ -129,6 +129,31 @@ migración ya ejecutada en Supabase y comprobada):
  - **Festivos:** 1 y 6 de enero salen como días normales: Adrián tiene que
    cerrarlos con "Día libre" en el panel.
 
+**REVISIÓN DE SEGURIDAD Y LEGAL (26/10/2026)** (rama `fix/seguridad-legal`):
+ - 🔴 **Fallo grave encontrado:** el registro de Supabase estaba ABIERTO y las
+   normas daban permiso total a cualquier usuario con sesión. Cualquiera podía
+   crearse cuenta y leer nombres/móviles de clientes o borrar citas.
+   Arreglo: `supabase/migracion-seguridad.sql` (lista `barberos`, función
+   `es_barbero()`, freno de 20 reservas web/hora) + **desactivar el registro**
+   en Supabase (Authentication → Sign In / Providers → "Allow new users to
+   sign up" OFF). Tras la migración hay que añadir cada cuenta del panel a
+   `barberos` (bloque del final del SQL); si no, el panel dice "Esta cuenta no
+   tiene acceso". Probado en PGlite (9 casos).
+ - Cabeceras de seguridad en `vercel.json` (CSP, X-Frame-Options, nosniff,
+   Referrer-Policy, Permissions-Policy, noindex en /admin). Probadas sirviendo
+   el build: 0 violaciones. HTTPS y HSTS ya los pone Vercel.
+ - `npm audit fix`: 6 vulnerabilidades de Vite (solo servidor de desarrollo)
+   → 0. Sin secretos en Git ni en el JS publicado (solo la clave anon).
+ - Legal: páginas /aviso-legal, /privacidad y /cookies + enlaces en el pie y en
+   la reserva. Mapa de Google solo al pulsar "Ver mapa". Tipografías dentro de
+   la web (fuera Google Fonts: mandaba la IP del visitante a Google). Sin
+   cookies de analítica → no hace falta banner.
+ - ⬜ **Falta de Adrián:** NIF y email para el aviso legal (`LEGAL` en
+   data/contacto.js; mientras estén vacíos esas líneas no se muestran).
+ - ⬜ Borrar en Vercel `VITE_CALLMEBOT_PHONE` / `VITE_CALLMEBOT_APIKEY` (ya no
+   se usan). Quitado el móvil de Alberto de este archivo (sigue en el
+   historial de Git, que es público).
+
 **LO QUE TOCA AHORA (por orden):**
 1. **Generar el QR de reseñas** con el enlace de arriba (qrcode-monkey, mismos
    ajustes que el de la web) y guardarlo como `qr-resenas/qr-resena.png`.
@@ -182,7 +207,7 @@ Pendiente menor: geo (lat/lng) exacto en el JSON-LD. Se sigue en URL de Vercel (
 dominio propio de momento; Adrián lo pagará si la web da fruto).
 
 **Datos clave:** Supabase URL `https://ydzeqcujmohupzcmhrbk.supabase.co`, org
-"A.S Barbería". Panel en `/admin`. Aviso WhatsApp de prueba al 34684059380.
+"A.S Barbería". Panel en `/admin`. Aviso WhatsApp de prueba al móvil de Alberto.
 SQL completo en `supabase/setup-completo.sql`.
 
 ## ⚡ RESUMEN ACTUAL (para retomar rápido)

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Loader2, AlertCircle, User, Phone, ShieldCheck } from 'lucide-react'
 import { crearCita } from '../../../lib/citas'
 import { sumarMin } from '../../../utils/disponibilidad'
@@ -116,7 +117,12 @@ export default function PasoDatos({ servicio, hora, onConfirmado, onHoraPerdida 
 
         <p className="flex items-start justify-center gap-2 text-center text-xs leading-relaxed text-tinta/45">
           <ShieldCheck size={15} className="mt-px shrink-0 text-acento-oscuro" />
-          Tu nombre y tu móvil solo los ve Adrián, para gestionar esta cita.
+          <span>
+            Tu nombre y tu móvil solo los ve Adrián, para gestionar esta cita.{' '}
+            <Link to="/privacidad" target="_blank" className="underline hover:text-acento-oscuro">
+              Política de privacidad
+            </Link>
+          </span>
         </p>
       </form>
     </div>

@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /panel
 
 Sitemap: https://adrian-barber.vercel.app/sitemap.xml

@@ -15,9 +15,9 @@
    ──────────────────────────────────────────────────────────── */
 @theme {
   /* Tipografía */
-  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
-  --font-body: "Lora", Georgia, "Times New Roman", serif;
-  --font-script: "Great Vibes", "Brush Script MT", cursive; /* eco del logo manuscrito */
+  --font-display: "Playfair Display Variable", "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "Lora Variable", "Lora", Georgia, "Times New Roman", serif;
+  --font-script: "Brush Script MT", cursive; /* solo el logo antiguo de reserva */
 
   /* Paleta tomada del logo: pizarra azulada + dorado + granate */
   --color-tinta-900:    #0f161d; /* pizarra más profunda (footer)    */

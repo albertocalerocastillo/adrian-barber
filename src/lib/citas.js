@@ -70,6 +70,9 @@ const ERRORES_BD = {
   DEMASIADO_LEJOS: { texto: 'Esa fecha queda demasiado lejos. Elige una más cercana.', volverAHoras: true },
   SERVICIO_NO_VALIDO: { texto: 'Ese servicio ha cambiado. Vuelve a empezar, por favor.', volverAHoras: true },
   DATOS_NO_VALIDOS: { texto: 'Revisa tu nombre y tu móvil.' },
+  DEMASIADAS_RESERVAS: {
+    texto: 'Ahora mismo hay muchas reservas a la vez. Prueba en un rato o escríbeme por WhatsApp.',
+  },
   DEMASIADAS_CITAS: {
     texto: 'Ya tienes citas pendientes con ese móvil. Si quieres otra, escríbeme por WhatsApp.',
   },

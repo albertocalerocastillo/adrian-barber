@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Phone, MapPin, ArrowUp } from 'lucide-react'
 import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
 import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
@@ -119,9 +120,16 @@ export default function FooterComponent() {
       </div>
 
       <div className="mx-auto mt-14 flex max-w-6xl flex-col items-center justify-between gap-4 border-t border-hueso/10 px-5 py-7 text-xs text-hueso/40 md:flex-row md:px-8">
-        <p>
-          © {anio} {NEGOCIO.nombreCompleto}. Hecho con cariño en {NEGOCIO.localidad}.
-        </p>
+        <div className="flex flex-col items-center gap-2 md:items-start">
+          <p>
+            © {anio} {NEGOCIO.nombreCompleto}. Hecho con cariño en {NEGOCIO.localidad}.
+          </p>
+          <nav aria-label="Información legal" className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+            <Link to="/aviso-legal" className="hover:text-acento">Aviso legal</Link>
+            <Link to="/privacidad" className="hover:text-acento">Privacidad</Link>
+            <Link to="/cookies" className="hover:text-acento">Cookies</Link>
+          </nav>
+        </div>
         <a href="#inicio" className="al-tocar group inline-flex items-center gap-2 uppercase tracking-widest hover:text-acento">
           Volver arriba
           <ArrowUp size={14} className="transition-transform group-hover:-translate-y-0.5" />

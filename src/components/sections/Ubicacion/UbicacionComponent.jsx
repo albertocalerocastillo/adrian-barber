@@ -1,6 +1,8 @@
-import { MapPin, Phone, Navigation } from 'lucide-react'
+import { useState } from 'react'
+import { MapPin, Phone, Navigation, Map as IconoMapa } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
 import RevealComponent from '../../ui/Reveal/RevealComponent'
+import { Link } from 'react-router-dom'
 import {
   NEGOCIO,
   TELEFONO,
@@ -10,11 +12,15 @@ import {
 } from '../../../data/contacto'
 
 /**
- * Ubicación: dirección, teléfono y mapa de Google embebido.
- * El mapa usa una búsqueda por dirección; se afinará con las coordenadas
- * exactas del local de Adrián.
+ * Ubicación: dirección, teléfono y mapa de Google.
+ *
+ * El mapa NO se carga solo: Google Maps pone cookies y recibe la IP del
+ * visitante, y eso exige su permiso (RGPD/LSSI). Hasta que pulsa "Ver mapa"
+ * sale una tarjeta propia, sin nada de Google. El botón "Cómo llegar" es un
+ * enlace normal y funciona siempre.
  */
 export default function UbicacionComponent() {
+  const [mapa, setMapa] = useState(false)
   const datos = [
     {
       icono: MapPin,
@@ -82,17 +88,37 @@ export default function UbicacionComponent() {
 
           {/* Mapa */}
           <RevealComponent delay={120} desde="derecha">
-            <div className="relative overflow-hidden ring-1 ring-acento/25">
-              <iframe
-                title="Ubicación de A.S Barbería en Google Maps"
-                src={MAPS_EMBED}
-                width="100%"
-                style={{ border: 0 }}
-                className="block h-[300px] w-full grayscale-[60%] transition-[filter] duration-700 hover:grayscale-0 md:h-[380px]"
-                loading="lazy"
-                allowFullScreen
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+            <div className="relative h-[300px] overflow-hidden ring-1 ring-acento/25 md:h-[380px]">
+              {mapa ? (
+                <iframe
+                  title="Ubicación de A.S Barbería en Google Maps"
+                  src={MAPS_EMBED}
+                  width="100%"
+                  style={{ border: 0 }}
+                  className="block h-full w-full"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              ) : (
+                <div className="grain flex h-full flex-col items-center justify-center gap-4 bg-tinta-800 px-6 text-center">
+                  {/* Sello en vez del mapa: nada de Google hasta que se pulse */}
+                  <img src="/logo-sello.webp" alt="" aria-hidden="true" loading="lazy" className="w-24 opacity-90 md:w-28" />
+                  <p className="max-w-xs text-sm text-hueso/60">
+                    {NEGOCIO.direccion}, {NEGOCIO.localidad}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setMapa(true)}
+                    className="al-tocar inline-flex items-center gap-2 border border-hueso/30 px-6 py-3 text-xs font-semibold uppercase tracking-widest text-hueso transition-colors hover:border-acento hover:text-acento"
+                  >
+                    <IconoMapa size={16} /> Ver mapa
+                  </button>
+                  <p className="max-w-xs text-[0.7rem] leading-relaxed text-hueso/35">
+                    Al pulsar se carga Google Maps, que puede usar cookies. Más en la{' '}
+                    <Link to="/cookies" className="underline hover:text-acento">política de cookies</Link>.
+                  </p>
+                </div>
+              )}
             </div>
           </RevealComponent>
         </div>
