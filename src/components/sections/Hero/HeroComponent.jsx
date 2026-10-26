@@ -117,17 +117,22 @@ export default function HeroComponent() {
           </p>
 
           <h1 className="font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight min-[400px]:text-5xl sm:text-6xl md:text-7xl lg:text-6xl xl:text-7xl 2xl:text-[5.25rem] [@media(max-height:760px)_and_(min-width:1024px)]:text-6xl">
+            {/* Entre palabra y palabra va un espacio de verdad (no margen):
+                Google y los lectores de pantalla leían "Cortesconcarácter…". */}
             {TITULAR.map((linea) => (
               <span key={linea.texto} className={`block ${linea.clase ?? ''}`}>
-                {linea.palabras.map(({ p, orden }) => (
-                  <span key={orden} className="palabra mr-[0.22em] last:mr-0">
-                    <span style={ordenEntrada(orden)}>{p}</span>
+                {linea.palabras.map(({ p, orden }, i) => (
+                  <span key={orden}>
+                    {i > 0 && ' '}
+                    <span className="palabra">
+                      <span style={ordenEntrada(orden)}>{p}</span>
+                    </span>
                   </span>
-                ))}
+                ))}{' '}
               </span>
             ))}
             <span className="sr-only">
-              — {NEGOCIO.nombreCompleto}, {NEGOCIO.barbero}
+              {' '}— {NEGOCIO.nombreCompleto}, {NEGOCIO.barbero}
             </span>
           </h1>
 
