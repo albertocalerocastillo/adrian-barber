@@ -1,30 +1,30 @@
 import { useState, useEffect } from 'react'
-import { X, Loader2 } from 'lucide-react'
+import { Loader2, CalendarX } from 'lucide-react'
+import Hoja from './Hoja'
+import { Campo, BotonPrincipal, AtajosFecha, claseInput } from './Controles'
 import { generarRejilla, sumarMin } from '../../../utils/disponibilidad'
-import { hora as fmtHora, inicioDia } from '../../../utils/fechas'
+import { hora as fmtHora, inicioDia, aInputDate } from '../../../utils/fechas'
 import { listarCitas, listarBloqueos, crearCitaManual } from '../../../lib/panel'
 import { getHorario, getServicios } from '../../../lib/config'
-
-/** Devuelve "YYYY-MM-DD" en local para el <input type=date>. */
-function aInputDate(d) {
-  const p = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
-}
+import { ICONOS } from '../../../theme/icons'
 
 /**
- * Alta manual de cita desde el panel. Reutiliza el motor de huecos para no
- * ofrecer horas ocupadas. Sirve para migrar la agenda y para citas por
- * teléfono/presencial.
+ * Alta manual de cita desde el panel (cliente que llama, que pasa por la
+ * puerta o que escribe por WhatsApp). Todo se elige tocando: servicio,
+ * día y hora; solo se escribe el nombre. Las horas salen del motor de huecos,
+ * así que nunca ofrece una que ya esté ocupada.
+ *
+ * Props: fechaInicial (Date), horaInicial ("HH:MM", opcional: viene de pulsar
+ * un hueco libre), onClose, onCreada(texto del aviso).
  */
-export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
+export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onCreada }) {
   const [servicios, setServicios] = useState([])
   const [servicioId, setServicioId] = useState('')
   const [fechaStr, setFechaStr] = useState(aInputDate(fechaInicial || new Date()))
-  const [rejilla, setRejilla] = useState([])
+  const [rejilla, setRejilla] = useState(null)
   const [horaISO, setHoraISO] = useState('')
   const [nombre, setNombre] = useState('')
   const [movil, setMovil] = useState('')
-  const [cargandoHuecos, setCargandoHuecos] = useState(true)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
   const [horario, setHorario] = useState(null)
@@ -34,12 +34,10 @@ export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
   // Carga horario y servicios una vez (para citas manuales se ofrecen los activos).
   useEffect(() => {
     let vivo = true
-    getHorario().then((h) => {
-      if (vivo) setHorario(h)
-    })
-    getServicios().then((ss) => {
+    Promise.all([getHorario(), getServicios()]).then(([h, ss]) => {
       if (!vivo) return
       const activos = ss.filter((s) => s.activo !== false)
+      setHorario(h)
       setServicios(activos)
       setServicioId(activos[0]?.id ?? '')
     })
@@ -56,35 +54,38 @@ export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
     let vivo = true
     const desde = inicioDia(f)
     const hasta = sumarMin(desde, 24 * 60)
-    Promise.all([listarCitas(desde, hasta), listarBloqueos(desde, hasta)]).then(
-      ([citas, bloqueos]) => {
-        if (!vivo) return
-        const libres = generarRejilla({
-          fecha: f,
-          duracionMin: svc.duracion,
-          horario,
-          citas: citas.filter((c) => c.estado !== 'cancelada'),
-          bloqueos,
-          ahora: new Date(0), // en el panel permitimos también hoy más temprano
-          granularidadMin: 15,
-        }).filter((s) => s.estado === 'libre')
-        setRejilla(libres)
-        setHoraISO('')
-        setCargandoHuecos(false)
-      }
-    )
+    Promise.all([listarCitas(desde, hasta), listarBloqueos(desde, hasta)]).then(([citas, bloqueos]) => {
+      if (!vivo) return
+      const libres = generarRejilla({
+        fecha: f,
+        duracionMin: svc.duracion,
+        horario,
+        citas: citas.filter((c) => c.estado !== 'cancelada'),
+        bloqueos,
+        ahora: new Date(0), // en el panel se permite también hoy más temprano
+        granularidadMin: 15,
+      }).filter((s) => s.estado === 'libre')
+      setRejilla(libres)
+      // Si se vino desde un hueco libre, esa hora sale ya marcada.
+      const preferida = horaInicial && libres.find((s) => fmtHora(s.inicio) === horaInicial)
+      setHoraISO(preferida ? preferida.inicio.toISOString() : '')
+    })
     return () => {
       vivo = false
     }
-  }, [servicioId, fechaStr, horario, servicios])
+  }, [servicioId, fechaStr, horario, servicios, horaInicial])
+
+  const cambiarFecha = (v) => {
+    setRejilla(null)
+    setFechaStr(v)
+  }
 
   async function onGuardar(e) {
-    e.preventDefault()
+    e?.preventDefault()
     if (guardando) return
-    if (!servicio || !horaISO || nombre.trim().length < 2) {
-      setError('Completa servicio, hora y nombre.')
-      return
-    }
+    if (!servicio) return setError('Elige un servicio.')
+    if (!horaISO) return setError('Elige una hora.')
+    if (nombre.trim().length < 2) return setError('Escribe el nombre del cliente.')
     setGuardando(true)
     setError('')
     const inicio = new Date(horaISO)
@@ -98,106 +99,138 @@ export default function NuevaCitaModal({ fechaInicial, onClose, onCreada }) {
     })
     setGuardando(false)
     if (res.ok) {
-      onCreada()
+      onCreada(`Cita de ${nombre.trim().split(' ')[0]} a las ${fmtHora(inicio)} guardada`)
       onClose()
     } else {
       setError(res.error)
     }
   }
 
+  // Mañana y tarde por separado: más fácil de encontrar la hora.
+  const manana = rejilla?.filter((s) => s.inicio.getHours() < 15) ?? []
+  const tarde = rejilla?.filter((s) => s.inicio.getHours() >= 15) ?? []
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-4">
-      <div className="w-full max-w-md rounded-t-2xl bg-hueso p-6 text-tinta sm:rounded-2xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold">Nueva cita</h2>
-          <button type="button" onClick={onClose} aria-label="Cerrar" className="text-tinta/50 hover:text-tinta">
-            <X size={22} />
-          </button>
+    <Hoja
+      titulo="Nueva cita"
+      subtitulo="Para quien llama o pasa por la puerta."
+      onCerrar={onClose}
+      pie={
+        <div>
+          {error && (
+            <p role="alert" className="mb-3 rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-700">
+              {error}
+            </p>
+          )}
+          <BotonPrincipal type="button" onClick={onGuardar} cargando={guardando} className="w-full">
+            {horaISO ? `Guardar cita a las ${fmtHora(new Date(horaISO))}` : 'Guardar cita'}
+          </BotonPrincipal>
         </div>
-
-        <form onSubmit={onGuardar} className="space-y-3">
-          <label className="block">
-            <span className="mb-1 block text-sm font-medium text-tinta/70">Servicio</span>
-            <select
-              value={servicioId}
-              onChange={(e) => setServicioId(e.target.value)}
-              className="w-full rounded-xl border border-hueso-200 bg-white px-3 py-2.5 outline-none focus:border-acento"
-            >
-              {servicios.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.nombre} · {s.duracion} min · {s.precio} €
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="block">
-            <span className="mb-1 block text-sm font-medium text-tinta/70">Fecha</span>
-            <input
-              type="date"
-              value={fechaStr}
-              onChange={(e) => setFechaStr(e.target.value)}
-              className="w-full rounded-xl border border-hueso-200 bg-white px-3 py-2.5 outline-none focus:border-acento"
-            />
-          </label>
-
-          <label className="block">
-            <span className="mb-1 block text-sm font-medium text-tinta/70">Hora</span>
-            {cargandoHuecos ? (
-              <p className="flex items-center gap-2 py-2 text-sm text-tinta/50">
-                <Loader2 size={15} className="animate-spin" /> Calculando huecos…
-              </p>
-            ) : rejilla.length === 0 ? (
-              <p className="py-2 text-sm text-tinta/50">No hay huecos libres ese día.</p>
-            ) : (
-              <select
-                value={horaISO}
-                onChange={(e) => setHoraISO(e.target.value)}
-                className="w-full rounded-xl border border-hueso-200 bg-white px-3 py-2.5 outline-none focus:border-acento"
-              >
-                <option value="">Elige hora…</option>
-                {rejilla.map((s) => (
-                  <option key={s.inicio.toISOString()} value={s.inicio.toISOString()}>
-                    {fmtHora(s.inicio)}
-                  </option>
-                ))}
-              </select>
-            )}
-          </label>
-
-          <div className="grid grid-cols-2 gap-3">
-            <label className="block">
-              <span className="mb-1 block text-sm font-medium text-tinta/70">Nombre</span>
-              <input
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                className="w-full rounded-xl border border-hueso-200 bg-white px-3 py-2.5 outline-none focus:border-acento"
-                placeholder="Cliente"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block text-sm font-medium text-tinta/70">Móvil</span>
-              <input
-                value={movil}
-                onChange={(e) => setMovil(e.target.value)}
-                className="w-full rounded-xl border border-hueso-200 bg-white px-3 py-2.5 outline-none focus:border-acento"
-                placeholder="(opcional)"
-              />
-            </label>
+      }
+    >
+      <form onSubmit={onGuardar} className="space-y-6">
+        <Campo etiqueta="Servicio">
+          <div className="grid gap-2 sm:grid-cols-2">
+            {servicios.map((s) => {
+              const Icono = ICONOS[s.icono] || ICONOS.Scissors
+              const elegido = String(s.id) === String(servicioId)
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setServicioId(s.id)}
+                  aria-pressed={elegido}
+                  className={`flex items-center gap-3 rounded-2xl p-3 text-left transition-all ${
+                    elegido ? 'bg-tinta text-hueso shadow-lg' : 'bg-white ring-1 ring-hueso-200 hover:ring-tinta/30'
+                  }`}
+                >
+                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${elegido ? 'bg-acento text-tinta' : 'bg-tinta/5 text-acento-oscuro'}`}>
+                    <Icono size={18} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold">{s.nombre}</span>
+                    <span className={`text-xs ${elegido ? 'text-hueso/60' : 'text-tinta/50'}`}>
+                      {s.duracion} min · {s.precio} €
+                    </span>
+                  </span>
+                </button>
+              )
+            })}
           </div>
+        </Campo>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+        <Campo etiqueta="Día">
+          <AtajosFecha valor={fechaStr} onCambio={cambiarFecha} />
+        </Campo>
 
-          <button
-            type="submit"
-            disabled={guardando}
-            className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-acento py-3 font-semibold text-tinta transition-colors hover:bg-acento-claro disabled:opacity-60"
-          >
-            {guardando && <Loader2 size={17} className="animate-spin" />}
-            Guardar cita
-          </button>
-        </form>
-      </div>
-    </div>
+        <Campo etiqueta="Hora">
+          {rejilla === null ? (
+            <p className="flex items-center gap-2 py-3 text-sm text-tinta/50">
+              <Loader2 size={16} className="animate-spin" /> Buscando huecos libres…
+            </p>
+          ) : rejilla.length === 0 ? (
+            <p className="flex items-center gap-2 rounded-2xl bg-tinta/5 px-4 py-4 text-sm text-tinta/60">
+              <CalendarX size={18} /> No hay huecos libres ese día. Prueba otro.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {[
+                ['Mañana', manana],
+                ['Tarde', tarde],
+              ].map(
+                ([titulo, horas]) =>
+                  horas.length > 0 && (
+                    <div key={titulo}>
+                      <p className="mb-1.5 text-xs text-tinta/40">{titulo}</p>
+                      <div className="grid grid-cols-4 gap-1.5 min-[400px]:grid-cols-5 sm:grid-cols-6">
+                        {horas.map((s) => {
+                          const iso = s.inicio.toISOString()
+                          const elegida = iso === horaISO
+                          return (
+                            <button
+                              key={iso}
+                              type="button"
+                              onClick={() => setHoraISO(iso)}
+                              aria-pressed={elegida}
+                              className={`rounded-xl py-2.5 text-sm font-semibold tabular-nums transition-all active:scale-95 ${
+                                elegida ? 'bg-acento text-tinta shadow-md shadow-acento/30' : 'bg-white ring-1 ring-hueso-200 hover:ring-acento'
+                              }`}
+                            >
+                              {fmtHora(s.inicio)}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+              )}
+            </div>
+          )}
+        </Campo>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Campo etiqueta="Nombre">
+            <input
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              autoComplete="off"
+              className={claseInput}
+              placeholder="Nombre del cliente"
+            />
+          </Campo>
+          <Campo etiqueta="Móvil (opcional)">
+            <input
+              value={movil}
+              onChange={(e) => setMovil(e.target.value)}
+              type="tel"
+              inputMode="tel"
+              autoComplete="off"
+              className={claseInput}
+              placeholder="600 000 000"
+            />
+          </Campo>
+        </div>
+      </form>
+    </Hoja>
   )
 }

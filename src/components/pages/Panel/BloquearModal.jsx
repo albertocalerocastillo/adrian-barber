@@ -1,17 +1,15 @@
 import { useState } from 'react'
-import { X, Loader2 } from 'lucide-react'
+import Hoja from './Hoja'
+import { Campo, Segmentado, BotonPrincipal, AtajosFecha, claseInput } from './Controles'
 import { aHora, sumarMin } from '../../../utils/disponibilidad'
-import { inicioDia } from '../../../utils/fechas'
+import { inicioDia, fechaLarga, aInputDate } from '../../../utils/fechas'
 import { crearBloqueo } from '../../../lib/panel'
 
-function aInputDate(d) {
-  const p = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
-}
+const MOTIVOS = ['Vacaciones', 'Médico', 'Descanso', 'Formación']
 
 /**
- * Crea un bloqueo: un día entero o una franja horaria. Esos ratos desaparecen
- * de los huecos de la web automáticamente. Para vacaciones/descansos.
+ * Cierra un día entero o un rato (vacaciones, médico, descanso). Esos huecos
+ * desaparecen de la web automáticamente.
  */
 export default function BloquearModal({ fechaInicial, onClose, onCreado }) {
   const [fechaStr, setFechaStr] = useState(aInputDate(fechaInicial || new Date()))
@@ -23,7 +21,7 @@ export default function BloquearModal({ fechaInicial, onClose, onCreado }) {
   const [error, setError] = useState('')
 
   async function onGuardar(e) {
-    e.preventDefault()
+    e?.preventDefault()
     if (guardando) return
     const fecha = new Date(`${fechaStr}T00:00:00`)
     let ini, fin
@@ -34,16 +32,16 @@ export default function BloquearModal({ fechaInicial, onClose, onCreado }) {
       ini = aHora(fecha, desde)
       fin = aHora(fecha, hasta)
       if (fin <= ini) {
-        setError('La hora de fin debe ser posterior a la de inicio.')
+        setError('La hora de fin tiene que ser después de la de inicio.')
         return
       }
     }
     setGuardando(true)
     setError('')
-    const res = await crearBloqueo({ inicio: ini, fin, motivo })
+    const res = await crearBloqueo({ inicio: ini, fin, motivo: motivo.trim() })
     setGuardando(false)
     if (res.ok) {
-      onCreado()
+      onCreado(`${fechaLarga(fecha)}: ${todoElDia ? 'cerrado todo el día' : `cerrado de ${desde} a ${hasta}`}`)
       onClose()
     } else {
       setError(res.error)
@@ -51,84 +49,74 @@ export default function BloquearModal({ fechaInicial, onClose, onCreado }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-4">
-      <div className="w-full max-w-md rounded-t-2xl bg-hueso p-6 text-tinta sm:rounded-2xl">
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold">Día libre / cerrar</h2>
-          <button type="button" onClick={onClose} aria-label="Cerrar" className="text-tinta/50 hover:text-tinta">
-            <X size={22} />
-          </button>
+    <Hoja
+      titulo="Día libre"
+      subtitulo="Cierra un día o un rato. Esos huecos desaparecen de la web."
+      onCerrar={onClose}
+      pie={
+        <div>
+          {error && (
+            <p role="alert" className="mb-3 rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-700">
+              {error}
+            </p>
+          )}
+          <BotonPrincipal type="button" onClick={onGuardar} cargando={guardando} className="w-full">
+            Cerrar {todoElDia ? 'el día' : `de ${desde} a ${hasta}`}
+          </BotonPrincipal>
         </div>
-        <p className="mb-4 text-sm text-tinta/50">
-          Cierra un día entero o un rato (vacaciones, descanso). Esos huecos desaparecen de la web.
-        </p>
+      }
+    >
+      <form onSubmit={onGuardar} className="space-y-6">
+        <Campo etiqueta="Día">
+          <AtajosFecha valor={fechaStr} onCambio={setFechaStr} />
+        </Campo>
 
-        <form onSubmit={onGuardar} className="space-y-3">
-          <label className="block">
-            <span className="mb-1 block text-sm font-medium text-tinta/70">Fecha</span>
-            <input
-              type="date"
-              value={fechaStr}
-              onChange={(e) => setFechaStr(e.target.value)}
-              className="w-full rounded-xl border border-hueso-200 bg-white px-3 py-2.5 outline-none focus:border-acento"
-            />
-          </label>
-
-          <label className="flex items-center gap-2.5">
-            <input
-              type="checkbox"
-              checked={todoElDia}
-              onChange={(e) => setTodoElDia(e.target.checked)}
-              className="h-4 w-4 accent-acento"
-            />
-            <span className="text-sm font-medium text-tinta/80">Todo el día</span>
-          </label>
-
+        <Campo etiqueta="¿Cuánto?">
+          <Segmentado
+            opciones={[
+              { valor: true, texto: 'Todo el día' },
+              { valor: false, texto: 'Unas horas' },
+            ]}
+            valor={todoElDia}
+            onCambio={setTodoElDia}
+          />
           {!todoElDia && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="mt-3 grid grid-cols-2 gap-3">
               <label className="block">
-                <span className="mb-1 block text-sm font-medium text-tinta/70">Desde</span>
-                <input
-                  type="time"
-                  value={desde}
-                  onChange={(e) => setDesde(e.target.value)}
-                  className="w-full rounded-xl border border-hueso-200 bg-white px-3 py-2.5 outline-none focus:border-acento"
-                />
+                <span className="mb-1.5 block text-xs text-tinta/50">Desde</span>
+                <input type="time" value={desde} onChange={(e) => setDesde(e.target.value)} className={claseInput} />
               </label>
               <label className="block">
-                <span className="mb-1 block text-sm font-medium text-tinta/70">Hasta</span>
-                <input
-                  type="time"
-                  value={hasta}
-                  onChange={(e) => setHasta(e.target.value)}
-                  className="w-full rounded-xl border border-hueso-200 bg-white px-3 py-2.5 outline-none focus:border-acento"
-                />
+                <span className="mb-1.5 block text-xs text-tinta/50">Hasta</span>
+                <input type="time" value={hasta} onChange={(e) => setHasta(e.target.value)} className={claseInput} />
               </label>
             </div>
           )}
+        </Campo>
 
-          <label className="block">
-            <span className="mb-1 block text-sm font-medium text-tinta/70">Motivo (opcional)</span>
-            <input
-              value={motivo}
-              onChange={(e) => setMotivo(e.target.value)}
-              className="w-full rounded-xl border border-hueso-200 bg-white px-3 py-2.5 outline-none focus:border-acento"
-              placeholder="Vacaciones, descanso…"
-            />
-          </label>
-
-          {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={guardando}
-            className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-tinta py-3 font-semibold text-hueso transition-colors hover:bg-tinta-800 disabled:opacity-60"
-          >
-            {guardando && <Loader2 size={17} className="animate-spin" />}
-            Guardar día libre
-          </button>
-        </form>
-      </div>
-    </div>
+        <Campo etiqueta="Motivo (opcional)" ayuda="Solo lo ves tú.">
+          <div className="mb-2 flex flex-wrap gap-2">
+            {MOTIVOS.map((mo) => (
+              <button
+                key={mo}
+                type="button"
+                onClick={() => setMotivo(mo)}
+                className={`rounded-full px-3.5 py-1.5 text-sm transition-all ${
+                  motivo === mo ? 'bg-tinta text-hueso' : 'bg-white text-tinta/65 ring-1 ring-hueso-200 hover:ring-tinta/30'
+                }`}
+              >
+                {mo}
+              </button>
+            ))}
+          </div>
+          <input
+            value={motivo}
+            onChange={(e) => setMotivo(e.target.value)}
+            className={claseInput}
+            placeholder="U otro motivo…"
+          />
+        </Campo>
+      </form>
+    </Hoja>
   )
 }

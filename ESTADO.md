@@ -85,6 +85,23 @@ repo quedó limpio (solo `main`, sin stash ni ramas de respaldo).
  - **Fix**: Ubicación decía "pide tu cita online" (no hay reserva online).
  - Revisado sin scroll horizontal a 1920, 1366, 1024, 768, 430 y 360 px.
 
+**PANEL /admin REDISEÑADO (26/10/2026)** (rama `feature/panel-rediseno`):
+ - Móvil: navegación abajo (Agenda · Horario · Servicios) y botón "+" flotante
+   (Nueva cita / Día libre). Tablet: secciones arriba. Escritorio: barra lateral.
+ - Agenda: resumen del día (citas, atendidas, pendientes, caja prevista), la
+   SIGUIENTE cita destacada con llamar/WhatsApp/Atendido, tira con los 7 días,
+   línea de tiempo con los HUECOS LIBRES ("Cita aquí" abre la cita con esa
+   hora puesta), vista semana. Atender/cancelar se deshace desde el aviso de
+   abajo (ya no hay window.confirm).
+ - Horario y Servicios: interruptores, contadores −/+ y barra "Guardar" que
+   solo sale si hay cambios. Horario: "Partir jornada" y "Copiar a los demás".
+ - Ventanas, avisos y botones flotantes van en portal (`createPortal`): la
+   animación de entrada de cada pantalla los dejaba debajo de la navegación.
+ - **Modo demo para revisarlo sin tocar datos reales:** `npm run demo` →
+   http://localhost:5174/admin (Supabase de mentira en `demo/supabase-demo.js`;
+   con `/admin?login` empieza en la pantalla de acceso, entra con cualquier
+   cosa). No forma parte del build publicado.
+
 **LO QUE TOCA AHORA (por orden):**
 1. **Generar el QR de reseñas** con el enlace de arriba (qrcode-monkey, mismos
    ajustes que el de la web) y guardarlo como `qr-resenas/qr-resena.png`.
