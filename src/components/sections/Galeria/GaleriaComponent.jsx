@@ -32,16 +32,16 @@ export default function GaleriaComponent() {
         {/* Filas que se rellenan en orden, no "masonry" de columnas: las fotos
             son todas verticales con la misma proporción, y las columnas CSS
             las repartían 3+2+2 con un hueco feo al final. Con flex centrado,
-            si la última fila queda corta (7 fotos = 3+3+1) se queda en medio
+            si la última fila queda corta (7 fotos = 4+3 en escritorio) se queda en medio
             en vez de colgando a la izquierda, sea cual sea el número de fotos.
             (Si algún día entran fotos apaisadas, habría que revisarlo.) */}
         <div className="mt-14 flex flex-wrap justify-center gap-3 sm:gap-4 lg:gap-5">
           {GALERIA.map((foto, i) => (
             <RevealComponent
               key={foto.id}
-              delay={(i % 3) * 90}
+              delay={(i % 4) * 90}
               desde="escala"
-              className="w-[calc((100%-0.75rem)/2)] sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
+              className="w-[calc((100%-0.75rem)/2)] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3.75rem)/4)]"
             >
               <button
                 type="button"
@@ -55,7 +55,7 @@ export default function GaleriaComponent() {
                   width={foto.w}
                   height={foto.h}
                   loading="lazy"
-                  className="block h-auto w-full transition-transform duration-700 ease-[var(--ease-suave)] group-hover:scale-110"
+                  className="block h-auto w-full transition-transform duration-700 ease-[var(--ease-suave)] group-hover:scale-105"
                 />
                 <span className="absolute inset-0 bg-gradient-to-t from-tinta/70 via-tinta/0 to-tinta/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 <span className="absolute bottom-4 right-4 flex h-10 w-10 translate-y-3 items-center justify-center bg-acento text-tinta opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">

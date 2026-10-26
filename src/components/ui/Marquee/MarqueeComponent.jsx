@@ -14,7 +14,7 @@ import {
 
 const COPIAS = 4
 const MUELLE_VELOCIDAD = { damping: 50, stiffness: 400 }
-const INCLINACION_MAX = 5
+const INCLINACION_MAX = 3
 
 /**
  * Cinta de texto que se desliza sin fin y reacciona al scroll: al bajar rápido

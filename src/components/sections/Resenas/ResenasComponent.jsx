@@ -99,7 +99,7 @@ export default function ResenasComponent() {
                 delay={i * 110}
                 className={i === TESTIMONIOS.length - 1 && TESTIMONIOS.length % 2 ? 'md:col-span-2 lg:col-span-1' : ''}
               >
-                <TiltCardComponent inclinacion={4}>
+                <TiltCardComponent inclinacion={2}>
                   <figure className="relative flex h-full flex-col border border-tinta-700 bg-tinta-800/80 p-7 backdrop-blur-sm transition-colors duration-500 hover:border-acento/40 md:p-8">
                     <Quote
                       aria-hidden="true"

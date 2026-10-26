@@ -5,7 +5,7 @@ import { MUELLE_SUAVE } from '../../../theme/animacion'
  * Tarjeta que se inclina en 3D siguiendo al ratón, con un brillo dorado que se
  * mueve con él. Solo con ratón: en pantallas táctiles se queda quieta.
  */
-export default function TiltCardComponent({ children, inclinacion = 5, brillo = 0.22, className = '' }) {
+export default function TiltCardComponent({ children, inclinacion = 3, brillo = 0.18, className = '' }) {
   // Posición del ratón dentro de la tarjeta, de 0 a 1 (0,5 = centro).
   const px = useMotionValue(0.5)
   const py = useMotionValue(0.5)
