@@ -28,6 +28,11 @@ const TITULAR = [
 
 const PRECIO_CORTE = SERVICIOS.find((s) => s.id === 'corte')?.precio
 
+// Sello en tres tamaños: el móvil se baja el de 400 en vez del de 779.
+// Los anchos de SELLO_SIZES son los del contenedor del sello (ver más abajo).
+const SELLO_SRCSET = '/logo-sello-400.webp 400w, /logo-sello-600.webp 600w, /logo-sello.webp 779w'
+const SELLO_SIZES = '(min-width: 1024px) 30rem, (min-width: 768px) 20rem, (min-width: 640px) 18rem, min(62vw, 17rem)'
+
 /**
  * Primera pantalla. En escritorio, texto a la izquierda y el sello a la
  * derecha; en móvil y tablet, el sello arriba y el texto centrado debajo.
@@ -94,7 +99,13 @@ export default function HeroComponent() {
             <span className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-acento" />
           </div>
 
+          {/* srcSet/sizes deben coincidir con la precarga de index.html, o el
+              navegador descargaría el sello dos veces. Van ANTES que src: React
+              pone los atributos en este orden y, con src primero, el navegador
+              empezaría a bajar el grande antes de ver los otros tamaños. */}
           <img
+            srcSet={SELLO_SRCSET}
+            sizes={SELLO_SIZES}
             src="/logo-sello.webp"
             alt={`${NEGOCIO.nombreCompleto} — ${NEGOCIO.barbero}, ${NEGOCIO.localidad}`}
             width={779}

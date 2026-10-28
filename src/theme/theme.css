@@ -148,7 +148,7 @@
     display: inline-block;
     transform: translateY(110%);
     animation: palabra-sube 1s var(--ease-suave) forwards;
-    animation-delay: calc(var(--orden, 0) * 70ms + 250ms);
+    animation-delay: calc(var(--orden, 0) * 70ms + 100ms);
   }
 
   /* El sello del hero entra girando y creciendo. */

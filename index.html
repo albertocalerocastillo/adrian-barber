@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- Sello de la portada: es lo más grande de la primera pantalla (LCP).
+         Se pide ya, sin esperar a React. srcset/sizes = los del HeroComponent. -->
+    <link
+      rel="preload"
+      as="image"
+      href="/logo-sello.webp"
+      imagesrcset="/logo-sello-400.webp 400w, /logo-sello-600.webp 600w, /logo-sello.webp 779w"
+      imagesizes="(min-width: 1024px) 30rem, (min-width: 768px) 20rem, (min-width: 640px) 18rem, min(62vw, 17rem)"
+      fetchpriority="high"
+    />
+
     <!-- Verificación Google Search Console -->
     <meta name="google-site-verification" content="373ReQSUmSvZnA4ldRT71RsjVQjqNB9NlUkzl7gNmbM" />
 
