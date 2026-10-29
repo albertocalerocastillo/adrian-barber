@@ -99,6 +99,13 @@ repo quedó limpio (solo `main`, sin stash ni ramas de respaldo).
    línea de tiempo con los HUECOS LIBRES ("Cita aquí" abre la cita con esa
    hora puesta), vista semana. Atender/cancelar se deshace desde el aviso de
    abajo (ya no hay window.confirm).
+ - Agenda (29/10/2026): vista MES (barrita de ocupación por día, nombres en
+   escritorio), tocar la fecha de arriba abre un calendario para saltar a
+   cualquier día, lupa para BUSCAR CLIENTE por nombre o móvil (próximas y
+   anteriores), CAMBIAR HORA de una cita con WhatsApp ya escrito para avisar
+   al cliente (y deshacer), y "Repetir cada semana" al crear una cita (2–12
+   semanas; salta las ocupadas o cerradas y avisa). La búsqueda usa ilike:
+   no ignora tildes ("Jose" no encuentra "José").
  - Horario y Servicios: interruptores, contadores −/+ y barra "Guardar" que
    solo sale si hay cambios. Horario: "Partir jornada" y "Copiar a los demás".
  - Ventanas, avisos y botones flotantes van en portal (`createPortal`): la

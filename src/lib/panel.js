@@ -96,6 +96,45 @@ export async function crearCitaManual(cita) {
   return { ok: true }
 }
 
+/** Cambia una cita de día u hora. {inicio,fin} son Date. */
+export async function moverCita(id, inicio, fin) {
+  if (!supabase) return { ok: false, error: 'Supabase no configurado.' }
+  const { error } = await supabase
+    .from('citas')
+    .update({ inicio: inicio.toISOString(), fin: fin.toISOString() })
+    .eq('id', id)
+  if (error) {
+    const ocupado = error.code === '23P01' || /exclu|overlap/i.test(error.message)
+    return { ok: false, error: ocupado ? 'Ese hueco ya está ocupado.' : 'No se pudo cambiar la cita.' }
+  }
+  return { ok: true }
+}
+
+/**
+ * Busca citas por nombre o móvil (las más recientes primero). Se quitan los
+ * caracteres que tienen significado en el filtro `or` de Supabase.
+ */
+export async function buscarCitas(texto) {
+  if (!supabase) return []
+  const t = texto.replace(/[,()%*\\]/g, ' ').trim()
+  if (t.length < 2) return []
+  const movil = t.replace(/\s+/g, '')
+  const filtro = /^\d+$/.test(movil)
+    ? `cliente_movil.ilike.%${movil}%`
+    : `cliente_nombre.ilike.%${t}%`
+  const { data, error } = await supabase
+    .from('citas')
+    .select('*')
+    .or(filtro)
+    .order('inicio', { ascending: false })
+    .limit(60)
+  if (error) {
+    console.error('Error buscando citas:', error.message)
+    return []
+  }
+  return data || []
+}
+
 /** Crea un bloqueo (vacaciones/descanso). {inicio,fin} son Date. */
 export async function crearBloqueo({ inicio, fin, motivo }) {
   if (!supabase) return { ok: false, error: 'Supabase no configurado.' }

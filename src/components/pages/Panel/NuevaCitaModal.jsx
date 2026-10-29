@@ -1,18 +1,42 @@
 import { useState, useEffect } from 'react'
-import { Loader2, CalendarX } from 'lucide-react'
+import { Repeat } from 'lucide-react'
 import Hoja from './Hoja'
-import { Campo, BotonPrincipal, AtajosFecha, claseInput } from './Controles'
-import { generarRejilla, sumarMin } from '../../../utils/disponibilidad'
-import { hora as fmtHora, inicioDia, aInputDate } from '../../../utils/fechas'
-import { listarCitas, listarBloqueos, crearCitaManual } from '../../../lib/panel'
+import SelectorHora from './SelectorHora'
+import { huecosDelDia } from './huecos'
+import { Campo, BotonPrincipal, AtajosFecha, Interruptor, Contador, claseInput } from './Controles'
+import { sumarMin } from '../../../utils/disponibilidad'
+import { hora as fmtHora, fechaCorta, aInputDate } from '../../../utils/fechas'
+import { listarBloqueos, crearCitaManual } from '../../../lib/panel'
 import { getHorario, getServicios } from '../../../lib/config'
 import { ICONOS } from '../../../theme/icons'
+
+const SEMANAS_MIN = 2
+const SEMANAS_MAX = 12
+const DIAS_SEMANA = ['domingos', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábados']
+
+/** La misma hora `n` semanas seguidas (con setDate, para no liarla con el cambio de hora). */
+function semanasDesde(inicio, n) {
+  return Array.from({ length: n }, (_, i) => {
+    const d = new Date(inicio)
+    d.setDate(inicio.getDate() + i * 7)
+    return d
+  })
+}
+
+const diaYMes = (d) => {
+  const { dia, mes } = fechaCorta(d)
+  return `${dia} ${mes}`
+}
 
 /**
  * Alta manual de cita desde el panel (cliente que llama, que pasa por la
  * puerta o que escribe por WhatsApp). Todo se elige tocando: servicio,
  * día y hora; solo se escribe el nombre. Las horas salen del motor de huecos,
  * así que nunca ofrece una que ya esté ocupada.
+ *
+ * "Repetir cada semana" aparta la misma hora varias semanas seguidas (los
+ * fijos de la oferta semanal). Las semanas que ya están ocupadas o cerradas
+ * se saltan y se avisa de cuáles fueron.
  *
  * Props: fechaInicial (Date), horaInicial ("HH:MM", opcional: viene de pulsar
  * un hueco libre), onClose, onCreada(texto del aviso).
@@ -25,6 +49,8 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
   const [horaISO, setHoraISO] = useState('')
   const [nombre, setNombre] = useState('')
   const [movil, setMovil] = useState('')
+  const [repetir, setRepetir] = useState(false)
+  const [semanas, setSemanas] = useState(4)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
   const [horario, setHorario] = useState(null)
@@ -50,21 +76,9 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
   useEffect(() => {
     const svc = servicios.find((s) => String(s.id) === String(servicioId))
     if (!svc || !horario) return
-    const f = new Date(`${fechaStr}T00:00:00`)
     let vivo = true
-    const desde = inicioDia(f)
-    const hasta = sumarMin(desde, 24 * 60)
-    Promise.all([listarCitas(desde, hasta), listarBloqueos(desde, hasta)]).then(([citas, bloqueos]) => {
+    huecosDelDia({ fecha: new Date(`${fechaStr}T00:00:00`), duracion: svc.duracion, horario }).then((libres) => {
       if (!vivo) return
-      const libres = generarRejilla({
-        fecha: f,
-        duracionMin: svc.duracion,
-        horario,
-        citas: citas.filter((c) => c.estado !== 'cancelada'),
-        bloqueos,
-        ahora: new Date(0), // en el panel se permite también hoy más temprano
-        granularidadMin: 15,
-      }).filter((s) => s.estado === 'libre')
       setRejilla(libres)
       // Si se vino desde un hueco libre, esa hora sale ya marcada.
       const preferida = horaInicial && libres.find((s) => fmtHora(s.inicio) === horaInicial)
@@ -80,6 +94,8 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
     setFechaStr(v)
   }
 
+  const fechas = horaISO ? semanasDesde(new Date(horaISO), repetir ? semanas : 1) : []
+
   async function onGuardar(e) {
     e?.preventDefault()
     if (guardando) return
@@ -88,27 +104,47 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
     if (nombre.trim().length < 2) return setError('Escribe el nombre del cliente.')
     setGuardando(true)
     setError('')
-    const inicio = new Date(horaISO)
-    const res = await crearCitaManual({
-      servicioId: servicio.id,
-      servicioNombre: servicio.nombre,
-      clienteNombre: nombre.trim(),
-      clienteMovil: movil.replace(/\s+/g, ''),
-      inicio,
-      fin: sumarMin(inicio, servicio.duracion),
-    })
-    setGuardando(false)
-    if (res.ok) {
-      onCreada(`Cita de ${nombre.trim().split(' ')[0]} a las ${fmtHora(inicio)} guardada`)
-      onClose()
-    } else {
-      setError(res.error)
-    }
-  }
 
-  // Mañana y tarde por separado: más fácil de encontrar la hora.
-  const manana = rejilla?.filter((s) => s.inicio.getHours() < 15) ?? []
-  const tarde = rejilla?.filter((s) => s.inicio.getHours() >= 15) ?? []
+    // Días libres que pisan alguna de las semanas: esas se saltan.
+    const ultima = fechas.at(-1)
+    const bloqueos = fechas.length > 1 ? await listarBloqueos(fechas[0], sumarMin(ultima, servicio.duracion)) : []
+
+    const guardadas = []
+    const saltadas = []
+    for (const [i, inicio] of fechas.entries()) {
+      const fin = sumarMin(inicio, servicio.duracion)
+      const cerrado = i > 0 && bloqueos.some((b) => new Date(b.inicio) < fin && new Date(b.fin) > inicio)
+      if (cerrado) {
+        saltadas.push(inicio)
+        continue
+      }
+      const res = await crearCitaManual({
+        servicioId: servicio.id,
+        servicioNombre: servicio.nombre,
+        clienteNombre: nombre.trim(),
+        clienteMovil: movil.replace(/\s+/g, ''),
+        inicio,
+        fin,
+      })
+      if (res.ok) guardadas.push(inicio)
+      else if (i === 0) {
+        // La primera es la que ha elegido a mano: si falla, no se sigue.
+        setGuardando(false)
+        return setError(res.error)
+      } else saltadas.push(inicio)
+    }
+    setGuardando(false)
+
+    const quien = nombre.trim().split(' ')[0]
+    const primera = new Date(horaISO)
+    let texto = `Cita de ${quien} a las ${fmtHora(primera)} guardada`
+    if (fechas.length > 1) {
+      texto = `${quien}: ${guardadas.length} ${DIAS_SEMANA[primera.getDay()]} a las ${fmtHora(primera)} guardados`
+      if (saltadas.length) texto += `. Ocupado: ${saltadas.map(diaYMes).join(', ')}`
+    }
+    onCreada(texto)
+    onClose()
+  }
 
   return (
     <Hoja
@@ -123,7 +159,11 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
             </p>
           )}
           <BotonPrincipal type="button" onClick={onGuardar} cargando={guardando} className="w-full">
-            {horaISO ? `Guardar cita a las ${fmtHora(new Date(horaISO))}` : 'Guardar cita'}
+            {!horaISO
+              ? 'Guardar cita'
+              : fechas.length > 1
+                ? `Guardar ${fechas.length} citas a las ${fmtHora(new Date(horaISO))}`
+                : `Guardar cita a las ${fmtHora(new Date(horaISO))}`}
           </BotonPrincipal>
         </div>
       }
@@ -164,48 +204,7 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
         </Campo>
 
         <Campo etiqueta="Hora">
-          {rejilla === null ? (
-            <p className="flex items-center gap-2 py-3 text-sm text-tinta/50">
-              <Loader2 size={16} className="animate-spin" /> Buscando huecos libres…
-            </p>
-          ) : rejilla.length === 0 ? (
-            <p className="flex items-center gap-2 rounded-2xl bg-tinta/5 px-4 py-4 text-sm text-tinta/60">
-              <CalendarX size={18} /> No hay huecos libres ese día. Prueba otro.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {[
-                ['Mañana', manana],
-                ['Tarde', tarde],
-              ].map(
-                ([titulo, horas]) =>
-                  horas.length > 0 && (
-                    <div key={titulo}>
-                      <p className="mb-1.5 text-xs text-tinta/40">{titulo}</p>
-                      <div className="grid grid-cols-4 gap-1.5 min-[400px]:grid-cols-5 sm:grid-cols-6">
-                        {horas.map((s) => {
-                          const iso = s.inicio.toISOString()
-                          const elegida = iso === horaISO
-                          return (
-                            <button
-                              key={iso}
-                              type="button"
-                              onClick={() => setHoraISO(iso)}
-                              aria-pressed={elegida}
-                              className={`rounded-xl py-2.5 text-sm font-semibold tabular-nums transition-all active:scale-95 ${
-                                elegida ? 'bg-acento text-tinta shadow-md shadow-acento/30' : 'bg-white ring-1 ring-hueso-200 hover:ring-acento'
-                              }`}
-                            >
-                              {fmtHora(s.inicio)}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )
-              )}
-            </div>
-          )}
+          <SelectorHora rejilla={rejilla} valor={horaISO} onCambio={setHoraISO} />
         </Campo>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -229,6 +228,43 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
               placeholder="600 000 000"
             />
           </Campo>
+        </div>
+
+        {/* Fijos semanales */}
+        <div className="rounded-2xl bg-white p-4 ring-1 ring-hueso-200">
+          <div className="flex items-center gap-3">
+            <Repeat size={18} className="shrink-0 text-acento-oscuro" />
+            <p className="min-w-0 flex-1 text-sm leading-snug">
+              <span className="font-semibold">Repetir cada semana</span>
+              <span className="block text-xs text-tinta/50">Para los fijos: misma hora, varias semanas.</span>
+            </p>
+            <Interruptor activo={repetir} onCambio={setRepetir} etiqueta="Repetir cada semana" />
+          </div>
+
+          {repetir && (
+            <div className="mt-4 space-y-3">
+              <div className="max-w-[14rem]">
+                <Contador
+                  valor={semanas}
+                  onCambio={(v) => setSemanas(Math.min(SEMANAS_MAX, Math.max(SEMANAS_MIN, v)))}
+                  min={SEMANAS_MIN}
+                  sufijo="semanas"
+                  etiqueta="semanas"
+                />
+              </div>
+              {fechas.length > 1 ? (
+                <ul className="flex flex-wrap gap-1.5" aria-label="Días que se apartan">
+                  {fechas.map((d) => (
+                    <li key={d.toISOString()} className="rounded-full bg-white px-3 py-1 text-xs font-medium ring-1 ring-hueso-200">
+                      {fechaCorta(d).diaSemana} {diaYMes(d)}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-tinta/50">Elige primero la hora.</p>
+              )}
+            </div>
+          )}
         </div>
       </form>
     </Hoja>
