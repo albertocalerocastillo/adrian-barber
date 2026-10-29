@@ -36,6 +36,7 @@ export default function ReservaComponent() {
   const [avisoHora, setAvisoHora] = useState('')
   const [horario, setHorario] = useState(null)
   const [servicios, setServicios] = useState(null)
+  const [soloWhatsapp, setSoloWhatsapp] = useState([])
   const [direccion, setDireccion] = useState(1)
 
   useEffect(() => {
@@ -43,7 +44,9 @@ export default function ReservaComponent() {
     Promise.all([getHorario(), getServicios()]).then(([h, ss]) => {
       if (!vivo) return
       setHorario(h)
-      setServicios(ss.filter((s) => s.activo !== false))
+      const activos = ss.filter((s) => s.activo !== false)
+      setServicios(activos.filter((s) => s.online !== false))
+      setSoloWhatsapp(activos.filter((s) => s.online === false))
     })
     return () => {
       vivo = false
@@ -143,6 +146,7 @@ export default function ReservaComponent() {
             {paso === 1 && (
               <PasoServicio
                 servicios={servicios}
+                soloWhatsapp={soloWhatsapp}
                 servicio={servicio}
                 onElegir={(s) => {
                   if (s.id !== servicio?.id) setHora(null)

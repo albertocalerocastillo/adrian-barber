@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { Plus, Trash2, EyeOff, Sparkles } from 'lucide-react'
+import { Plus, Trash2, EyeOff, Sparkles, MessageCircle } from 'lucide-react'
 import { useAviso } from './avisoContexto'
 import { CabeceraSeccion, Interruptor, Contador, BarraGuardar, Esqueleto } from './Controles'
 import { getServicios, guardarServicios } from '../../../lib/config'
@@ -67,7 +67,7 @@ export default function AjustesServicios({ activa = true }) {
   const anadir = () =>
     setServicios((ss) => [
       ...ss,
-      conKey({ nombre: '', descripcion: '', duracion: 30, precio: 10, icono: 'Scissors', destacado: false, activo: true }),
+      conKey({ nombre: '', descripcion: '', duracion: 30, precio: 10, icono: 'Scissors', destacado: false, activo: true, online: true }),
     ])
 
   async function onGuardar() {
@@ -185,6 +185,23 @@ export default function AjustesServicios({ activa = true }) {
                         etiqueta="duración"
                       />
                     </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center gap-3 rounded-2xl bg-hueso/60 px-4 py-3">
+                    <MessageCircle size={18} className="shrink-0 text-tinta/40" />
+                    <p className="min-w-0 flex-1 text-sm leading-snug">
+                      <span className="font-semibold">{s.online !== false ? 'Se reserva online' : 'Solo por WhatsApp'}</span>
+                      <span className="block text-xs text-tinta/45">
+                        {s.online !== false
+                          ? 'El cliente lo elige y coge hora en la web.'
+                          : 'Sale en la web, pero para pedirlo te escriben.'}
+                      </span>
+                    </p>
+                    <Interruptor
+                      activo={s.online !== false}
+                      onCambio={(v) => editar(s._key, 'online', v)}
+                      etiqueta={`Reservar ${s.nombre} online`}
+                    />
                   </div>
 
                   <button
