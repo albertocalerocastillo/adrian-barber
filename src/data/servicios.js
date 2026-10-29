@@ -1,12 +1,12 @@
 // Servicios de A.S Barbería.
-// Precios REALES (de sus historias de Instagram). ⚠️ Las DURACIONES son
-// estimadas — pendientes de confirmar con Adrián (son clave para calcular
-// los huecos de la reserva en la Fase 2).
+// Precios REALES (de sus historias de Instagram). Corte: 30 min, confirmado
+// por Adrián. Mechas y tinte solo se piden por WhatsApp (online: false), así
+// que su duración solo sirve para cuando él las apunta en el panel.
 //
 // En la Fase 2 estos datos pasarán a la tabla `servicios` de Supabase y se
 // gestionarán desde el panel.
 //
-// duracion: minutos · icono: nombre de un icono de lucide-react (theme/icons.js)
+// duracion: minutos · online: si se puede reservar desde la web · icono: nombre de un icono de lucide-react (theme/icons.js)
 
 export const SERVICIOS = [
   {
@@ -26,6 +26,7 @@ export const SERVICIOS = [
     precio: 17,
     icono: 'Paintbrush',
     destacado: false,
+    online: false,
   },
   {
     id: 'tinte-blanco-corte',
@@ -35,6 +36,7 @@ export const SERVICIOS = [
     precio: 20,
     icono: 'PaintBucket',
     destacado: false,
+    online: false,
   },
 ]
 

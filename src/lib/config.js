@@ -62,8 +62,9 @@ export async function guardarHorario(dias) {
 // ════════════════════════════════════════════════════════════
 //  SERVICIOS
 //  La app trabaja con la forma { id, nombre, descripcion, duracion, precio,
-//  icono, destacado, activo }. En Supabase la columna es `duracion_min`, así
-//  que traducimos en ambos sentidos (aApp / aDb) para no tocar los
+//  icono, destacado, activo, online }. En Supabase las columnas son
+//  `duracion_min` y `reserva_online`, así que traducimos en ambos sentidos
+//  (aApp / aDb) para no tocar los
 //  consumidores (reserva, panel y home).
 // ════════════════════════════════════════════════════════════
 
@@ -78,6 +79,7 @@ function aApp(r) {
     icono: r.icono || 'Scissors',
     destacado: !!r.destacado,
     activo: r.activo !== false,
+    online: r.reserva_online !== false,
   }
 }
 
@@ -91,6 +93,7 @@ function aDb(s) {
     icono: s.icono || 'Scissors',
     destacado: !!s.destacado,
     activo: s.activo !== false,
+    reserva_online: s.online !== false,
   }
 }
 
@@ -101,9 +104,11 @@ function aDb(s) {
 export async function getServicios() {
   if (!supabase) return SERVICIOS
 
+  // Con '*' (y no una lista de columnas): si falta una columna nueva porque
+  // aún no se ha ejecutado su migración, sigue leyendo en vez de fallar.
   const { data, error } = await supabase
     .from('servicios')
-    .select('id, nombre, descripcion, duracion_min, precio, icono, destacado, activo, orden')
+    .select('*')
     .order('orden', { ascending: true })
     .order('id', { ascending: true })
 

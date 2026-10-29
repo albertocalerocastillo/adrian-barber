@@ -37,7 +37,13 @@ modo localStorage). El `.env` local (gitignored) tiene los mismos valores. El
 aviso WhatsApp sigue apuntando al **móvil de PRUEBA de Alberto**.
 La idea aún NO se le ha enseñado a Adrián (Alberto se lo comenta esta noche).
 
-**HORARIO REAL (verificado en la ficha de Google, 18/09/2026):**
+**HORARIO ACTUAL (confirmado por Adrián, 29/10/2026):** lunes a viernes
+9:00–14:00 y 14:30–22:00 (media hora para comer). Corte 30 min. Mechas y tinte
+**solo por WhatsApp** (columna `servicios.reserva_online`, interruptor en el
+panel). SQL: `supabase/migracion-ajustes-adrian.sql`. ⚠️ Hay que actualizar
+también la ficha de Google (abre a las 9:00, no a las 10:00).
+
+**HORARIO ANTERIOR (ficha de Google, 18/09/2026), ya sustituido:**
 **Lunes a viernes 10:00–22:00 · sábado y domingo CERRADO.** La web anunciaba mal
 dos días (lunes abría a las 15:00 y el sábado salía abierto de 10 a 16). Corregido
 en `data/horarios.js`, en el JSON-LD de `index.html` y en `seed.sql`, y el usuario

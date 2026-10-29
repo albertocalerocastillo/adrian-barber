@@ -53,14 +53,13 @@ const tablas = {
     icono: s.icono,
     destacado: s.destacado,
     activo: true,
+    reserva_online: s.online !== false,
     orden: i + 1,
   })),
-  horario: [1, 2, 3, 4, 5].map((dia, i) => ({
-    id: i + 1,
-    dia_semana: dia,
-    hora_inicio: '10:00:00',
-    hora_fin: '22:00:00',
-  })),
+  horario: [1, 2, 3, 4, 5].flatMap((dia, i) => [
+    { id: i * 2 + 1, dia_semana: dia, hora_inicio: '09:00:00', hora_fin: '14:00:00' },
+    { id: i * 2 + 2, dia_semana: dia, hora_inicio: '14:30:00', hora_fin: '22:00:00' },
+  ]),
   citas: [
     cita(0, '10:00', 'Corte', 'Julián Vázquez', '600111222', 'atendida'),
     cita(0, '10:30', 'Corte', 'Manuel Ortega', '600333444', 'atendida'),

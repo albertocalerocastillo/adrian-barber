@@ -1,14 +1,20 @@
 import { m } from 'motion/react'
-import { Clock, ChevronRight, Sparkles } from 'lucide-react'
+import { Clock, ChevronRight, Sparkles, MessageCircle } from 'lucide-react'
 import { ICONOS } from '../../../theme/icons'
 import { EASE_SUAVE } from '../../../theme/animacion'
+import { WHATSAPP } from '../../../data/contacto'
+
+/** "A", "A y B", "A, B y C". */
+const enumerar = (nombres) =>
+  nombres.length < 2 ? nombres.join('') : `${nombres.slice(0, -1).join(', ')} y ${nombres.at(-1)}`
 
 /**
  * Paso 1: elegir servicio. Muestra los servicios activos con duración y precio.
  * Recibe la lista ya filtrada (activos) desde ReservaComponent; `null` mientras
- * se cargan de Supabase.
+ * se cargan de Supabase. `soloWhatsapp` son los que Adrián prefiere cerrar
+ * hablando (mechas, tinte): no se reservan aquí, solo se avisa de cómo pedirlos.
  */
-export default function PasoServicio({ servicios, servicio, onElegir }) {
+export default function PasoServicio({ servicios, servicio, onElegir, soloWhatsapp = [] }) {
   if (servicios === null) {
     return (
       <div className="space-y-3" aria-label="Cargando servicios">
@@ -68,6 +74,23 @@ export default function PasoServicio({ servicios, servicio, onElegir }) {
           )
         })}
       </div>
+
+      {soloWhatsapp.length > 0 && (
+        <a
+          href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
+            `Hola Adrián, me gustaría pedir cita para ${soloWhatsapp[0].nombre.toLowerCase()}`
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-5 flex items-center gap-3 rounded-2xl border border-dashed border-tinta/15 p-4 text-sm text-tinta/60 transition-colors hover:border-acento hover:text-tinta"
+        >
+          <MessageCircle size={20} className="shrink-0 text-acento-oscuro" />
+          <span>
+            <strong className="font-semibold text-tinta">{enumerar(soloWhatsapp.map((s) => s.nombre))}</strong>: pídelo
+            por WhatsApp y te busco el mejor hueco.
+          </span>
+        </a>
+      )}
     </div>
   )
 }

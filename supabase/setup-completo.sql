@@ -18,6 +18,7 @@ create table if not exists servicios (
   icono       text,
   destacado   boolean default false,
   activo      boolean default true,
+  reserva_online boolean not null default true,
   orden       int     default 0,
   creado_en   timestamptz default now()
 );
@@ -100,18 +101,18 @@ create policy "barbero gestiona bloqueos" on bloqueos for all to authenticated u
 grant execute on function citas_ocupadas(timestamptz, timestamptz) to anon, authenticated;
 
 -- ─── DATOS DE EJEMPLO (precios reales; duración/horario a ajustar) ──
-insert into servicios (nombre, descripcion, duracion_min, precio, icono, destacado, orden) values
-  ('Corte', 'Incluye cejas, barba y diseños.', 30, 6, 'Scissors', true, 1),
-  ('Mechas + Corte', 'Mechas y corte con acabado y peinado.', 75, 17, 'Paintbrush', false, 2),
-  ('Tinte blanco + Corte', 'Coloración en blanco más corte completo.', 60, 20, 'PaintBucket', false, 3);
+insert into servicios (nombre, descripcion, duracion_min, precio, icono, destacado, reserva_online, orden) values
+  ('Corte', 'Incluye cejas, barba y diseños.', 30, 6, 'Scissors', true, true, 1),
+  ('Mechas + Corte', 'Mechas y corte con acabado y peinado.', 75, 17, 'Paintbrush', false, false, 2),
+  ('Tinte blanco + Corte', 'Coloración en blanco más corte completo.', 60, 20, 'PaintBucket', false, false, 3);
 
--- Horario real (ficha de Google, 18/09/2026): L-V 10:00–22:00, S y D cerrado.
-insert into horario (dia_semana, hora_inicio, hora_fin) values
-  (1, '10:00', '22:00'),
-  (2, '10:00', '22:00'),
-  (3, '10:00', '22:00'),
-  (4, '10:00', '22:00'),
-  (5, '10:00', '22:00');
+-- Horario real (confirmado por Adrián, 29/10/2026): L-V 9:00–22:00 con
+-- comida de 14:00 a 14:30; S y D cerrado.
+insert into horario (dia_semana, hora_inicio, hora_fin)
+select d, t.ini, t.fin
+  from generate_series(1, 5) d
+ cross join (values ('09:00'::time, '14:00'::time), ('14:30'::time, '22:00'::time)) t(ini, fin);
 
--- ⚠️ Después de esto, ejecutar también supabase/migracion-reservas-2027.sql
+-- ⚠️ Después de esto, ejecutar también supabase/migracion-reservas-2027.sql,
+--    migracion-seguridad.sql y migracion-ajustes-adrian.sql
 --    (validación de reservas, días libres en la web, origen de la cita).
