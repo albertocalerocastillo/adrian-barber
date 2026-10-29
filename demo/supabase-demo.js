@@ -98,6 +98,7 @@ function consulta(nombre) {
   const ordenes = []
   let modo = 'select'
   let carga = null
+  let limite = Infinity
 
   const q = {
     select() { return q },
@@ -110,6 +111,18 @@ function consulta(nombre) {
     lt(c, v) { filtros.push((r) => r[c] < v); return q },
     lte(c, v) { filtros.push((r) => r[c] <= v); return q },
     order(c, { ascending = true } = {}) { ordenes.push([c, ascending]); return q },
+    // Solo la forma que usa la app: "columna.ilike.%texto%" (varias con coma).
+    or(expr) {
+      const conds = expr.split(',').map((e) => {
+        const [c, , patron] = e.split('.')
+        // ilike de Postgres no ignora tildes, así que aquí tampoco.
+        const t = patron.replaceAll('%', '').toLowerCase()
+        return (r) => String(r[c] ?? '').toLowerCase().includes(t)
+      })
+      filtros.push((r) => conds.some((f) => f(r)))
+      return q
+    },
+    limit(n) { limite = n; return q },
     then(ok, mal) { return Promise.resolve(ejecutar()).then(ok, mal) },
   }
 
@@ -143,7 +156,7 @@ function consulta(nombre) {
       filas.sort((a, b) => (a[c] < b[c] ? -1 : a[c] > b[c] ? 1 : 0) * (asc ? 1 : -1))
     }
     // Retardo pequeño para que se vean los estados de carga.
-    return new Promise((r) => setTimeout(() => r({ data: filas, error: null }), 250))
+    return new Promise((r) => setTimeout(() => r({ data: filas.slice(0, limite), error: null }), 250))
   }
 
   return q

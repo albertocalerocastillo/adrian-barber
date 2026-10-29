@@ -4,24 +4,34 @@ import { AnimatePresence, m } from 'motion/react'
 import {
   ChevronLeft, ChevronRight, Plus, Ban, Phone, Check, X, CalendarDays,
   RotateCcw, Clock, Coffee, Moon, Wallet, Users, Hourglass, CalendarPlus,
+  CalendarClock, ChevronDown, Search,
 } from 'lucide-react'
 import WhatsAppIcon from '../../ui/WhatsAppIcon/WhatsAppIcon'
 import NuevaCitaModal from './NuevaCitaModal'
 import BloquearModal from './BloquearModal'
+import MoverCitaModal from './MoverCitaModal'
+import BuscarClienteModal from './BuscarClienteModal'
+import VistaMes from './VistaMes'
 import { useAviso } from './avisoContexto'
 import { CabeceraSeccion, Segmentado, Esqueleto } from './Controles'
 import { aHora, sumarMin } from '../../../utils/disponibilidad'
 import {
-  fechaLarga, fechaCorta, hora as fmtHora, inicioDia, inicioSemana, mismoDia,
+  fechaLarga, fechaCorta, hora as fmtHora, inicioDia, inicioSemana, mismoDia, aInputDate,
 } from '../../../utils/fechas'
 import {
-  listarCitas, listarBloqueos, cambiarEstado, borrarBloqueo, crearBloqueo,
+  listarCitas, listarBloqueos, cambiarEstado, borrarBloqueo, crearBloqueo, moverCita,
 } from '../../../lib/panel'
 import { getHorario, getServicios } from '../../../lib/config'
 import { EASE_SUAVE } from '../../../theme/animacion'
 
 // Huecos más cortos que esto no se ofrecen como "libre" (no cabe un corte).
 const HUECO_MINIMO = 30
+
+const VISTAS = [
+  { valor: 'dia', texto: 'Día' },
+  { valor: 'semana', texto: 'Semana' },
+  { valor: 'mes', texto: 'Mes' },
+]
 
 /**
  * Agenda del barbero.
@@ -32,6 +42,10 @@ const HUECO_MINIMO = 30
  *  - Vista DÍA: línea de tiempo con las citas, los ratos cerrados y los
  *    HUECOS LIBRES (con botón para meter una cita justo ahí).
  *  - Vista SEMANA: los 7 días de un vistazo.
+ *  - Vista MES: el mes entero, con lo lleno que va cada día.
+ *  - Tocando la fecha de arriba se salta a cualquier día; la lupa busca a un
+ *    cliente; y cada cita se puede cambiar de hora (con WhatsApp ya escrito
+ *    para avisarle).
  *
  * Marcar atendida o cancelar se hace al momento y se puede deshacer desde el
  * aviso de abajo, en vez de preguntar "¿seguro?" cada vez.
@@ -44,7 +58,7 @@ export default function AgendaPanel({ activa = true }) {
   const [horario, setHorario] = useState(null)
   const [servicios, setServicios] = useState([])
   const [tick, setTick] = useState(0)
-  const [modal, setModal] = useState(null) // { tipo: 'cita'|'bloquear', hora? }
+  const [modal, setModal] = useState(null) // { tipo: 'cita'|'bloquear'|'mover'|'buscar', hora?, cita? }
   const [ahora, setAhora] = useState(() => new Date())
 
   // El reloj avanza cada minuto ("en curso", "en 20 min").
@@ -65,12 +79,14 @@ export default function AgendaPanel({ activa = true }) {
     }
   }, [])
 
-  // Se carga la SEMANA entera: con eso salen la tira de días, la vista
-  // semana y la del día sin pedir nada más al cambiar de día.
+  // Se cargan las 6 semanas que pinta el MES del día elegido: con eso salen
+  // la tira de días y las vistas día, semana y mes sin pedir nada más al
+  // moverse dentro del mes.
   const semana = inicioSemana(dia).getTime()
+  const desdeCarga = inicioSemana(new Date(dia.getFullYear(), dia.getMonth(), 1)).getTime()
   useEffect(() => {
-    const desde = new Date(semana)
-    const hasta = sumarMin(desde, 7 * 24 * 60)
+    const desde = new Date(desdeCarga)
+    const hasta = sumarMin(desde, 42 * 24 * 60)
     let vivo = true
     Promise.all([listarCitas(desde, hasta), listarBloqueos(desde, hasta)]).then(([citas, bloqueos]) => {
       if (vivo) setDatos({ citas, bloqueos })
@@ -78,7 +94,7 @@ export default function AgendaPanel({ activa = true }) {
     return () => {
       vivo = false
     }
-  }, [semana, tick])
+  }, [desdeCarga, tick])
 
   const recargar = () => setTick((t) => t + 1)
   const esHoy = mismoDia(dia, ahora)
@@ -127,7 +143,33 @@ export default function AgendaPanel({ activa = true }) {
     })
   }
 
-  const moverSemana = (signo) => setDia((d) => sumarMin(d, signo * 7 * 24 * 60))
+  async function onMovida(cita, inicioAnterior, finAnterior) {
+    recargar()
+    avisar({
+      texto: `Cita de ${cita.cliente_nombre.split(' ')[0]} cambiada`,
+      deshacer: async () => {
+        await moverCita(cita.id, inicioAnterior, finAnterior)
+        recargar()
+      },
+    })
+  }
+
+  // Las flechas mueven una semana, o un mes en la vista mes (al día 1, o a
+  // hoy si es el mes en curso).
+  const mover = (signo) => {
+    if (vista !== 'mes') return setDia((d) => sumarMin(d, signo * 7 * 24 * 60))
+    setDia((d) => {
+      const primero = new Date(d.getFullYear(), d.getMonth() + signo, 1)
+      return primero.getMonth() === ahora.getMonth() && primero.getFullYear() === ahora.getFullYear()
+        ? inicioDia(ahora)
+        : primero
+    })
+  }
+
+  const irA = (d) => {
+    setDia(inicioDia(d))
+    setVista('dia')
+  }
 
   return (
     <>
@@ -172,15 +214,42 @@ export default function AgendaPanel({ activa = true }) {
       <div className="mb-6 rounded-3xl border border-hueso-200 bg-white p-3 shadow-sm sm:p-4">
         <div className="mb-3 flex items-center justify-between gap-2 px-1">
           <div className="flex items-center gap-1">
-            <BotonRedondo onClick={() => moverSemana(-1)} etiqueta="Semana anterior">
+            <BotonRedondo onClick={() => mover(-1)} etiqueta={vista === 'mes' ? 'Mes anterior' : 'Semana anterior'}>
               <ChevronLeft size={18} />
             </BotonRedondo>
-            <BotonRedondo onClick={() => moverSemana(1)} etiqueta="Semana siguiente">
+            <BotonRedondo onClick={() => mover(1)} etiqueta={vista === 'mes' ? 'Mes siguiente' : 'Semana siguiente'}>
               <ChevronRight size={18} />
             </BotonRedondo>
-            <p className="ml-1 font-display text-base font-bold sm:text-lg">{rotuloSemana(new Date(semana))}</p>
+            {/* Tocar la fecha abre el calendario del móvil para saltar a cualquier día. */}
+            <label className="relative ml-0.5 flex cursor-pointer items-center gap-1 whitespace-nowrap rounded-full px-2 py-1.5 transition-colors hover:bg-tinta/5">
+              <span className="font-display text-base font-bold sm:text-lg">
+                {vista === 'mes' ? (
+                  <>
+                    <span className="sm:hidden">{rotuloMes(dia, 'short')}</span>
+                    <span className="hidden sm:inline">{rotuloMes(dia)}</span>
+                  </>
+                ) : (
+                  rotuloSemana(new Date(semana))
+                )}
+              </span>
+              <ChevronDown size={15} className="text-tinta/45" />
+              <input
+                type="date"
+                value={aInputDate(dia)}
+                onChange={(e) => e.target.value && setDia(new Date(`${e.target.value}T00:00:00`))}
+                onClick={(e) => {
+                  try {
+                    e.currentTarget.showPicker?.()
+                  } catch {
+                    // Algunos navegadores no lo dejan; entonces abre el suyo al tocar.
+                  }
+                }}
+                aria-label="Ir a una fecha"
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+              />
+            </label>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {!esHoy && (
               <button
                 type="button"
@@ -190,9 +259,18 @@ export default function AgendaPanel({ activa = true }) {
                 Hoy
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => setModal({ tipo: 'buscar' })}
+              aria-label="Buscar cliente"
+              className="flex h-9 items-center gap-1.5 rounded-full px-2.5 text-sm font-medium text-tinta/60 transition-colors hover:bg-tinta/5 hover:text-tinta"
+            >
+              <Search size={17} />
+              <span className="hidden lg:inline">Buscar</span>
+            </button>
             <div className="hidden sm:block">
               <Segmentado
-                opciones={[{ valor: 'dia', texto: 'Día' }, { valor: 'semana', texto: 'Semana' }]}
+                opciones={VISTAS}
                 valor={vista}
                 onCambio={setVista}
               />
@@ -214,7 +292,7 @@ export default function AgendaPanel({ activa = true }) {
 
         <div className="mt-3 flex justify-center sm:hidden">
           <Segmentado
-            opciones={[{ valor: 'dia', texto: 'Día' }, { valor: 'semana', texto: 'Semana' }]}
+            opciones={VISTAS}
             valor={vista}
             onCambio={setVista}
           />
@@ -233,17 +311,24 @@ export default function AgendaPanel({ activa = true }) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: EASE_SUAVE }}
           >
-            {vista === 'semana' ? (
+            {vista === 'mes' ? (
+              <VistaMes
+                mes={dia}
+                dia={dia}
+                ahora={ahora}
+                citas={datos.citas}
+                bloqueos={datos.bloqueos}
+                horario={horario}
+                onDia={irA}
+              />
+            ) : vista === 'semana' ? (
               <VistaSemana
                 inicio={new Date(semana)}
                 citas={datos.citas}
                 bloqueos={datos.bloqueos}
                 horario={horario}
                 ahora={ahora}
-                onDia={(d) => {
-                  setDia(d)
-                  setVista('dia')
-                }}
+                onDia={irA}
               />
             ) : (
               <VistaDia
@@ -254,6 +339,7 @@ export default function AgendaPanel({ activa = true }) {
                 bloqueos={delDia.bloqueos}
                 precios={precios}
                 onEstado={cambiar}
+                onMover={(cita) => setModal({ tipo: 'mover', cita })}
                 onQuitarBloqueo={quitarBloqueo}
                 onNuevaEn={(hora) => setModal({ tipo: 'cita', hora })}
               />
@@ -284,6 +370,19 @@ export default function AgendaPanel({ activa = true }) {
             }}
           />
         )}
+        {modal?.tipo === 'mover' && (
+          <MoverCitaModal key="mover" cita={modal.cita} onClose={() => setModal(null)} onMovida={onMovida} />
+        )}
+        {modal?.tipo === 'buscar' && (
+          <BuscarClienteModal
+            key="buscar"
+            onClose={() => setModal(null)}
+            onIrA={(d) => {
+              setModal(null)
+              irA(d)
+            }}
+          />
+        )}
         {modal?.tipo === 'bloquear' && (
           <BloquearModal
             key="bloquear"
@@ -307,6 +406,12 @@ const capital = (t) => t.charAt(0).toUpperCase() + t.slice(1)
 function saludo(d) {
   const h = d.getHours()
   return h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches'
+}
+
+/** "Noviembre 2026" (o "Nov 2026" con `mes: 'short'`, para el móvil). */
+function rotuloMes(d, mes = 'long') {
+  const nombre = new Intl.DateTimeFormat('es-ES', { month: mes }).format(d).replace('.', '')
+  return `${capital(nombre)} ${d.getFullYear()}`
 }
 
 function rotuloSemana(inicio) {
@@ -369,7 +474,7 @@ function BotonRedondo({ onClick, etiqueta, children }) {
       type="button"
       onClick={onClick}
       aria-label={etiqueta}
-      className="flex h-9 w-9 items-center justify-center rounded-full text-tinta/60 transition-colors hover:bg-tinta/5 hover:text-tinta active:scale-90"
+      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-tinta/60 transition-colors hover:bg-tinta/5 hover:text-tinta active:scale-90"
     >
       {children}
     </button>
@@ -560,7 +665,7 @@ function TiraDias({ inicio, dia, ahora, citas, horario, onElegir }) {
 
 // ─── Vista DÍA ──────────────────────────────────────────────
 
-function VistaDia({ dia, ahora, horario, citas, bloqueos, precios, onEstado, onQuitarBloqueo, onNuevaEn }) {
+function VistaDia({ dia, ahora, horario, citas, bloqueos, precios, onEstado, onMover, onQuitarBloqueo, onNuevaEn }) {
   const [verCanceladas, setVerCanceladas] = useState(false)
   const activas = citas.filter((c) => c.estado !== 'cancelada')
   const canceladas = citas.filter((c) => c.estado === 'cancelada')
@@ -635,7 +740,7 @@ function VistaDia({ dia, ahora, horario, citas, bloqueos, precios, onEstado, onQ
               }`}
             />
             <div className="min-w-0 flex-1">
-              {e.tipo === 'cita' && <CitaCard cita={e.dato} ahora={ahora} precios={precios} onEstado={onEstado} />}
+              {e.tipo === 'cita' && <CitaCard cita={e.dato} ahora={ahora} precios={precios} onEstado={onEstado} onMover={onMover} />}
               {e.tipo === 'bloqueo' && <BloqueoCard bloqueo={e.dato} onQuitar={onQuitarBloqueo} />}
               {e.tipo === 'libre' && <HuecoLibre hueco={e.dato} onNueva={() => onNuevaEn(fmtHora(e.dato.inicio))} />}
             </div>
@@ -684,7 +789,7 @@ function VistaDia({ dia, ahora, horario, citas, bloqueos, precios, onEstado, onQ
   )
 }
 
-function CitaCard({ cita, ahora, precios, onEstado }) {
+function CitaCard({ cita, ahora, precios, onEstado, onMover }) {
   const ini = new Date(cita.inicio)
   const fin = new Date(cita.fin)
   const atendida = cita.estado === 'atendida'
@@ -774,6 +879,16 @@ function CitaCard({ cita, ahora, precios, onEstado }) {
             </button>
           ) : (
             <>
+              <button
+                type="button"
+                onClick={() => onMover(cita)}
+                aria-label={`Cambiar la hora de ${nombre}`}
+                title="Cambiar día u hora"
+                className="flex h-10 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-tinta/55 transition-colors hover:bg-tinta/5 hover:text-tinta"
+              >
+                <CalendarClock size={17} />
+                <span className="hidden min-[400px]:inline">Cambiar</span>
+              </button>
               <button
                 type="button"
                 onClick={() => onEstado(cita, 'cancelada', `Cita de ${nombre} cancelada`)}
