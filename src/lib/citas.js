@@ -12,30 +12,34 @@
 import { supabase } from './supabase'
 import { solapan } from '../utils/disponibilidad'
 import { avisarNuevaCita } from './aviso'
+import { EstadoCitaEnum } from '../enums/EstadoCitaEnum'
 
+// #region Copia local (sin Supabase)
 const LS_KEY = 'as_citas'
 
-// ─── localStorage helpers ───────────────────────────────────
-function lsLeer() {
+const lsLeer = () => {
   try {
     return JSON.parse(localStorage.getItem(LS_KEY) || '[]')
   } catch {
     return []
   }
 }
-function lsGuardar(citas) {
+const lsGuardar = (citas) => {
   localStorage.setItem(LS_KEY, JSON.stringify(citas))
 }
 
+// #endregion
+
+// #region Lectura de citas
 /**
  * Devuelve los ratos OCUPADOS (citas activas y días libres) que se solapan con
  * el rango dado, solo con inicio/fin: nada de datos de otros clientes.
  * Si falla la conexión LANZA un error: es mejor decirle al cliente "no se
  * pudo cargar" que enseñarle todo libre y que luego no pueda reservar.
  * @param {Date} desde @param {Date} hasta
- * @returns {Promise<Array<{inicio:string, fin:string}>>}
+ * @returns {Promise<Array<{inicio:string, fin:string}>>}.
  */
-export async function getCitas(desde, hasta) {
+export const getCitas = async (desde, hasta) => {
   if (supabase) {
     // Función segura de la BD: citas + días libres, solo las horas.
     const { data, error } = await supabase.rpc('citas_ocupadas', {
@@ -49,15 +53,18 @@ export async function getCitas(desde, hasta) {
     return data || []
   }
 
-  // localStorage
+  // Sin Supabase, las citas salen del localStorage.
   return lsLeer().filter(
     (c) =>
-      c.estado !== 'cancelada' &&
+      c.estado !== EstadoCitaEnum.Cancelada &&
       new Date(c.inicio) < hasta &&
       new Date(c.fin) > desde
   )
 }
 
+// #endregion
+
+// #region Errores de la base de datos
 // Errores que devuelve la base de datos al validar una reserva (ver
 // supabase/migracion-reservas-2027.sql), en cristiano. `volverAHoras` = el
 // hueco ya no vale y hay que elegir otro.
@@ -78,7 +85,7 @@ const ERRORES_BD = {
   },
 }
 
-function traducirError(error) {
+const traducirError = (error) => {
   const clave = Object.keys(ERRORES_BD).find(
     (k) => error.message?.includes(k) || (k === 'citas_sin_solape' && error.code === '23P01')
   )
@@ -87,21 +94,24 @@ function traducirError(error) {
     : { ok: false, error: 'No se pudo guardar la cita. Revisa la conexión e inténtalo de nuevo.' }
 }
 
+// #endregion
+
+// #region Creación de citas
 /**
  * Crea una cita. Devuelve { ok } o { ok:false, error, volverAHoras }.
  * @param {Object} cita {servicioId, servicioNombre, clienteNombre,
- *   clienteMovil, inicio:Date, fin:Date}
+ *   clienteMovil, inicio:Date, fin:Date}.
  */
-export async function crearCita(cita) {
+export const crearCita = async (cita) => {
   const registro = {
-    // servicio_id (bigint FK) se omite: la web usa servicios estáticos con id
+    // El servicio_id (bigint FK) se omite: la web usa servicios estáticos con id
     // de texto. Guardamos el nombre, que es lo que se muestra y da el histórico.
     servicio_nombre: cita.servicioNombre,
     cliente_nombre: cita.clienteNombre,
     cliente_movil: cita.clienteMovil,
     inicio: cita.inicio.toISOString(),
     fin: cita.fin.toISOString(),
-    estado: 'pendiente',
+    estado: EstadoCitaEnum.Pendiente,
   }
 
   if (supabase) {
@@ -111,13 +121,13 @@ export async function crearCita(cita) {
     return { ok: true }
   }
 
-  // localStorage: comprobación de solape antes de guardar
+  // Sin Supabase, se comprueba el solape en localStorage antes de guardar.
   const citas = lsLeer()
   const ini = new Date(registro.inicio)
   const fin = new Date(registro.fin)
   const choca = citas.some(
     (c) =>
-      c.estado !== 'cancelada' &&
+      c.estado !== EstadoCitaEnum.Cancelada &&
       solapan(ini, fin, new Date(c.inicio), new Date(c.fin))
   )
   if (choca) {
@@ -128,3 +138,4 @@ export async function crearCita(cita) {
   avisarNuevaCita(cita)
   return { ok: true }
 }
+// #endregion

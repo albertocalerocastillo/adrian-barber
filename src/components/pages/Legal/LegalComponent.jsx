@@ -1,14 +1,10 @@
+// #region Imports
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
 import { NEGOCIO, LEGAL, TELEFONO_VISIBLE, WHATSAPP } from '../../../data/contacto'
-
-const PAGINAS = {
-  'aviso-legal': { titulo: 'Aviso legal', Contenido: AvisoLegal },
-  privacidad: { titulo: 'Política de privacidad', Contenido: Privacidad },
-  cookies: { titulo: 'Política de cookies', Contenido: Cookies },
-}
+// #endregion
 
 /**
  * Páginas legales: aviso legal (LSSI), privacidad (RGPD) y cookies.
@@ -17,7 +13,8 @@ const PAGINAS = {
  * la web hace DE VERDAD (si algún día se añade analítica o publicidad, hay
  * que actualizarlas y poner un aviso de cookies).
  */
-export default function LegalComponent({ tipo }) {
+const LegalComponent = ({ tipo }) => {
+  // #region Declaraciones, variables y hooks
   const { titulo, Contenido } = PAGINAS[tipo]
 
   useEffect(() => {
@@ -28,7 +25,9 @@ export default function LegalComponent({ tipo }) {
       document.title = anterior
     }
   }, [titulo])
+  // #endregion
 
+  // #region Renderizado
   return (
     <div className="min-h-screen bg-hueso text-tinta">
       <header className="pizarra border-b border-acento/15">
@@ -63,10 +62,11 @@ export default function LegalComponent({ tipo }) {
       </main>
     </div>
   )
+  // #endregion
 }
 
 /** Cómo contactar con el titular (email si lo hay, y siempre WhatsApp/teléfono). */
-function Contacto() {
+const Contacto = () => {
   return (
     <>
       {LEGAL.email && (
@@ -83,7 +83,7 @@ function Contacto() {
   )
 }
 
-function Titular() {
+const Titular = () => {
   return (
     <ul>
       <li>
@@ -112,7 +112,7 @@ function Titular() {
   )
 }
 
-function AvisoLegal() {
+const AvisoLegal = () => {
   return (
     <>
       <section>
@@ -182,7 +182,7 @@ function AvisoLegal() {
   )
 }
 
-function Privacidad() {
+const Privacidad = () => {
   return (
     <>
       <section>
@@ -260,7 +260,7 @@ function Privacidad() {
   )
 }
 
-function Cookies() {
+const Cookies = () => {
   return (
     <>
       <section>
@@ -304,3 +304,12 @@ function Cookies() {
     </>
   )
 }
+
+// Cada página legal con su título.
+const PAGINAS = {
+  'aviso-legal': { titulo: 'Aviso legal', Contenido: AvisoLegal },
+  privacidad: { titulo: 'Política de privacidad', Contenido: Privacidad },
+  cookies: { titulo: 'Política de cookies', Contenido: Cookies },
+}
+
+export default LegalComponent

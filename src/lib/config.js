@@ -8,15 +8,16 @@ import { supabase } from './supabase'
 import { HORARIO } from '../data/horarios'
 import { SERVICIOS } from '../data/servicios'
 
+// #region Horario
 const NOMBRES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
 // Orden de presentación: lunes primero, domingo al final.
 const ORDEN = [1, 2, 3, 4, 5, 6, 0]
 
 /**
  * Devuelve el horario en la estructura de la app:
- *   [{ dia, nombre, tramos: [['HH:MM','HH:MM'], ...] }]  (7 días)
+ *   [{ dia, nombre, tramos: [['HH:MM','HH:MM'], ...] }]  (7 días).
  */
-export async function getHorario() {
+export const getHorario = async () => {
   if (!supabase) return HORARIO
 
   const { data, error } = await supabase
@@ -40,7 +41,7 @@ export async function getHorario() {
  * Guarda el horario completo (solo panel autenticado). Borra el anterior y
  * escribe el nuevo. `dias` es la estructura de arriba.
  */
-export async function guardarHorario(dias) {
+export const guardarHorario = async (dias) => {
   if (!supabase) return { ok: false, error: 'Supabase no configurado.' }
 
   const { error: errBorrar } = await supabase.from('horario').delete().gte('id', 0)
@@ -58,18 +59,16 @@ export async function guardarHorario(dias) {
   }
   return { ok: true }
 }
+// #endregion
 
-// ════════════════════════════════════════════════════════════
-//  SERVICIOS
-//  La app trabaja con la forma { id, nombre, descripcion, duracion, precio,
-//  icono, destacado, activo, online }. En Supabase las columnas son
-//  `duracion_min` y `reserva_online`, así que traducimos en ambos sentidos
-//  (aApp / aDb) para no tocar los
-//  consumidores (reserva, panel y home).
-// ════════════════════════════════════════════════════════════
+// #region Servicios
+// La app trabaja con la forma { id, nombre, descripcion, duracion, precio,
+// icono, destacado, activo, online }. En Supabase las columnas son
+// `duracion_min` y `reserva_online`, así que se traducen en ambos sentidos
+// (aApp / aDb) para no tocar a quien los usa (reserva, panel y home).
 
 /** Fila de Supabase → forma de la app. */
-function aApp(r) {
+const aApp = (r) => {
   return {
     id: r.id,
     nombre: r.nombre,
@@ -84,7 +83,7 @@ function aApp(r) {
 }
 
 /** Forma de la app → columnas de Supabase (sin id ni orden; los pone quien escribe). */
-function aDb(s) {
+const aDb = (s) => {
   return {
     nombre: (s.nombre || '').trim(),
     descripcion: s.descripcion?.trim() ? s.descripcion.trim() : null,
@@ -101,7 +100,7 @@ function aDb(s) {
  * Devuelve los servicios (todos, incluidos los inactivos, ordenados). Los
  * consumidores filtran por `activo` según convenga. Fallback al estático.
  */
-export async function getServicios() {
+export const getServicios = async () => {
   if (!supabase) return SERVICIOS
 
   // Con '*' (y no una lista de columnas): si falta una columna nueva porque
@@ -123,7 +122,7 @@ export async function getServicios() {
  * posición. Las citas guardan el nombre del servicio (no el id), así que
  * regenerar ids no afecta al histórico.
  */
-export async function guardarServicios(lista) {
+export const guardarServicios = async (lista) => {
   if (!supabase) return { ok: false, error: 'Supabase no configurado.' }
 
   const filas = lista
@@ -141,3 +140,4 @@ export async function guardarServicios(lista) {
 }
 
 export { NOMBRES, ORDEN }
+// #endregion

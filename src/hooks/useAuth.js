@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase'
  *  - sesion: objeto de sesión si hay alguien logueado, null si no.
  *  - cargando: true mientras se comprueba la sesión inicial.
  */
-export function useAuth() {
+export const useAuth = () => {
   const [sesion, setSesion] = useState(null)
   // Si no hay Supabase configurado no hay nada que cargar.
   const [cargando, setCargando] = useState(Boolean(supabase))
@@ -16,11 +16,13 @@ export function useAuth() {
     if (!supabase) return
     let vivo = true
 
-    supabase.auth.getSession().then(({ data }) => {
+    const cargar = async () => {
+      const { data } = await supabase.auth.getSession()
       if (!vivo) return
       setSesion(data.session)
       setCargando(false)
-    })
+    }
+    cargar()
 
     const { data: sub } = supabase.auth.onAuthStateChange((_evento, nueva) => {
       setSesion(nueva)

@@ -8,21 +8,24 @@
 //  vive además en la BD: exclusion constraint — ver supabase/schema.sql.)
 // ════════════════════════════════════════════════════════════
 
+// Minutos que tiene un día.
+export const MINUTOS_DIA = 24 * 60
+
 /** Devuelve un Date en el día `fecha` a la hora "HH:MM" (hora local). */
-export function aHora(fecha, hhmm) {
+export const aHora = (fecha, hhmm) => {
   const [h, m] = hhmm.split(':').map(Number)
-  const d = new Date(fecha)
-  d.setHours(h, m, 0, 0)
-  return d
+  const result = new Date(fecha)
+  result.setHours(h, m, 0, 0)
+  return result
 }
 
 /** Suma minutos a un Date (devuelve uno nuevo). */
-export function sumarMin(fecha, min) {
+export const sumarMin = (fecha, min) => {
   return new Date(fecha.getTime() + min * 60000)
 }
 
 /** ¿Se solapan los intervalos [aIni,aFin) y [bIni,bFin)? */
-export function solapan(aIni, aFin, bIni, bFin) {
+export const solapan = (aIni, aFin, bIni, bFin) => {
   return aIni < bFin && bIni < aFin
 }
 
@@ -30,7 +33,7 @@ export function solapan(aIni, aFin, bIni, bFin) {
  * Minutos que la zona `zona` va por delante de UTC en el instante dado
  * (60 en invierno en España, 120 en verano).
  */
-function desfaseMin(zona, instante) {
+const desfaseMin = (zona, instante) => {
   const partes = Object.fromEntries(
     new Intl.DateTimeFormat('en-US', {
       timeZone: zona,
@@ -53,7 +56,7 @@ function desfaseMin(zona, instante) {
  * 10:00 de Sevilla), sea cual sea el huso del navegador. El día se toma de
  * `fecha` (año/mes/día locales, que es lo que el cliente pulsó).
  */
-export function aHoraZona(fecha, hhmm, zona) {
+export const aHoraZona = (fecha, hhmm, zona) => {
   const [h, m] = hhmm.split(':').map(Number)
   const comoUtc = Date.UTC(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), h, m)
   let t = comoUtc - desfaseMin(zona, new Date(comoUtc)) * 60000
@@ -87,7 +90,7 @@ export function aHoraZona(fecha, hhmm, zona) {
  *   solapan con una cita/bloqueo salen como 'ocupado' (para mostrarlas en gris
  *   y dar sensación de agenda llena), el resto como 'libre'.
  */
-export function generarRejilla({
+export const generarRejilla = ({
   fecha,
   duracionMin,
   horario,
@@ -97,7 +100,7 @@ export function generarRejilla({
   granularidadMin = 15,
   margenMin = 0,
   zona,
-}) {
+}) => {
   const def = horario.find((h) => h.dia === fecha.getDay())
   if (!def || !def.tramos || def.tramos.length === 0) return []
 
@@ -110,7 +113,7 @@ export function generarRejilla({
   }))
 
   const limite = sumarMin(ahora, margenMin)
-  const rejilla = []
+  const result = []
 
   for (const [horaIni, horaFin] of def.tramos) {
     const apertura = enHora(horaIni)
@@ -126,27 +129,29 @@ export function generarRejilla({
     for (const t of [...candidatas].sort((a, b) => a - b)) {
       const inicio = new Date(t)
       const fin = sumarMin(inicio, duracionMin)
-      if (fin > cierre) continue // el servicio no cabe entero en el tramo
-      if (inicio < limite) continue // no mostramos el pasado
+      // El servicio no cabe entero en el tramo.
+      if (fin > cierre) continue
+      // No mostramos el pasado.
+      if (inicio < limite) continue
       const chocaOcupado = ocupados.some((o) => solapan(inicio, fin, o.ini, o.fin))
       // Las horas "pegadas" solo se ofrecen si están libres: ocupadas no
       // aportan nada y desordenarían la rejilla.
       const deRejilla = minutosDesde(apertura, inicio) % granularidadMin === 0
       if (chocaOcupado && !deRejilla) continue
-      rejilla.push({ inicio, estado: chocaOcupado ? 'ocupado' : 'libre' })
+      result.push({ inicio, estado: chocaOcupado ? 'ocupado' : 'libre' })
     }
   }
 
-  return rejilla
+  return result
 }
 
 const minutosDesde = (a, b) => Math.round((b - a) / 60000)
 
 /**
  * Solo las horas LIBRES (atajo sobre generarRejilla). Mismos parámetros.
- * @returns {Date[]}
+ * @returns {Date[]}.
  */
-export function generarHuecos(opts) {
+export const generarHuecos = (opts) => {
   return generarRejilla(opts)
     .filter((s) => s.estado === 'libre')
     .map((s) => s.inicio)

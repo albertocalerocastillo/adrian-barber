@@ -1,3 +1,4 @@
+// #region Imports
 import { useState, useEffect } from 'react'
 import { Clock, Repeat, Scissors, Sparkles } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
@@ -9,6 +10,7 @@ import { useCountUp } from '../../../hooks/useCountUp'
 import { PROMO } from '../../../data/servicios'
 import { getServicios } from '../../../lib/config'
 import { ICONOS } from '../../../theme/icons'
+// #endregion
 
 /**
  * Listado de servicios con icono, descripción, duración y precio.
@@ -17,23 +19,28 @@ import { ICONOS } from '../../../theme/icons'
  * Los servicios se leen de Supabase (o del estático como fallback) y se
  * muestran solo los activos.
  */
-export default function ServiciosComponent() {
+const ServiciosComponent = () => {
+  // #region Declaraciones, variables y hooks
   const [servicios, setServicios] = useState([])
   const promoRef = useCountUp(PROMO.precio)
 
   useEffect(() => {
     let vivo = true
-    getServicios().then((ss) => {
+    const cargar = async () => {
+      const ss = await getServicios()
       if (vivo) setServicios(ss.filter((s) => s.activo !== false))
-    })
+    }
+    cargar()
     return () => {
       vivo = false
     }
   }, [])
+  // #endregion
 
+  // #region Renderizado
   return (
     <section id="servicios" className="relative overflow-hidden bg-hueso py-24 md:py-32">
-      {/* Sello gigante de marca de agua */}
+      {/* Sello gigante de marca de agua. */}
       <img
         src="/logo-sello.webp"
         alt=""
@@ -116,7 +123,7 @@ export default function ServiciosComponent() {
             propio botón, en vez de dejarla como nota al pie. */}
         <RevealComponent className="mt-10" desde="escala">
           <div className="grain destello relative flex flex-col items-center gap-8 overflow-hidden bg-vino px-6 py-12 text-center text-hueso ring-1 ring-acento/30 md:flex-row md:justify-between md:px-14 md:py-14 md:text-left">
-            {/* Tijeras gigantes de fondo */}
+            {/* Tijeras gigantes de fondo. */}
             <Scissors
               aria-hidden="true"
               size={260}
@@ -143,7 +150,7 @@ export default function ServiciosComponent() {
           </div>
         </RevealComponent>
 
-        {/* Nota + CTA */}
+        {/* Nota + CTA. */}
         <RevealComponent className="mt-14 flex flex-col items-center gap-5 text-center">
           <p className="font-display text-xl italic text-tinta/60">
             ¿No lo tienes claro? Escríbeme y lo vemos.
@@ -154,4 +161,7 @@ export default function ServiciosComponent() {
       </div>
     </section>
   )
+  // #endregion
 }
+
+export default ServiciosComponent

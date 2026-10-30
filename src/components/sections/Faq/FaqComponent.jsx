@@ -1,9 +1,11 @@
+// #region Imports
 import { useEffect, useMemo } from 'react'
 import { Plus } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
 import RevealComponent from '../../ui/Reveal/RevealComponent'
 import { useEstadoNegocio } from '../../../hooks/useEstadoNegocio'
 import { construirFaq } from '../../../data/faq'
+// #endregion
 
 const ID_MARCADO = 'faq-jsonld'
 
@@ -16,7 +18,8 @@ const ID_MARCADO = 'faq-jsonld'
  * que se ven en pantalla. Google exige que coincidan, y generándolo aquí es
  * imposible que se desincronicen (el problema que tuvimos con el horario).
  */
-export default function FaqComponent() {
+const FaqComponent = () => {
+  // #region Declaraciones, variables y hooks
   const { horario } = useEstadoNegocio()
   const preguntas = useMemo(() => construirFaq(horario), [horario])
 
@@ -42,7 +45,9 @@ export default function FaqComponent() {
       document.getElementById(ID_MARCADO)?.remove()
     }
   }, [preguntas])
+  // #endregion
 
+  // #region Renderizado
   return (
     <section id="faq" className="bg-hueso py-24 md:py-32">
       <div className="mx-auto grid max-w-6xl gap-12 px-5 md:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
@@ -81,4 +86,7 @@ export default function FaqComponent() {
       </div>
     </section>
   )
+  // #endregion
 }
+
+export default FaqComponent

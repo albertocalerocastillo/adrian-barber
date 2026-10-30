@@ -1,9 +1,11 @@
+// #region Imports
 import { useState } from 'react'
 import Hoja from './Hoja'
 import { Campo, Segmentado, BotonPrincipal, AtajosFecha, claseInput } from './Controles'
-import { aHora, sumarMin } from '../../../utils/disponibilidad'
+import { aHora, sumarMin, MINUTOS_DIA } from '../../../utils/disponibilidad'
 import { inicioDia, fechaLarga, aInputDate } from '../../../utils/fechas'
 import { crearBloqueo } from '../../../lib/panel'
+// #endregion
 
 const MOTIVOS = ['Vacaciones', 'Médico', 'Descanso', 'Formación']
 
@@ -11,7 +13,8 @@ const MOTIVOS = ['Vacaciones', 'Médico', 'Descanso', 'Formación']
  * Cierra un día entero o un rato (vacaciones, médico, descanso). Esos huecos
  * desaparecen de la web automáticamente.
  */
-export default function BloquearModal({ fechaInicial, onClose, onCreado }) {
+const BloquearModal = ({ fechaInicial, onClose, onCreado }) => {
+  // #region Declaraciones, variables y hooks
   const [fechaStr, setFechaStr] = useState(aInputDate(fechaInicial || new Date()))
   const [todoElDia, setTodoElDia] = useState(true)
   const [desde, setDesde] = useState('10:00')
@@ -20,14 +23,14 @@ export default function BloquearModal({ fechaInicial, onClose, onCreado }) {
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
 
-  async function onGuardar(e) {
+  const onGuardar = async (e) => {
     e?.preventDefault()
     if (guardando) return
     const fecha = new Date(`${fechaStr}T00:00:00`)
     let ini, fin
     if (todoElDia) {
       ini = inicioDia(fecha)
-      fin = sumarMin(ini, 24 * 60)
+      fin = sumarMin(ini, MINUTOS_DIA)
     } else {
       ini = aHora(fecha, desde)
       fin = aHora(fecha, hasta)
@@ -47,7 +50,9 @@ export default function BloquearModal({ fechaInicial, onClose, onCreado }) {
       setError(res.error)
     }
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <Hoja
       titulo="Día libre"
@@ -119,4 +124,7 @@ export default function BloquearModal({ fechaInicial, onClose, onCreado }) {
       </form>
     </Hoja>
   )
+  // #endregion
 }
+
+export default BloquearModal

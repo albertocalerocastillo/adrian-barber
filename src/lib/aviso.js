@@ -16,8 +16,10 @@
 // ════════════════════════════════════════════════════════════
 import { supabase } from './supabase'
 
-export function avisarNuevaCita({ clienteMovil, inicio }) {
-  if (!supabase) return // sin Supabase no hay función a la que llamar
+/** Pide a la Edge Function que avise a Adrián de la cita nueva, sin esperar ni lanzar errores. */
+export const avisarNuevaCita = ({ clienteMovil, inicio }) => {
+  // Sin Supabase no hay función a la que llamar.
+  if (!supabase) return
 
   try {
     Promise.resolve(

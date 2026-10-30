@@ -1,6 +1,8 @@
+// #region Imports
 import { m } from 'motion/react'
 import RevealComponent from '../Reveal/RevealComponent'
 import { EASE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 /**
  * Encabezado de sección reutilizable: kicker en mayúsculas + título display +
@@ -14,13 +16,13 @@ import { EASE_SUAVE } from '../../../theme/animacion'
  *  - claro: true para texto claro (sobre fondos oscuros).
  *  - centrado: centra el bloque (por defecto true).
  */
-export default function SectionHeadingComponent({
+const SectionHeadingComponent = ({
   kicker,
   titulo,
   texto,
   claro = false,
   centrado = true,
-}) {
+}) => {
   const colorTitulo = claro ? 'text-hueso' : 'text-tinta'
   const colorTexto = claro ? 'text-hueso/65' : 'text-tinta/60'
 
@@ -51,3 +53,5 @@ export default function SectionHeadingComponent({
     </RevealComponent>
   )
 }
+
+export default SectionHeadingComponent

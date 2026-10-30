@@ -1,3 +1,4 @@
+// #region Imports
 import { useState, useEffect, useRef } from 'react'
 import { m } from 'motion/react'
 import { Search, Loader2, Phone, ChevronRight, UserRound } from 'lucide-react'
@@ -7,11 +8,13 @@ import { claseInput } from './Controles'
 import { hora as fmtHora, fechaCorta } from '../../../utils/fechas'
 import { buscarCitas } from '../../../lib/panel'
 import { EASE_SUAVE } from '../../../theme/animacion'
+import { EstadoCitaEnum } from '../../../enums/EstadoCitaEnum'
+// #endregion
 
 const ESTADOS = {
-  pendiente: { texto: 'Pendiente', clase: 'bg-acento/15 text-acento-oscuro' },
-  atendida: { texto: 'Atendido', clase: 'bg-green-100 text-green-700' },
-  cancelada: { texto: 'Cancelada', clase: 'bg-tinta/5 text-tinta/40 line-through' },
+  [EstadoCitaEnum.Pendiente]: { texto: 'Pendiente', clase: 'bg-acento/15 text-acento-oscuro' },
+  [EstadoCitaEnum.Atendida]: { texto: 'Atendido', clase: 'bg-green-100 text-green-700' },
+  [EstadoCitaEnum.Cancelada]: { texto: 'Cancelada', clase: 'bg-tinta/5 text-tinta/40 line-through' },
 }
 
 /**
@@ -21,7 +24,8 @@ const ESTADOS = {
  *
  * Props: onClose, onIrA(fecha).
  */
-export default function BuscarClienteModal({ onClose, onIrA }) {
+const BuscarClienteModal = ({ onClose, onIrA }) => {
+  // #region Declaraciones, variables y hooks
   const [texto, setTexto] = useState('')
   const [resultado, setResultado] = useState({ para: '', citas: [] })
   const campo = useRef(null)
@@ -37,8 +41,9 @@ export default function BuscarClienteModal({ onClose, onIrA }) {
   useEffect(() => {
     if (buscado.length < 2) return
     let vivo = true
-    const id = setTimeout(() => {
-      buscarCitas(buscado).then((citas) => vivo && setResultado({ para: buscado, citas }))
+    const id = setTimeout(async () => {
+      const citas = await buscarCitas(buscado)
+      if (vivo) setResultado({ para: buscado, citas })
     }, 300)
     return () => {
       vivo = false
@@ -50,7 +55,9 @@ export default function BuscarClienteModal({ onClose, onIrA }) {
   const cargando = !corto && resultado.para !== buscado
   const clientes = corto || cargando ? [] : agrupar(resultado.citas)
   const ahora = new Date()
+  // #endregion
 
+  // #region Renderizado
   return (
     <Hoja titulo="Buscar cliente" subtitulo="Por nombre o por móvil." onCerrar={onClose}>
       <div className="relative">
@@ -81,9 +88,9 @@ export default function BuscarClienteModal({ onClose, onIrA }) {
         )}
 
         {clientes.map((cl, i) => {
-          const proximas = cl.citas.filter((c) => new Date(c.inicio) >= ahora && c.estado !== 'cancelada').reverse()
+          const proximas = cl.citas.filter((c) => new Date(c.inicio) >= ahora && c.estado !== EstadoCitaEnum.Cancelada).reverse()
           const pasadas = cl.citas.filter((c) => !proximas.includes(c))
-          const visitas = cl.citas.filter((c) => c.estado === 'atendida').length
+          const visitas = cl.citas.filter((c) => c.estado === EstadoCitaEnum.Atendida).length
           const movil = cl.movil
           return (
             <m.section
@@ -134,9 +141,10 @@ export default function BuscarClienteModal({ onClose, onIrA }) {
       </div>
     </Hoja>
   )
+  // #endregion
 }
 
-function Lista({ titulo, citas, onIrA, destacar = false }) {
+const Lista = ({ titulo, citas, onIrA, destacar = false }) => {
   return (
     <div className="mt-4">
       <p className="mb-1.5 text-[0.65rem] font-semibold uppercase tracking-widest text-tinta/40">{titulo}</p>
@@ -144,7 +152,7 @@ function Lista({ titulo, citas, onIrA, destacar = false }) {
         {citas.map((c) => {
           const ini = new Date(c.inicio)
           const { diaSemana, dia, mes } = fechaCorta(ini)
-          const estado = ESTADOS[c.estado] ?? ESTADOS.pendiente
+          const estado = ESTADOS[c.estado] ?? ESTADOS[EstadoCitaEnum.Pendiente]
           return (
             <li key={c.id}>
               <button
@@ -178,7 +186,7 @@ function Lista({ titulo, citas, onIrA, destacar = false }) {
 }
 
 /** Junta las citas de una misma persona: por móvil, o por nombre si no hay móvil. */
-function agrupar(citas) {
+const agrupar = (citas) => {
   const grupos = new Map()
   for (const c of citas) {
     const movil = (c.cliente_movil || '').replace(/\D/g, '')
@@ -190,3 +198,5 @@ function agrupar(citas) {
   // pone primero a quien tiene la cita más reciente.
   return [...grupos.values()]
 }
+
+export default BuscarClienteModal

@@ -1,6 +1,8 @@
+// #region Imports
 import { Link } from 'react-router-dom'
 import { CalendarCheck, ArrowRight } from 'lucide-react'
 import { RESERVAS_ONLINE, reservaEmpezada, inicioReservas } from '../../../data/features'
+// #endregion
 
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
 
@@ -10,11 +12,14 @@ const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', '
  * coger hueco online para enero en adelante. Cuando empieza la reserva, el
  * botón principal ya lleva a /reserva y este enlace desaparece solo.
  */
-export default function ReservaOnlineComponent({ claro = false, className = '' }) {
+const ReservaOnlineComponent = ({ claro = false, className = '' }) => {
+  // #region Declaraciones, variables y hooks
   if (!RESERVAS_ONLINE || reservaEmpezada()) return null
 
   const mes = MESES[inicioReservas().getMonth()]
+  // #endregion
 
+  // #region Renderizado
   return (
     <Link
       to="/reserva"
@@ -29,4 +34,7 @@ export default function ReservaOnlineComponent({ claro = false, className = '' }
       <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
     </Link>
   )
+  // #endregion
 }
+
+export default ReservaOnlineComponent

@@ -1,3 +1,4 @@
+// #region Imports
 import { useState } from 'react'
 import { MapPin, Phone, Navigation, Map as IconoMapa } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
@@ -10,6 +11,7 @@ import {
   MAPS_URL,
   MAPS_EMBED,
 } from '../../../data/contacto'
+// #endregion
 
 /**
  * Ubicación: dirección, teléfono y mapa de Google.
@@ -19,7 +21,8 @@ import {
  * sale una tarjeta propia, sin nada de Google. El botón "Cómo llegar" es un
  * enlace normal y funciona siempre.
  */
-export default function UbicacionComponent() {
+const UbicacionComponent = () => {
+  // #region Declaraciones, variables y hooks
   const [mapa, setMapa] = useState(false)
   const datos = [
     {
@@ -47,7 +50,9 @@ export default function UbicacionComponent() {
       ),
     },
   ]
+  // #endregion
 
+  // #region Renderizado
   return (
     <section id="ubicacion" className="grain relative overflow-hidden bg-tinta py-24 text-hueso md:py-32">
       <div className="relative mx-auto max-w-6xl px-5 md:px-8">
@@ -59,7 +64,7 @@ export default function UbicacionComponent() {
         />
 
         <div className="mt-14 grid gap-8 lg:grid-cols-[1fr_1.3fr] lg:gap-12">
-          {/* Datos */}
+          {/* Datos. */}
           <RevealComponent desde="izquierda" className="flex flex-col justify-center">
             <ul className="space-y-7">
               {datos.map((d) => (
@@ -86,7 +91,7 @@ export default function UbicacionComponent() {
             </a>
           </RevealComponent>
 
-          {/* Mapa */}
+          {/* Mapa. */}
           <RevealComponent delay={120} desde="derecha">
             <div className="relative h-[300px] overflow-hidden ring-1 ring-acento/25 md:h-[380px]">
               {mapa ? (
@@ -101,7 +106,7 @@ export default function UbicacionComponent() {
                 />
               ) : (
                 <div className="grain flex h-full flex-col items-center justify-center gap-4 bg-tinta-800 px-6 text-center">
-                  {/* Sello en vez del mapa: nada de Google hasta que se pulse */}
+                  {/* Sello en vez del mapa: nada de Google hasta que se pulse. */}
                   <img src="/logo-sello.webp" alt="" aria-hidden="true" loading="lazy" className="w-24 opacity-90 md:w-28" />
                   <p className="max-w-xs text-sm text-hueso/60">
                     {NEGOCIO.direccion}, {NEGOCIO.localidad}
@@ -125,4 +130,7 @@ export default function UbicacionComponent() {
       </div>
     </section>
   )
+  // #endregion
 }
+
+export default UbicacionComponent

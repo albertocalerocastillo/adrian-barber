@@ -1,20 +1,22 @@
+// #region Imports
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { m } from 'motion/react'
 import { X } from 'lucide-react'
 import { EASE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 const ESCRITORIO = '(min-width: 640px)'
 
-function useEsEscritorio() {
-  const [es, setEs] = useState(() => window.matchMedia(ESCRITORIO).matches)
+const useEsEscritorio = () => {
+  const [result, setEs] = useState(() => window.matchMedia(ESCRITORIO).matches)
   useEffect(() => {
     const mq = window.matchMedia(ESCRITORIO)
     const cambio = () => setEs(mq.matches)
     mq.addEventListener('change', cambio)
     return () => mq.removeEventListener('change', cambio)
   }, [])
-  return es
+  return result
 }
 
 /**
@@ -31,7 +33,7 @@ function useEsEscritorio() {
  *
  * Props: titulo, subtitulo, onCerrar, pie (botones de abajo), children.
  */
-export default function Hoja({ titulo, subtitulo, onCerrar, pie, children }) {
+const Hoja = ({ titulo, subtitulo, onCerrar, pie, children }) => {
   const escritorio = useEsEscritorio()
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export default function Hoja({ titulo, subtitulo, onCerrar, pie, children }) {
         {...panel}
         transition={{ duration: 0.45, ease: EASE_SUAVE }}
       >
-        {/* Asa (móvil) */}
+        {/* Asa (móvil). */}
         <span className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-tinta/15 sm:hidden" />
 
         <div className="flex shrink-0 items-start justify-between gap-4 px-6 pb-4 pt-4 sm:pt-6">
@@ -97,3 +99,5 @@ export default function Hoja({ titulo, subtitulo, onCerrar, pie, children }) {
     document.body
   )
 }
+
+export default Hoja

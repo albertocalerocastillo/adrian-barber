@@ -1,3 +1,4 @@
+// #region Imports
 import { useState } from 'react'
 import { Expand } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
@@ -6,20 +7,24 @@ import LightboxComponent from '../../ui/Lightbox/LightboxComponent'
 import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
 import { GALERIA } from '../../../data/galeria'
 import { INSTAGRAM, INSTAGRAM_URL } from '../../../data/contacto'
+// #endregion
 
 /**
  * Rejilla de trabajos + lightbox al pulsar. Cada foto entra creciendo un poco,
  * escalonada por columnas; al pasar el ratón se acerca y aparece el icono de
  * ampliar.
  */
-export default function GaleriaComponent() {
+const GaleriaComponent = () => {
+  // #region Declaraciones, variables y hooks
   const [indice, setIndice] = useState(null)
 
   const abrir = (i) => setIndice(i)
   const cerrar = () => setIndice(null)
   const anterior = () => setIndice((i) => (i - 1 + GALERIA.length) % GALERIA.length)
   const siguiente = () => setIndice((i) => (i + 1) % GALERIA.length)
+  // #endregion
 
+  // #region Renderizado
   return (
     <section id="galeria" className="bg-hueso py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
@@ -34,7 +39,7 @@ export default function GaleriaComponent() {
             las repartían 3+2+2 con un hueco feo al final. Con flex centrado,
             si la última fila queda corta (7 fotos = 4+3 en escritorio) se queda en medio
             en vez de colgando a la izquierda, sea cual sea el número de fotos.
-            (Si algún día entran fotos apaisadas, habría que revisarlo.) */}
+            (Si algún día entran fotos apaisadas, habría que revisarlo.). */}
         <div className="mt-14 flex flex-wrap justify-center gap-3 sm:gap-4 lg:gap-5">
           {GALERIA.map((foto, i) => (
             <RevealComponent
@@ -61,7 +66,7 @@ export default function GaleriaComponent() {
                 <span className="absolute bottom-4 right-4 flex h-10 w-10 translate-y-3 items-center justify-center bg-acento text-tinta opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
                   <Expand size={18} strokeWidth={2} />
                 </span>
-                {/* Esquinas doradas al pasar el ratón */}
+                {/* Esquinas doradas al pasar el ratón. */}
                 <span className="pointer-events-none absolute left-3 top-3 h-6 w-6 border-l border-t border-acento opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               </button>
             </RevealComponent>
@@ -90,4 +95,7 @@ export default function GaleriaComponent() {
       />
     </section>
   )
+  // #endregion
 }
+
+export default GaleriaComponent

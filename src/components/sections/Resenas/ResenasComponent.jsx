@@ -1,3 +1,4 @@
+// #region Imports
 import { m } from 'motion/react'
 import { Star, ExternalLink, PenLine, Quote } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
@@ -10,8 +11,9 @@ import {
   GOOGLE_RESENA_URL,
   TESTIMONIOS,
 } from '../../../data/contacto'
+// #endregion
 
-// "5,0" → 5
+// "5,0" → 5.
 const NOTA = Number(GOOGLE_VALORACION.nota.replace(',', '.'))
 
 /**
@@ -22,14 +24,17 @@ const NOTA = Number(GOOGLE_VALORACION.nota.replace(',', '.'))
  * `aggregateRating` en el JSON-LD. Google ignora (y puede penalizar) las
  * valoraciones que un negocio se pone a sí mismo en su propia web.
  */
-export default function ResenasComponent() {
+const ResenasComponent = () => {
+  // #region Declaraciones, variables y hooks
   const { nota, resenas } = GOOGLE_VALORACION
   const notaRef = useCountUp(NOTA, 1)
   const resenasRef = useCountUp(resenas)
+  // #endregion
 
+  // #region Renderizado
   return (
     <section id="resenas" className="grain relative overflow-hidden bg-tinta py-24 text-hueso md:py-32">
-      {/* Halo dorado detrás de la nota */}
+      {/* Halo dorado detrás de la nota. */}
       <div
         aria-hidden="true"
         className="absolute inset-0"
@@ -39,7 +44,7 @@ export default function ResenasComponent() {
       <div className="relative mx-auto max-w-6xl px-5 md:px-8">
         <SectionHeadingComponent kicker="Lo que dicen" titulo="Reseñas" claro />
 
-        {/* Nota media */}
+        {/* Nota media. */}
         <RevealComponent className="mt-14 flex flex-col items-center text-center">
           <div className="flex items-center gap-1.5 text-acento">
             {Array.from({ length: 5 }, (_, i) => (
@@ -90,7 +95,7 @@ export default function ResenasComponent() {
           </div>
         </RevealComponent>
 
-        {/* Testimonios (solo si hay reales copiados de la ficha) */}
+        {/* Testimonios (solo si hay reales copiados de la ficha). */}
         {TESTIMONIOS.length > 0 && (
           <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
             {TESTIMONIOS.map((t, i) => (
@@ -130,4 +135,7 @@ export default function ResenasComponent() {
       </div>
     </section>
   )
+  // #endregion
 }
+
+export default ResenasComponent

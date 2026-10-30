@@ -1,3 +1,4 @@
+// #region Imports
 import { useRef } from 'react'
 import { m, useScroll, useTransform } from 'motion/react'
 import { Scissors, Award, Heart } from 'lucide-react'
@@ -9,6 +10,7 @@ import { NEGOCIO, INSTAGRAM, INSTAGRAM_URL } from '../../../data/contacto'
 // suyo (antes había una foto de stock de un desconocido).
 // Para ponerla: suelta la foto en src/assets/adrian.jpg y cambia este import.
 import fotoSobreMi from '../../../assets/galeria/corte-3.jpg'
+// #endregion
 
 const VALORES = [
   { icono: Scissors, titulo: 'Oficio', texto: 'Técnica cuidada en cada corte, sin prisas.' },
@@ -19,7 +21,7 @@ const VALORES = [
 // La frase grande se "enciende" palabra a palabra según se baja.
 const FRASE = 'Me gusta que salgas de la silla con la cabeza alta.'
 
-function Palabra({ texto, progreso, rango }) {
+const Palabra = ({ texto, progreso, rango }) => {
   const opacity = useTransform(progreso, rango, [0.18, 1])
   return (
     <m.span style={{ opacity }} className="motion-reduce:opacity-100!">
@@ -33,7 +35,8 @@ function Palabra({ texto, progreso, rango }) {
  * frase que se ilumina con el scroll, el texto y sus valores.
  * Fondo tinta (oscuro) para contraste con las secciones claras.
  */
-export default function SobreMiComponent() {
+const SobreMiComponent = () => {
+  // #region Declaraciones, variables y hooks
   const seccion = useRef(null)
   const frase = useRef(null)
 
@@ -46,11 +49,13 @@ export default function SobreMiComponent() {
     offset: ['start 85%', 'end 45%'],
   })
   const palabras = FRASE.split(' ')
+  // #endregion
 
+  // #region Renderizado
   return (
     <section ref={seccion} id="sobre-mi" className="grain relative overflow-hidden bg-tinta py-24 text-hueso md:py-32">
       <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 md:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
-        {/* Foto */}
+        {/* Foto. */}
         <RevealComponent desde="izquierda" className="relative mx-auto w-full max-w-md lg:max-w-none">
           <div className="relative overflow-hidden">
             <m.img
@@ -64,10 +69,10 @@ export default function SobreMiComponent() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-tinta/60 via-transparent to-transparent" />
           </div>
-          {/* Marco de acento */}
+          {/* Marco de acento. */}
           <span className="pointer-events-none absolute -bottom-4 -left-4 h-28 w-28 border-b-2 border-l-2 border-acento" />
           <span className="pointer-events-none absolute -right-4 -top-4 h-28 w-28 border-r-2 border-t-2 border-acento/40" />
-          {/* Sello que gira con el scroll */}
+          {/* Sello que gira con el scroll. */}
           <m.img
             src="/logo-sello.webp"
             alt=""
@@ -78,7 +83,7 @@ export default function SobreMiComponent() {
           />
         </RevealComponent>
 
-        {/* Texto */}
+        {/* Texto. */}
         <div>
           <RevealComponent>
             <p className="mb-4 flex items-center gap-3 text-xs tracking-kicker text-acento">
@@ -115,7 +120,7 @@ export default function SobreMiComponent() {
             </p>
           </RevealComponent>
 
-          {/* Valores */}
+          {/* Valores. */}
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {VALORES.map((v, i) => (
               <RevealComponent key={v.titulo} delay={150 + i * 90}>
@@ -145,4 +150,7 @@ export default function SobreMiComponent() {
       </div>
     </section>
   )
+  // #endregion
 }
+
+export default SobreMiComponent

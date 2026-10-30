@@ -1,3 +1,4 @@
+// #region Imports
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { LazyMotion, MotionConfig, domAnimation } from 'motion/react'
@@ -5,6 +6,7 @@ import HomeComponent from './components/pages/Home/HomeComponent'
 import NoEncontradaComponent from './components/pages/NoEncontrada/NoEncontradaComponent'
 import LegalComponent from './components/pages/Legal/LegalComponent'
 import { RESERVAS_ONLINE } from './data/features'
+// #endregion
 
 // La reserva y el panel van en su propio paquete: quien entra a la home (casi
 // todo el mundo) no se descarga el panel del barbero.
@@ -23,7 +25,8 @@ const PanelComponent = lazy(() => import('./components/pages/Panel/PanelComponen
  * Motion para toda la web: LazyMotion carga solo lo que se usa y MotionConfig
  * respeta la opción "reducir movimiento" del sistema.
  */
-export default function App() {
+const App = () => {
+  // #region Renderizado
   return (
     <LazyMotion features={domAnimation} strict>
       <MotionConfig reducedMotion="user">
@@ -48,4 +51,7 @@ export default function App() {
       </MotionConfig>
     </LazyMotion>
   )
+  // #endregion
 }
+
+export default App

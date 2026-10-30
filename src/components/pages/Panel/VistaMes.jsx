@@ -1,8 +1,11 @@
+// #region Imports
 import { m } from 'motion/react'
 import { Ban } from 'lucide-react'
 import { inicioSemana, mismoDia, hora as fmtHora, fechaLarga } from '../../../utils/fechas'
-import { aHora, sumarMin } from '../../../utils/disponibilidad'
+import { aHora, sumarMin, MINUTOS_DIA } from '../../../utils/disponibilidad'
 import { EASE_SUAVE } from '../../../theme/animacion'
+import { EstadoCitaEnum } from '../../../enums/EstadoCitaEnum'
+// #endregion
 
 const CABECERA = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
 
@@ -12,21 +15,24 @@ const CABECERA = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
  * llena según lo ocupado que está su horario y, en pantallas grandes, las
  * primeras citas con nombre. Tocar un día lleva a ese día.
  */
-export default function VistaMes({ mes, dia, ahora, citas, bloqueos, horario, onDia }) {
+const VistaMes = ({ mes, dia, ahora, citas, bloqueos, horario, onDia }) => {
+  // #region Declaraciones, variables y hooks
   const primero = new Date(mes.getFullYear(), mes.getMonth(), 1)
   const diasMes = new Date(mes.getFullYear(), mes.getMonth() + 1, 0).getDate()
   const inicio = inicioSemana(primero)
   const hueco = (primero.getDay() + 6) % 7
   const total = Math.ceil((hueco + diasMes) / 7) * 7
   const celdas = Array.from({ length: total }, (_, i) => {
-    const d = new Date(inicio)
-    d.setDate(inicio.getDate() + i)
-    return d
+    const result = new Date(inicio)
+    result.setDate(inicio.getDate() + i)
+    return result
   })
 
-  const activas = citas.filter((c) => c.estado !== 'cancelada')
+  const activas = citas.filter((c) => c.estado !== EstadoCitaEnum.Cancelada)
   const delMes = activas.filter((c) => new Date(c.inicio).getMonth() === mes.getMonth())
+  // #endregion
 
+  // #region Renderizado
   return (
     <div>
       <p className="mb-3 px-1 text-sm text-tinta/55">
@@ -45,7 +51,7 @@ export default function VistaMes({ mes, dia, ahora, citas, bloqueos, horario, on
         <div className="grid grid-cols-7">
           {celdas.map((d, i) => {
             const fuera = d.getMonth() !== mes.getMonth()
-            const finDia = sumarMin(d, 24 * 60)
+            const finDia = sumarMin(d, MINUTOS_DIA)
             const suyas = activas
               .filter((c) => mismoDia(new Date(c.inicio), d))
               .sort((a, b) => new Date(a.inicio) - new Date(b.inicio))
@@ -93,7 +99,7 @@ export default function VistaMes({ mes, dia, ahora, citas, bloqueos, horario, on
                   {cerradoTodo && !suyas.length && <Ban size={12} className="text-tinta/35" />}
                 </span>
 
-                {/* Lo lleno que va el día */}
+                {/* Lo lleno que va el día. */}
                 {abierto > 0 && !cerradoTodo && (
                   <span className={`h-1 overflow-hidden rounded-full ${elegido ? 'bg-white/15' : 'bg-tinta/[0.06]'}`}>
                     <span
@@ -103,13 +109,13 @@ export default function VistaMes({ mes, dia, ahora, citas, bloqueos, horario, on
                   </span>
                 )}
 
-                {/* En pantalla grande, las primeras citas con nombre */}
+                {/* En pantalla grande, las primeras citas con nombre. */}
                 <span className="hidden min-w-0 flex-col gap-0.5 lg:flex">
                   {suyas.slice(0, 3).map((c) => (
                     <span
                       key={c.id}
                       className={`truncate rounded px-1 py-px text-[0.65rem] leading-tight ${
-                        elegido ? 'bg-white/10' : c.estado === 'atendida' ? 'bg-green-100 text-green-800' : 'bg-acento/15'
+                        elegido ? 'bg-white/10' : c.estado === EstadoCitaEnum.Atendida ? 'bg-green-100 text-green-800' : 'bg-acento/15'
                       }`}
                     >
                       <span className="tabular-nums">{fmtHora(new Date(c.inicio))}</span> {c.cliente_nombre.split(' ')[0]}
@@ -138,4 +144,7 @@ export default function VistaMes({ mes, dia, ahora, citas, bloqueos, horario, on
       </div>
     </div>
   )
+  // #endregion
 }
+
+export default VistaMes

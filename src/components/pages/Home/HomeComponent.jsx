@@ -1,3 +1,4 @@
+// #region Imports
 import NavComponent from '../../layout/Nav/NavComponent'
 import FooterComponent from '../../layout/Footer/FooterComponent'
 import HeroComponent from '../../sections/Hero/HeroComponent'
@@ -12,6 +13,7 @@ import FaqComponent from '../../sections/Faq/FaqComponent'
 import CtaFinalComponent from '../../sections/CtaFinal/CtaFinalComponent'
 import FloatingActionsComponent from '../../ui/FloatingActions/FloatingActionsComponent'
 import ProgresoScrollComponent from '../../ui/ProgresoScroll/ProgresoScrollComponent'
+// #endregion
 
 /**
  * Página pública (landing). El orden de secciones alterna fondos claros (hueso)
@@ -23,7 +25,8 @@ import ProgresoScrollComponent from '../../ui/ProgresoScroll/ProgresoScrollCompo
  * página se ensanchaba, con un hueco blanco a la derecha), así que se recorta
  * aquí. "clip" y no "hidden" para no romper los position: sticky.
  */
-export default function HomeComponent() {
+const HomeComponent = () => {
+  // #region Renderizado
   return (
     <div className="min-h-screen overflow-x-clip bg-hueso text-tinta">
       <ProgresoScrollComponent />
@@ -44,4 +47,7 @@ export default function HomeComponent() {
       <FloatingActionsComponent />
     </div>
   )
+  // #endregion
 }
+
+export default HomeComponent

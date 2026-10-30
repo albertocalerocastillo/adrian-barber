@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
  * Devuelve true cuando la página se ha desplazado más de `umbral` píxeles.
  * Se usa para condensar/oscurecer la barra de navegación al hacer scroll.
  */
-export function useScrolled(umbral = 24) {
-  const [scrolled, setScrolled] = useState(false)
+export const useScrolled = (umbral = 24) => {
+  const [result, setScrolled] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > umbral)
@@ -14,5 +14,5 @@ export function useScrolled(umbral = 24) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [umbral])
 
-  return scrolled
+  return result
 }

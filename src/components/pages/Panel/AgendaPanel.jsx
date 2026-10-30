@@ -1,3 +1,4 @@
+// #region Imports
 import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, m } from 'motion/react'
@@ -14,7 +15,7 @@ import BuscarClienteModal from './BuscarClienteModal'
 import VistaMes from './VistaMes'
 import { useAviso } from './avisoContexto'
 import { CabeceraSeccion, Segmentado, Esqueleto } from './Controles'
-import { aHora, sumarMin } from '../../../utils/disponibilidad'
+import { aHora, sumarMin, MINUTOS_DIA } from '../../../utils/disponibilidad'
 import {
   fechaLarga, fechaCorta, hora as fmtHora, inicioDia, inicioSemana, mismoDia, aInputDate,
 } from '../../../utils/fechas'
@@ -23,16 +24,23 @@ import {
 } from '../../../lib/panel'
 import { getHorario, getServicios } from '../../../lib/config'
 import { EASE_SUAVE } from '../../../theme/animacion'
+import { EstadoCitaEnum } from '../../../enums/EstadoCitaEnum'
+import { VistaAgendaEnum } from '../../../enums/VistaAgendaEnum'
+import { HojaAgendaEnum } from '../../../enums/HojaAgendaEnum'
+// #endregion
 
+// #region Constantes
 // Huecos más cortos que esto no se ofrecen como "libre" (no cabe un corte).
 const HUECO_MINIMO = 30
 
 const VISTAS = [
-  { valor: 'dia', texto: 'Día' },
-  { valor: 'semana', texto: 'Semana' },
-  { valor: 'mes', texto: 'Mes' },
+  { valor: VistaAgendaEnum.Dia, texto: 'Día' },
+  { valor: VistaAgendaEnum.Semana, texto: 'Semana' },
+  { valor: VistaAgendaEnum.Mes, texto: 'Mes' },
 ]
+// #endregion
 
+// #region Agenda
 /**
  * Agenda del barbero.
  *  - Arriba, el resumen del día (citas, atendidas, pendientes, caja prevista)
@@ -50,15 +58,18 @@ const VISTAS = [
  * Marcar atendida o cancelar se hace al momento y se puede deshacer desde el
  * aviso de abajo, en vez de preguntar "¿seguro?" cada vez.
  */
-export default function AgendaPanel({ activa = true }) {
+const AgendaPanel = ({ activa = true }) => {
+  // #region Declaraciones, variables y hooks
   const avisar = useAviso()
-  const [vista, setVista] = useState('dia')
+  const [vista, setVista] = useState(VistaAgendaEnum.Dia)
   const [dia, setDia] = useState(() => inicioDia(new Date()))
-  const [datos, setDatos] = useState(null) // { citas, bloqueos } de la semana
+  // Citas y bloqueos de las semanas cargadas: { citas, bloqueos }.
+  const [datos, setDatos] = useState(null)
   const [horario, setHorario] = useState(null)
   const [servicios, setServicios] = useState([])
   const [tick, setTick] = useState(0)
-  const [modal, setModal] = useState(null) // { tipo: 'cita'|'bloquear'|'mover'|'buscar', hora?, cita? }
+  // Hoja abierta: { tipo: HojaAgendaEnum, hora?, cita? }.
+  const [modal, setModal] = useState(null)
   const [ahora, setAhora] = useState(() => new Date())
 
   // El reloj avanza cada minuto ("en curso", "en 20 min").
@@ -69,11 +80,13 @@ export default function AgendaPanel({ activa = true }) {
 
   useEffect(() => {
     let vivo = true
-    Promise.all([getHorario(), getServicios()]).then(([h, s]) => {
+    const cargar = async () => {
+      const [h, s] = await Promise.all([getHorario(), getServicios()])
       if (!vivo) return
       setHorario(h)
       setServicios(s)
-    })
+    }
+    cargar()
     return () => {
       vivo = false
     }
@@ -86,11 +99,13 @@ export default function AgendaPanel({ activa = true }) {
   const desdeCarga = inicioSemana(new Date(dia.getFullYear(), dia.getMonth(), 1)).getTime()
   useEffect(() => {
     const desde = new Date(desdeCarga)
-    const hasta = sumarMin(desde, 42 * 24 * 60)
+    const hasta = sumarMin(desde, 42 * MINUTOS_DIA)
     let vivo = true
-    Promise.all([listarCitas(desde, hasta), listarBloqueos(desde, hasta)]).then(([citas, bloqueos]) => {
+    const cargar = async () => {
+      const [citas, bloqueos] = await Promise.all([listarCitas(desde, hasta), listarBloqueos(desde, hasta)])
       if (vivo) setDatos({ citas, bloqueos })
-    })
+    }
+    cargar()
     return () => {
       vivo = false
     }
@@ -104,15 +119,17 @@ export default function AgendaPanel({ activa = true }) {
   const delDia = useMemo(() => {
     if (!datos) return null
     const citas = datos.citas.filter((c) => mismoDia(new Date(c.inicio), dia))
-    const bloqueos = datos.bloqueos.filter((b) => new Date(b.inicio) < sumarMin(dia, 24 * 60) && new Date(b.fin) > dia)
+    const bloqueos = datos.bloqueos.filter((b) => new Date(b.inicio) < sumarMin(dia, MINUTOS_DIA) && new Date(b.fin) > dia)
     return { citas, bloqueos }
   }, [datos, dia])
 
-  // ── Acciones (se aplican al momento y se pueden deshacer) ──
+  // #endregion
+
+  // #region Acciones (se aplican al momento y se pueden deshacer)
   const fijarEstadoLocal = (id, estado) =>
     setDatos((d) => d && { ...d, citas: d.citas.map((c) => (c.id === id ? { ...c, estado } : c)) })
 
-  async function cambiar(cita, estado, texto) {
+  const cambiar = async (cita, estado, texto) => {
     const anterior = cita.estado
     fijarEstadoLocal(cita.id, estado)
     const res = await cambiarEstado(cita.id, estado)
@@ -130,7 +147,7 @@ export default function AgendaPanel({ activa = true }) {
     })
   }
 
-  async function quitarBloqueo(b) {
+  const quitarBloqueo = async (b) => {
     const res = await borrarBloqueo(b.id)
     if (!res.ok) return avisar({ texto: 'No se pudo quitar.', tipo: 'error' })
     recargar()
@@ -143,7 +160,7 @@ export default function AgendaPanel({ activa = true }) {
     })
   }
 
-  async function onMovida(cita, inicioAnterior, finAnterior) {
+  const onMovida = async (cita, inicioAnterior, finAnterior) => {
     recargar()
     avisar({
       texto: `Cita de ${cita.cliente_nombre.split(' ')[0]} cambiada`,
@@ -157,7 +174,7 @@ export default function AgendaPanel({ activa = true }) {
   // Las flechas mueven una semana, o un mes en la vista mes (al día 1, o a
   // hoy si es el mes en curso).
   const mover = (signo) => {
-    if (vista !== 'mes') return setDia((d) => sumarMin(d, signo * 7 * 24 * 60))
+    if (vista !== VistaAgendaEnum.Mes) return setDia((d) => sumarMin(d, signo * 7 * MINUTOS_DIA))
     setDia((d) => {
       const primero = new Date(d.getFullYear(), d.getMonth() + signo, 1)
       return primero.getMonth() === ahora.getMonth() && primero.getFullYear() === ahora.getFullYear()
@@ -168,9 +185,11 @@ export default function AgendaPanel({ activa = true }) {
 
   const irA = (d) => {
     setDia(inicioDia(d))
-    setVista('dia')
+    setVista(VistaAgendaEnum.Dia)
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <>
       <CabeceraSeccion
@@ -181,14 +200,14 @@ export default function AgendaPanel({ activa = true }) {
         <div className="hidden gap-2 md:flex">
           <button
             type="button"
-            onClick={() => setModal({ tipo: 'bloquear' })}
+            onClick={() => setModal({ tipo: HojaAgendaEnum.Bloquear })}
             className="flex items-center gap-2 rounded-full border border-tinta/15 bg-white px-5 py-3 text-sm font-semibold transition-all hover:border-tinta hover:bg-tinta hover:text-hueso active:scale-[0.98]"
           >
             <Ban size={17} /> Día libre
           </button>
           <button
             type="button"
-            onClick={() => setModal({ tipo: 'cita' })}
+            onClick={() => setModal({ tipo: HojaAgendaEnum.Cita })}
             className="flex items-center gap-2 rounded-full bg-acento px-5 py-3 text-sm font-semibold text-tinta shadow-lg shadow-acento/25 transition-all hover:bg-acento-claro active:scale-[0.98]"
           >
             <Plus size={18} /> Nueva cita
@@ -196,7 +215,7 @@ export default function AgendaPanel({ activa = true }) {
         </div>
       </CabeceraSeccion>
 
-      {/* Resumen del día */}
+      {/* Resumen del día. */}
       {delDia ? (
         <Resumen citas={delDia.citas} precios={precios} />
       ) : (
@@ -207,23 +226,23 @@ export default function AgendaPanel({ activa = true }) {
         </div>
       )}
 
-      {/* La siguiente cita, bien a la vista (solo hoy) */}
+      {/* La siguiente cita, bien a la vista (solo hoy). */}
       {esHoy && delDia && <Siguiente citas={delDia.citas} ahora={ahora} precios={precios} onEstado={cambiar} />}
 
-      {/* Semana: navegación + tira de días */}
+      {/* Semana: navegación + tira de días. */}
       <div className="mb-6 rounded-3xl border border-hueso-200 bg-white p-3 shadow-sm sm:p-4">
         <div className="mb-3 flex items-center justify-between gap-2 px-1">
           <div className="flex items-center gap-1">
-            <BotonRedondo onClick={() => mover(-1)} etiqueta={vista === 'mes' ? 'Mes anterior' : 'Semana anterior'}>
+            <BotonRedondo onClick={() => mover(-1)} etiqueta={vista === VistaAgendaEnum.Mes ? 'Mes anterior' : 'Semana anterior'}>
               <ChevronLeft size={18} />
             </BotonRedondo>
-            <BotonRedondo onClick={() => mover(1)} etiqueta={vista === 'mes' ? 'Mes siguiente' : 'Semana siguiente'}>
+            <BotonRedondo onClick={() => mover(1)} etiqueta={vista === VistaAgendaEnum.Mes ? 'Mes siguiente' : 'Semana siguiente'}>
               <ChevronRight size={18} />
             </BotonRedondo>
             {/* Tocar la fecha abre el calendario del móvil para saltar a cualquier día. */}
             <label className="relative ml-0.5 flex cursor-pointer items-center gap-1 whitespace-nowrap rounded-full px-2 py-1.5 transition-colors hover:bg-tinta/5">
               <span className="font-display text-base font-bold sm:text-lg">
-                {vista === 'mes' ? (
+                {vista === VistaAgendaEnum.Mes ? (
                   <>
                     <span className="sm:hidden">{rotuloMes(dia, 'short')}</span>
                     <span className="hidden sm:inline">{rotuloMes(dia)}</span>
@@ -261,7 +280,7 @@ export default function AgendaPanel({ activa = true }) {
             )}
             <button
               type="button"
-              onClick={() => setModal({ tipo: 'buscar' })}
+              onClick={() => setModal({ tipo: HojaAgendaEnum.Buscar })}
               aria-label="Buscar cliente"
               className="flex h-9 items-center gap-1.5 rounded-full px-2.5 text-sm font-medium text-tinta/60 transition-colors hover:bg-tinta/5 hover:text-tinta"
             >
@@ -286,7 +305,7 @@ export default function AgendaPanel({ activa = true }) {
           horario={horario}
           onElegir={(d) => {
             setDia(d)
-            setVista('dia')
+            setVista(VistaAgendaEnum.Dia)
           }}
         />
 
@@ -299,7 +318,7 @@ export default function AgendaPanel({ activa = true }) {
         </div>
       </div>
 
-      {/* Contenido */}
+      {/* Contenido. */}
       {!delDia || !horario ? (
         <Esqueleto filas={4} alto="h-20" />
       ) : (
@@ -311,7 +330,7 @@ export default function AgendaPanel({ activa = true }) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: EASE_SUAVE }}
           >
-            {vista === 'mes' ? (
+            {vista === VistaAgendaEnum.Mes ? (
               <VistaMes
                 mes={dia}
                 dia={dia}
@@ -321,7 +340,7 @@ export default function AgendaPanel({ activa = true }) {
                 horario={horario}
                 onDia={irA}
               />
-            ) : vista === 'semana' ? (
+            ) : vista === VistaAgendaEnum.Semana ? (
               <VistaSemana
                 inicio={new Date(semana)}
                 citas={datos.citas}
@@ -339,9 +358,9 @@ export default function AgendaPanel({ activa = true }) {
                 bloqueos={delDia.bloqueos}
                 precios={precios}
                 onEstado={cambiar}
-                onMover={(cita) => setModal({ tipo: 'mover', cita })}
+                onMover={(cita) => setModal({ tipo: HojaAgendaEnum.Mover, cita })}
                 onQuitarBloqueo={quitarBloqueo}
-                onNuevaEn={(hora) => setModal({ tipo: 'cita', hora })}
+                onNuevaEn={(hora) => setModal({ tipo: HojaAgendaEnum.Cita, hora })}
               />
             )}
           </m.div>
@@ -352,13 +371,13 @@ export default function AgendaPanel({ activa = true }) {
           la vista: va en un portal y no se esconde con la pantalla. */}
       {activa && (
         <BotonFlotante
-          onCita={() => setModal({ tipo: 'cita' })}
-          onBloquear={() => setModal({ tipo: 'bloquear' })}
+          onCita={() => setModal({ tipo: HojaAgendaEnum.Cita })}
+          onBloquear={() => setModal({ tipo: HojaAgendaEnum.Bloquear })}
         />
       )}
 
       <AnimatePresence>
-        {modal?.tipo === 'cita' && (
+        {modal?.tipo === HojaAgendaEnum.Cita && (
           <NuevaCitaModal
             key="cita"
             fechaInicial={dia}
@@ -370,10 +389,10 @@ export default function AgendaPanel({ activa = true }) {
             }}
           />
         )}
-        {modal?.tipo === 'mover' && (
+        {modal?.tipo === HojaAgendaEnum.Mover && (
           <MoverCitaModal key="mover" cita={modal.cita} onClose={() => setModal(null)} onMovida={onMovida} />
         )}
-        {modal?.tipo === 'buscar' && (
+        {modal?.tipo === HojaAgendaEnum.Buscar && (
           <BuscarClienteModal
             key="buscar"
             onClose={() => setModal(null)}
@@ -383,7 +402,7 @@ export default function AgendaPanel({ activa = true }) {
             }}
           />
         )}
-        {modal?.tipo === 'bloquear' && (
+        {modal?.tipo === HojaAgendaEnum.Bloquear && (
           <BloquearModal
             key="bloquear"
             fechaInicial={dia}
@@ -397,24 +416,25 @@ export default function AgendaPanel({ activa = true }) {
       </AnimatePresence>
     </>
   )
+  // #endregion
 }
+// #endregion
 
-// ─── Utilidades ─────────────────────────────────────────────
-
+// #region Utilidades
 const capital = (t) => t.charAt(0).toUpperCase() + t.slice(1)
 
-function saludo(d) {
+const saludo = (d) => {
   const h = d.getHours()
   return h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches'
 }
 
 /** "Noviembre 2026" (o "Nov 2026" con `mes: 'short'`, para el móvil). */
-function rotuloMes(d, mes = 'long') {
+const rotuloMes = (d, mes = 'long') => {
   const nombre = new Intl.DateTimeFormat('es-ES', { month: mes }).format(d).replace('.', '')
   return `${capital(nombre)} ${d.getFullYear()}`
 }
 
-function rotuloSemana(inicio) {
+const rotuloSemana = (inicio) => {
   const fin = new Date(inicio)
   fin.setDate(inicio.getDate() + 6)
   const a = fechaCorta(inicio)
@@ -424,14 +444,14 @@ function rotuloSemana(inicio) {
 
 const minutos = (a, b) => Math.round((b - a) / 60000)
 
-function duracionTexto(min) {
+const duracionTexto = (min) => {
   if (min < 60) return `${min} min`
   const h = Math.floor(min / 60)
   const r = min % 60
   return r ? `${h} h ${r} min` : `${h} h`
 }
 
-function cuandoTexto(inicio, ahora) {
+const cuandoTexto = (inicio, ahora) => {
   const min = minutos(ahora, inicio)
   if (min <= 0) return 'Ahora'
   if (min < 60) return `En ${min} min`
@@ -439,7 +459,7 @@ function cuandoTexto(inicio, ahora) {
 }
 
 /** Tramos de trabajo del día menos citas y bloqueos = huecos libres. */
-function huecosLibres(dia, horario, ocupados, ahora) {
+const huecosLibres = (dia, horario, ocupados, ahora) => {
   const def = horario.find((h) => h.dia === dia.getDay())
   if (!def?.tramos?.length) return []
   const ocup = ocupados
@@ -453,22 +473,22 @@ function huecosLibres(dia, horario, ocupados, ahora) {
     desdeAhora.setMinutes(Math.ceil(ahora.getMinutes() / 15) * 15, 0, 0)
   }
 
-  const libres = []
+  const result = []
   for (const [a, b] of def.tramos) {
     let cursor = aHora(dia, a)
     const finTramo = aHora(dia, b)
     if (desdeAhora && desdeAhora > cursor) cursor = desdeAhora
     for (const o of ocup) {
       if (o.fin <= cursor || o.ini >= finTramo) continue
-      if (o.ini > cursor && minutos(cursor, o.ini) >= HUECO_MINIMO) libres.push({ inicio: cursor, fin: o.ini })
+      if (o.ini > cursor && minutos(cursor, o.ini) >= HUECO_MINIMO) result.push({ inicio: cursor, fin: o.ini })
       if (o.fin > cursor) cursor = o.fin
     }
-    if (minutos(cursor, finTramo) >= HUECO_MINIMO) libres.push({ inicio: cursor, fin: finTramo })
+    if (minutos(cursor, finTramo) >= HUECO_MINIMO) result.push({ inicio: cursor, fin: finTramo })
   }
-  return libres
+  return result
 }
 
-function BotonRedondo({ onClick, etiqueta, children }) {
+const BotonRedondo = ({ onClick, etiqueta, children }) => {
   return (
     <button
       type="button"
@@ -480,12 +500,12 @@ function BotonRedondo({ onClick, etiqueta, children }) {
     </button>
   )
 }
+// #endregion
 
-// ─── Resumen ────────────────────────────────────────────────
-
-function Resumen({ citas, precios }) {
-  const activas = citas.filter((c) => c.estado !== 'cancelada')
-  const atendidas = activas.filter((c) => c.estado === 'atendida').length
+// #region Resumen
+const Resumen = ({ citas, precios }) => {
+  const activas = citas.filter((c) => c.estado !== EstadoCitaEnum.Cancelada)
+  const atendidas = activas.filter((c) => c.estado === EstadoCitaEnum.Atendida).length
   const pendientes = activas.length - atendidas
   const caja = activas.reduce((t, c) => t + (precios.get(c.servicio_nombre) ?? 0), 0)
   const hecho = activas.length ? atendidas / activas.length : 0
@@ -531,12 +551,12 @@ function Resumen({ citas, precios }) {
 }
 
 const formatoEuros = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ','))
+// #endregion
 
-// ─── Siguiente cita ─────────────────────────────────────────
-
-function Siguiente({ citas, ahora, precios, onEstado }) {
+// #region Siguiente cita
+const Siguiente = ({ citas, ahora, precios, onEstado }) => {
   const siguiente = citas
-    .filter((c) => c.estado === 'pendiente' && new Date(c.fin) > ahora)
+    .filter((c) => c.estado === EstadoCitaEnum.Pendiente && new Date(c.fin) > ahora)
     .sort((a, b) => new Date(a.inicio) - new Date(b.inicio))[0]
 
   if (!siguiente) return null
@@ -603,7 +623,7 @@ function Siguiente({ citas, ahora, precios, onEstado }) {
           )}
           <button
             type="button"
-            onClick={() => onEstado(siguiente, 'atendida', `${siguiente.cliente_nombre.split(' ')[0]}, atendido`)}
+            onClick={() => onEstado(siguiente, EstadoCitaEnum.Atendida, `${siguiente.cliente_nombre.split(' ')[0]}, atendido`)}
             className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-acento px-6 font-semibold text-tinta transition-all hover:bg-acento-claro active:scale-[0.97] sm:flex-none"
           >
             <Check size={18} /> Atendido
@@ -613,20 +633,20 @@ function Siguiente({ citas, ahora, precios, onEstado }) {
     </m.section>
   )
 }
+// #endregion
 
-// ─── Tira de días ───────────────────────────────────────────
-
-function TiraDias({ inicio, dia, ahora, citas, horario, onElegir }) {
+// #region Tira de días
+const TiraDias = ({ inicio, dia, ahora, citas, horario, onElegir }) => {
   const dias = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(inicio)
-    d.setDate(inicio.getDate() + i)
-    return d
+    const result = new Date(inicio)
+    result.setDate(inicio.getDate() + i)
+    return result
   })
 
   return (
     <div className="grid grid-cols-7 gap-1 sm:gap-2">
       {dias.map((d) => {
-        const n = citas.filter((c) => c.estado !== 'cancelada' && mismoDia(new Date(c.inicio), d)).length
+        const n = citas.filter((c) => c.estado !== EstadoCitaEnum.Cancelada && mismoDia(new Date(c.inicio), d)).length
         const elegido = mismoDia(d, dia)
         const hoy = mismoDia(d, ahora)
         const cerrado = horario && !horario.find((h) => h.dia === d.getDay())?.tramos?.length
@@ -650,7 +670,7 @@ function TiraDias({ inicio, dia, ahora, citas, horario, onElegir }) {
               {diaSemana}
             </span>
             <span className="font-display text-lg font-bold leading-none sm:text-xl">{num}</span>
-            {/* Un puntito por cita (máx. 4) */}
+            {/* Un puntito por cita (máx. 4). */}
             <span className="flex h-1.5 items-center gap-0.5">
               {Array.from({ length: Math.min(n, 4) }, (_, i) => (
                 <span key={i} className={`h-1 w-1 rounded-full ${elegido ? 'bg-acento' : 'bg-acento-oscuro'}`} />
@@ -662,13 +682,13 @@ function TiraDias({ inicio, dia, ahora, citas, horario, onElegir }) {
     </div>
   )
 }
+// #endregion
 
-// ─── Vista DÍA ──────────────────────────────────────────────
-
-function VistaDia({ dia, ahora, horario, citas, bloqueos, precios, onEstado, onMover, onQuitarBloqueo, onNuevaEn }) {
+// #region Vista día
+const VistaDia = ({ dia, ahora, horario, citas, bloqueos, precios, onEstado, onMover, onQuitarBloqueo, onNuevaEn }) => {
   const [verCanceladas, setVerCanceladas] = useState(false)
-  const activas = citas.filter((c) => c.estado !== 'cancelada')
-  const canceladas = citas.filter((c) => c.estado === 'cancelada')
+  const activas = citas.filter((c) => c.estado !== EstadoCitaEnum.Cancelada)
+  const canceladas = citas.filter((c) => c.estado === EstadoCitaEnum.Cancelada)
   const abierto = !!horario.find((h) => h.dia === dia.getDay())?.tramos?.length
   const pasado = inicioDia(dia) < inicioDia(ahora)
 
@@ -710,7 +730,7 @@ function VistaDia({ dia, ahora, horario, citas, bloqueos, precios, onEstado, onM
   return (
     <>
       <ol className="relative space-y-3">
-        {/* Hilo vertical de la línea de tiempo */}
+        {/* Hilo vertical de la línea de tiempo. */}
         <span aria-hidden="true" className="absolute bottom-3 left-[4.25rem] top-3 hidden w-px bg-hueso-200 sm:block" />
 
         {elementos.map((e, i) => (
@@ -734,7 +754,7 @@ function VistaDia({ dia, ahora, horario, citas, bloqueos, precios, onEstado, onM
                   ? 'border-2 border-tinta/20 bg-hueso'
                   : e.tipo === 'bloqueo'
                     ? 'bg-tinta/30'
-                    : e.dato.estado === 'atendida'
+                    : e.dato.estado === EstadoCitaEnum.Atendida
                       ? 'bg-green-500'
                       : 'bg-acento'
               }`}
@@ -773,7 +793,7 @@ function VistaDia({ dia, ahora, horario, citas, bloqueos, precios, onEstado, onM
                     </span>
                     <button
                       type="button"
-                      onClick={() => onEstado(c, 'pendiente', 'Cita recuperada')}
+                      onClick={() => onEstado(c, EstadoCitaEnum.Pendiente, 'Cita recuperada')}
                       className="flex shrink-0 items-center gap-1 text-xs font-semibold text-acento-oscuro hover:underline"
                     >
                       <RotateCcw size={13} /> Recuperar
@@ -789,10 +809,10 @@ function VistaDia({ dia, ahora, horario, citas, bloqueos, precios, onEstado, onM
   )
 }
 
-function CitaCard({ cita, ahora, precios, onEstado, onMover }) {
+const CitaCard = ({ cita, ahora, precios, onEstado, onMover }) => {
   const ini = new Date(cita.inicio)
   const fin = new Date(cita.fin)
-  const atendida = cita.estado === 'atendida'
+  const atendida = cita.estado === EstadoCitaEnum.Atendida
   const enCurso = !atendida && ini <= ahora && ahora < fin
   const movil = (cita.cliente_movil || '').replace(/\s+/g, '')
   const precio = precios.get(cita.servicio_nombre)
@@ -811,7 +831,7 @@ function CitaCard({ cita, ahora, precios, onEstado, onMover }) {
           </p>
           <p className={`flex items-center gap-2 font-display text-lg font-bold sm:text-xl ${atendida ? 'text-tinta/55' : ''}`}>
             <span className="truncate">{cita.cliente_nombre}</span>
-            {/* Reservada por el cliente desde la web (no metida a mano) */}
+            {/* Reservada por el cliente desde la web (no metida a mano). */}
             {cita.origen === 'web' && (
               <span title="Reservada desde la web" className="shrink-0 rounded-full bg-tinta px-2 py-0.5 font-body text-[0.6rem] font-semibold uppercase tracking-wider text-acento">
                 Web
@@ -872,7 +892,7 @@ function CitaCard({ cita, ahora, precios, onEstado, onMover }) {
           {atendida ? (
             <button
               type="button"
-              onClick={() => onEstado(cita, 'pendiente', 'Vuelve a pendiente')}
+              onClick={() => onEstado(cita, EstadoCitaEnum.Pendiente, 'Vuelve a pendiente')}
               className="flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-tinta/55 transition-colors hover:bg-tinta/5 hover:text-tinta"
             >
               <RotateCcw size={15} /> Deshacer
@@ -891,7 +911,7 @@ function CitaCard({ cita, ahora, precios, onEstado, onMover }) {
               </button>
               <button
                 type="button"
-                onClick={() => onEstado(cita, 'cancelada', `Cita de ${nombre} cancelada`)}
+                onClick={() => onEstado(cita, EstadoCitaEnum.Cancelada, `Cita de ${nombre} cancelada`)}
                 aria-label={`Cancelar la cita de ${nombre}`}
                 title="Cancelar cita"
                 className="flex h-10 w-10 items-center justify-center rounded-full text-tinta/35 transition-colors hover:bg-red-50 hover:text-red-600"
@@ -900,7 +920,7 @@ function CitaCard({ cita, ahora, precios, onEstado, onMover }) {
               </button>
               <button
                 type="button"
-                onClick={() => onEstado(cita, 'atendida', `${nombre}, atendido`)}
+                onClick={() => onEstado(cita, EstadoCitaEnum.Atendida, `${nombre}, atendido`)}
                 className="flex h-10 items-center gap-1.5 rounded-full bg-green-600 px-4 text-sm font-semibold text-white shadow-sm shadow-green-600/25 transition-all hover:bg-green-700 active:scale-[0.97]"
               >
                 <Check size={16} /> Atendido
@@ -913,10 +933,10 @@ function CitaCard({ cita, ahora, precios, onEstado, onMover }) {
   )
 }
 
-function BloqueoCard({ bloqueo, onQuitar }) {
+const BloqueoCard = ({ bloqueo, onQuitar }) => {
   const ini = new Date(bloqueo.inicio)
   const fin = new Date(bloqueo.fin)
-  const diaEntero = minutos(ini, fin) >= 24 * 60 - 1
+  const diaEntero = minutos(ini, fin) >= MINUTOS_DIA - 1
   return (
     <div className="flex items-center justify-between gap-3 rounded-2xl border border-tinta/10 bg-[repeating-linear-gradient(135deg,transparent,transparent_8px,rgb(22_32_42/0.04)_8px,rgb(22_32_42/0.04)_16px)] px-4 py-4 sm:px-5">
       <div className="flex min-w-0 items-center gap-3">
@@ -939,7 +959,7 @@ function BloqueoCard({ bloqueo, onQuitar }) {
   )
 }
 
-function HuecoLibre({ hueco, onNueva }) {
+const HuecoLibre = ({ hueco, onNueva }) => {
   return (
     <button
       type="button"
@@ -956,15 +976,15 @@ function HuecoLibre({ hueco, onNueva }) {
     </button>
   )
 }
+// #endregion
 
-// ─── Vista SEMANA ───────────────────────────────────────────
-
-function VistaSemana({ inicio, citas, bloqueos, horario, ahora, onDia }) {
-  const activas = citas.filter((c) => c.estado !== 'cancelada')
+// #region Vista semana
+const VistaSemana = ({ inicio, citas, bloqueos, horario, ahora, onDia }) => {
+  const activas = citas.filter((c) => c.estado !== EstadoCitaEnum.Cancelada)
   const dias = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(inicio)
-    d.setDate(inicio.getDate() + i)
-    return d
+    const result = new Date(inicio)
+    result.setDate(inicio.getDate() + i)
+    return result
   })
 
   return (
@@ -973,7 +993,7 @@ function VistaSemana({ inicio, citas, bloqueos, horario, ahora, onDia }) {
         const delDia = activas
           .filter((c) => mismoDia(new Date(c.inicio), d))
           .sort((a, b) => new Date(a.inicio) - new Date(b.inicio))
-        const bloqueado = bloqueos.some((b) => new Date(b.inicio) < sumarMin(d, 24 * 60) && new Date(b.fin) > d)
+        const bloqueado = bloqueos.some((b) => new Date(b.inicio) < sumarMin(d, MINUTOS_DIA) && new Date(b.fin) > d)
         const cerrado = !horario.find((h) => h.dia === d.getDay())?.tramos?.length
         const { diaSemana, dia: num } = fechaCorta(d)
         const hoy = mismoDia(d, ahora)
@@ -1005,7 +1025,7 @@ function VistaSemana({ inicio, citas, bloqueos, horario, ahora, onDia }) {
                 <span
                   key={c.id}
                   className={`truncate rounded-lg px-2 py-1 text-xs font-medium ${
-                    c.estado === 'atendida' ? 'bg-green-100 text-green-800' : 'bg-acento/15 text-tinta'
+                    c.estado === EstadoCitaEnum.Atendida ? 'bg-green-100 text-green-800' : 'bg-acento/15 text-tinta'
                   }`}
                 >
                   <span className="tabular-nums">{fmtHora(new Date(c.inicio))}</span> {c.cliente_nombre.split(' ')[0]}
@@ -1018,10 +1038,10 @@ function VistaSemana({ inicio, citas, bloqueos, horario, ahora, onDia }) {
     </div>
   )
 }
+// #endregion
 
-// ─── Botón flotante (móvil) ─────────────────────────────────
-
-function BotonFlotante({ onCita, onBloquear }) {
+// #region Botón flotante (móvil)
+const BotonFlotante = ({ onCita, onBloquear }) => {
   const [abierto, setAbierto] = useState(false)
   const opciones = [
     { texto: 'Día libre', Icono: Ban, accion: onBloquear },
@@ -1081,3 +1101,6 @@ function BotonFlotante({ onCita, onBloquear }) {
     document.body
   )
 }
+// #endregion
+
+export default AgendaPanel

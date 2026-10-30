@@ -1,3 +1,4 @@
+// #region Imports
 import { useState, useEffect } from 'react'
 import { Repeat } from 'lucide-react'
 import Hoja from './Hoja'
@@ -9,17 +10,18 @@ import { hora as fmtHora, fechaCorta, aInputDate } from '../../../utils/fechas'
 import { listarBloqueos, crearCitaManual } from '../../../lib/panel'
 import { getHorario, getServicios } from '../../../lib/config'
 import { ICONOS } from '../../../theme/icons'
+// #endregion
 
 const SEMANAS_MIN = 2
 const SEMANAS_MAX = 12
 const DIAS_SEMANA = ['domingos', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábados']
 
 /** La misma hora `n` semanas seguidas (con setDate, para no liarla con el cambio de hora). */
-function semanasDesde(inicio, n) {
+const semanasDesde = (inicio, n) => {
   return Array.from({ length: n }, (_, i) => {
-    const d = new Date(inicio)
-    d.setDate(inicio.getDate() + i * 7)
-    return d
+    const result = new Date(inicio)
+    result.setDate(inicio.getDate() + i * 7)
+    return result
   })
 }
 
@@ -41,7 +43,8 @@ const diaYMes = (d) => {
  * Props: fechaInicial (Date), horaInicial ("HH:MM", opcional: viene de pulsar
  * un hueco libre), onClose, onCreada(texto del aviso).
  */
-export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onCreada }) {
+const NuevaCitaModal = ({ fechaInicial, horaInicial, onClose, onCreada }) => {
+  // #region Declaraciones, variables y hooks
   const [servicios, setServicios] = useState([])
   const [servicioId, setServicioId] = useState('')
   const [fechaStr, setFechaStr] = useState(aInputDate(fechaInicial || new Date()))
@@ -60,13 +63,15 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
   // Carga horario y servicios una vez (para citas manuales se ofrecen los activos).
   useEffect(() => {
     let vivo = true
-    Promise.all([getHorario(), getServicios()]).then(([h, ss]) => {
+    const cargar = async () => {
+      const [h, ss] = await Promise.all([getHorario(), getServicios()])
       if (!vivo) return
       const activos = ss.filter((s) => s.activo !== false)
       setHorario(h)
       setServicios(activos)
       setServicioId(activos[0]?.id ?? '')
-    })
+    }
+    cargar()
     return () => {
       vivo = false
     }
@@ -77,13 +82,15 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
     const svc = servicios.find((s) => String(s.id) === String(servicioId))
     if (!svc || !horario) return
     let vivo = true
-    huecosDelDia({ fecha: new Date(`${fechaStr}T00:00:00`), duracion: svc.duracion, horario }).then((libres) => {
+    const cargar = async () => {
+      const libres = await huecosDelDia({ fecha: new Date(`${fechaStr}T00:00:00`), duracion: svc.duracion, horario })
       if (!vivo) return
       setRejilla(libres)
       // Si se vino desde un hueco libre, esa hora sale ya marcada.
       const preferida = horaInicial && libres.find((s) => fmtHora(s.inicio) === horaInicial)
       setHoraISO(preferida ? preferida.inicio.toISOString() : '')
-    })
+    }
+    cargar()
     return () => {
       vivo = false
     }
@@ -96,7 +103,7 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
 
   const fechas = horaISO ? semanasDesde(new Date(horaISO), repetir ? semanas : 1) : []
 
-  async function onGuardar(e) {
+  const onGuardar = async (e) => {
     e?.preventDefault()
     if (guardando) return
     if (!servicio) return setError('Elige un servicio.')
@@ -145,7 +152,9 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
     onCreada(texto)
     onClose()
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <Hoja
       titulo="Nueva cita"
@@ -230,7 +239,7 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
           </Campo>
         </div>
 
-        {/* Fijos semanales */}
+        {/* Fijos semanales. */}
         <div className="rounded-2xl bg-white p-4 ring-1 ring-hueso-200">
           <div className="flex items-center gap-3">
             <Repeat size={18} className="shrink-0 text-acento-oscuro" />
@@ -269,4 +278,7 @@ export default function NuevaCitaModal({ fechaInicial, horaInicial, onClose, onC
       </form>
     </Hoja>
   )
+  // #endregion
 }
+
+export default NuevaCitaModal

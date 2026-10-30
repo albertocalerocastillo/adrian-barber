@@ -1,3 +1,4 @@
+// #region Imports
 import { useRef } from 'react'
 import {
   m,
@@ -11,6 +12,7 @@ import {
   useVelocity,
   wrap,
 } from 'motion/react'
+// #endregion
 
 const COPIAS = 4
 const MUELLE_VELOCIDAD = { damping: 50, stiffness: 400 }
@@ -25,7 +27,8 @@ const INCLINACION_MAX = 3
  * Props:
  *  - velocidad: % del ancho de UNA copia que avanza por segundo.
  */
-export default function MarqueeComponent({ children, velocidad = 3, className = '' }) {
+const MarqueeComponent = ({ children, velocidad = 3, className = '' }) => {
+  // #region Declaraciones, variables y hooks
   const ref = useRef(null)
   const enPantalla = useInView(ref)
   const reducir = useReducedMotion()
@@ -46,7 +49,9 @@ export default function MarqueeComponent({ children, velocidad = 3, className = 
     const base = (-velocidad / COPIAS) * sentido.current * (delta / 1000)
     desplazamiento.set(desplazamiento.get() + base + base * Math.abs(f))
   })
+  // #endregion
 
+  // #region Renderizado
   return (
     <div ref={ref} className="overflow-hidden">
       <m.div className={`flex w-max ${className}`} style={{ x, skewX }}>
@@ -58,4 +63,7 @@ export default function MarqueeComponent({ children, velocidad = 3, className = 
       </m.div>
     </div>
   )
+  // #endregion
 }
+
+export default MarqueeComponent

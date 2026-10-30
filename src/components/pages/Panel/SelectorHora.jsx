@@ -1,11 +1,14 @@
+// #region Imports
 import { Loader2, CalendarX } from 'lucide-react'
 import { hora as fmtHora } from '../../../utils/fechas'
+// #endregion
 
 /**
  * Rejilla de horas libres, partida en mañana y tarde para encontrar la hora
  * antes. `rejilla` null = cargando. `valor` es el ISO de la hora elegida.
  */
-export default function SelectorHora({ rejilla, valor, onCambio }) {
+const SelectorHora = ({ rejilla, valor, onCambio }) => {
+  // #region Declaraciones, variables y hooks
   if (rejilla === null) {
     return (
       <p className="flex items-center gap-2 py-3 text-sm text-tinta/50">
@@ -26,7 +29,9 @@ export default function SelectorHora({ rejilla, valor, onCambio }) {
     ['Mañana', rejilla.filter((s) => s.inicio.getHours() < 14)],
     ['Tarde', rejilla.filter((s) => s.inicio.getHours() >= 14)],
   ]
+  // #endregion
 
+  // #region Renderizado
   return (
     <div className="space-y-3">
       {grupos.map(
@@ -58,4 +63,7 @@ export default function SelectorHora({ rejilla, valor, onCambio }) {
       )}
     </div>
   )
+  // #endregion
 }
+
+export default SelectorHora

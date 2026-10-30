@@ -13,11 +13,11 @@ const easeOutCubic = (p) => 1 - Math.pow(1 - p, 3)
  *
  *  - decimales: cifras decimales a mostrar (con coma, como en España).
  */
-export function useCountUp(objetivo, decimales = 0) {
-  const ref = useRef(null)
+export const useCountUp = (objetivo, decimales = 0) => {
+  const result = useRef(null)
 
   useEffect(() => {
-    const el = ref.current
+    const el = result.current
     if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const formato = (v) => v.toFixed(decimales).replace('.', ',')
@@ -45,5 +45,5 @@ export function useCountUp(objetivo, decimales = 0) {
     }
   }, [objetivo, decimales])
 
-  return ref
+  return result
 }

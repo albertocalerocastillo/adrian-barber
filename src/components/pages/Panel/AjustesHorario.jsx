@@ -1,3 +1,4 @@
+// #region Imports
 import { useState, useEffect } from 'react'
 import { AnimatePresence, m } from 'motion/react'
 import { Plus, X, Copy, Info } from 'lucide-react'
@@ -5,6 +6,7 @@ import { useAviso } from './avisoContexto'
 import { CabeceraSeccion, Interruptor, BarraGuardar, Esqueleto } from './Controles'
 import { getHorario, guardarHorario } from '../../../lib/config'
 import { EASE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 const copia = (dias) => dias.map((d) => ({ ...d, tramos: d.tramos.map((t) => [...t]) }))
 
@@ -13,7 +15,8 @@ const copia = (dias) => dias.map((d) => ({ ...d, tramos: d.tramos.map((t) => [..
  * (vacaciones, médico) van con "Día libre" en la agenda. Al guardar, la web
  * recalcula los huecos y el "Abierto ahora" con este horario.
  */
-export default function AjustesHorario({ activa = true }) {
+const AjustesHorario = ({ activa = true }) => {
+  // #region Declaraciones, variables y hooks
   const avisar = useAviso()
   const [dias, setDias] = useState(null)
   const [original, setOriginal] = useState(null)
@@ -21,11 +24,13 @@ export default function AjustesHorario({ activa = true }) {
 
   useEffect(() => {
     let vivo = true
-    getHorario().then((h) => {
+    const cargar = async () => {
+      const h = await getHorario()
       if (!vivo) return
       setDias(copia(h))
       setOriginal(copia(h))
-    })
+    }
+    cargar()
     return () => {
       vivo = false
     }
@@ -59,7 +64,7 @@ export default function AjustesHorario({ activa = true }) {
     avisar({ texto: `Horario del ${origen.nombre.toLowerCase()} copiado a los días abiertos. Falta guardar.` })
   }
 
-  async function onGuardar() {
+  const onGuardar = async () => {
     if (guardando || !dias) return
     if (tramoMalo) {
       avisar({ texto: 'Hay un tramo que acaba antes de empezar. Revísalo.', tipo: 'error' })
@@ -75,7 +80,9 @@ export default function AjustesHorario({ activa = true }) {
       avisar({ texto: res.error || 'No se pudo guardar.', tipo: 'error' })
     }
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <>
       <CabeceraSeccion
@@ -188,4 +195,7 @@ export default function AjustesHorario({ activa = true }) {
       />
     </>
   )
+  // #endregion
 }
+
+export default AjustesHorario

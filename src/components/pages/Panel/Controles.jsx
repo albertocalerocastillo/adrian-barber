@@ -1,8 +1,10 @@
+// #region Imports
 import { createPortal } from 'react-dom'
 import { AnimatePresence, m } from 'motion/react'
 import { Loader2, Minus, Plus, Save, RotateCcw } from 'lucide-react'
 import { EASE_SUAVE } from '../../../theme/animacion'
 import { inicioDia, aInputDate } from '../../../utils/fechas'
+// #endregion
 
 /*
  * Piezas pequeñas que comparten las pantallas del panel, para que todo se
@@ -10,7 +12,7 @@ import { inicioDia, aInputDate } from '../../../utils/fechas'
  */
 
 /** Interruptor sí/no (más claro con el dedo que una casilla). */
-export function Interruptor({ activo, onCambio, etiqueta }) {
+export const Interruptor = ({ activo, onCambio, etiqueta }) => {
   return (
     <button
       type="button"
@@ -32,7 +34,7 @@ export function Interruptor({ activo, onCambio, etiqueta }) {
 }
 
 /** Número con botones − / + (duración, precio). Grande para el dedo. */
-export function Contador({ valor, onCambio, paso = 1, min = 0, sufijo, etiqueta }) {
+export const Contador = ({ valor, onCambio, paso = 1, min = 0, sufijo, etiqueta }) => {
   const fijar = (v) => onCambio(Math.max(min, Math.round(v * 100) / 100))
   return (
     <div className="flex items-center rounded-xl border border-hueso-200 bg-white">
@@ -70,7 +72,7 @@ export function Contador({ valor, onCambio, paso = 1, min = 0, sufijo, etiqueta 
 }
 
 /** Fila de opciones donde se elige una (Día / Semana, Todo el día / Unas horas). */
-export function Segmentado({ opciones, valor, onCambio, oscuro = false }) {
+export const Segmentado = ({ opciones, valor, onCambio, oscuro = false }) => {
   return (
     <div className={`inline-flex rounded-full p-1 ${oscuro ? 'bg-white/10' : 'bg-tinta/5'}`}>
       {opciones.map((o) => {
@@ -98,7 +100,7 @@ export function Segmentado({ opciones, valor, onCambio, oscuro = false }) {
 }
 
 /** Etiqueta + campo, con el mismo aspecto en todos los formularios. */
-export function Campo({ etiqueta, ayuda, children }) {
+export const Campo = ({ etiqueta, ayuda, children }) => {
   return (
     <div>
       <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-tinta/50">{etiqueta}</p>
@@ -112,7 +114,7 @@ export const claseInput =
   'w-full rounded-xl border border-hueso-200 bg-white px-4 py-3 text-base text-tinta outline-none transition-colors placeholder:text-tinta/30 focus:border-acento focus:ring-4 focus:ring-acento/15'
 
 /** Botón principal dorado (guardar, entrar). */
-export function BotonPrincipal({ children, cargando, className = '', ...resto }) {
+export const BotonPrincipal = ({ children, cargando, className = '', ...resto }) => {
   return (
     <button
       {...resto}
@@ -130,7 +132,7 @@ export function BotonPrincipal({ children, cargando, className = '', ...resto })
  * para que no se olvide (y no estorbe cuando no hace falta). En un portal,
  * como la Hoja, para quedar por encima de todo.
  */
-export function BarraGuardar({ visible, guardando, onGuardar, onDescartar, texto = 'Tienes cambios sin guardar' }) {
+export const BarraGuardar = ({ visible, guardando, onGuardar, onDescartar, texto = 'Tienes cambios sin guardar' }) => {
   return createPortal(
     <AnimatePresence>
       {visible && (
@@ -163,7 +165,7 @@ export function BarraGuardar({ visible, guardando, onGuardar, onDescartar, texto
 }
 
 /** Título de cada pantalla con su línea de ayuda y, a la derecha, acciones. */
-export function CabeceraSeccion({ kicker, titulo, ayuda, children }) {
+export const CabeceraSeccion = ({ kicker, titulo, ayuda, children }) => {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:mb-8 md:flex-row md:items-end md:justify-between">
       <div className="min-w-0">
@@ -177,7 +179,7 @@ export function CabeceraSeccion({ kicker, titulo, ayuda, children }) {
 }
 
 /** Estado de "cargando" con esqueletos, mejor que un simple spinner. */
-export function Esqueleto({ filas = 3, alto = 'h-24' }) {
+export const Esqueleto = ({ filas = 3, alto = 'h-24' }) => {
   return (
     <div className="space-y-3" aria-label="Cargando">
       {Array.from({ length: filas }, (_, i) => (
@@ -188,7 +190,7 @@ export function Esqueleto({ filas = 3, alto = 'h-24' }) {
 }
 
 /** Atajos de fecha (Hoy, Mañana, Pasado) para no tener que abrir el calendario. */
-export function AtajosFecha({ valor, onCambio }) {
+export const AtajosFecha = ({ valor, onCambio }) => {
   const hoy = inicioDia(new Date())
   const atajos = ['Hoy', 'Mañana', 'Pasado'].map((texto, i) => {
     const d = new Date(hoy)

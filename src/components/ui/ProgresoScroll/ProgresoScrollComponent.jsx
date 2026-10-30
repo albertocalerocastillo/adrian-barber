@@ -1,13 +1,18 @@
+// #region Imports
 import { m, useScroll, useSpring } from 'motion/react'
 import { MUELLE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 /**
  * Hilo dorado arriba del todo que se llena según se baja por la página.
  */
-export default function ProgresoScrollComponent() {
+const ProgresoScrollComponent = () => {
+  // #region Declaraciones, variables y hooks
   const { scrollYProgress } = useScroll()
   const scaleX = useSpring(scrollYProgress, MUELLE_SUAVE)
+  // #endregion
 
+  // #region Renderizado
   return (
     <m.div
       aria-hidden="true"
@@ -15,4 +20,7 @@ export default function ProgresoScrollComponent() {
       style={{ scaleX }}
     />
   )
+  // #endregion
 }
+
+export default ProgresoScrollComponent

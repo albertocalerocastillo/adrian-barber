@@ -9,6 +9,7 @@
  *   base de datos real ni datos de clientes.
  */
 import { SERVICIOS } from '../src/data/servicios'
+import { EstadoCitaEnum } from '../src/enums/EstadoCitaEnum'
 
 const hoy = new Date()
 hoy.setHours(0, 0, 0, 0)
@@ -27,7 +28,7 @@ const mas = (iso, min) => new Date(new Date(iso).getTime() + min * 60000).toISOS
 let ultimoId = 1000
 const nuevoId = () => ++ultimoId
 
-const cita = (dias, hhmm, servicio, nombre, movil, estado = 'pendiente') => {
+const cita = (dias, hhmm, servicio, nombre, movil, estado = EstadoCitaEnum.Pendiente) => {
   const s = SERVICIOS.find((x) => x.nombre === servicio)
   const inicio = el(dias, hhmm)
   return {
@@ -61,13 +62,13 @@ const tablas = {
     { id: i * 2 + 2, dia_semana: dia, hora_inicio: '14:30:00', hora_fin: '22:00:00' },
   ]),
   citas: [
-    cita(0, '10:00', 'Corte', 'Julián Vázquez', '600111222', 'atendida'),
-    cita(0, '10:30', 'Corte', 'Manuel Ortega', '600333444', 'atendida'),
+    cita(0, '10:00', 'Corte', 'Julián Vázquez', '600111222', EstadoCitaEnum.Atendida),
+    cita(0, '10:30', 'Corte', 'Manuel Ortega', '600333444', EstadoCitaEnum.Atendida),
     cita(0, '11:30', 'Mechas + Corte', 'Álvaro Romero', '611222333'),
     cita(0, '17:00', 'Corte', 'Sergio Domínguez', '622333444'),
     cita(0, '17:30', 'Tinte blanco + Corte', 'Rafael Moreno', ''),
     cita(0, '19:00', 'Corte', 'Pablo Jiménez', '633444555'),
-    cita(0, '12:00', 'Corte', 'Luis Navarro', '644555666', 'cancelada'),
+    cita(0, '12:00', 'Corte', 'Luis Navarro', '644555666', EstadoCitaEnum.Cancelada),
     cita(1, '10:30', 'Corte', 'Iván Castillo', '655666777'),
     cita(1, '18:00', 'Corte', 'David Ruiz', '666777888'),
     cita(2, '11:00', 'Mechas + Corte', 'Javier Molina', '677888999'),
@@ -75,8 +76,8 @@ const tablas = {
     cita(2, '20:00', 'Corte', 'Raúl Serrano', ''),
     cita(3, '10:00', 'Corte', 'Carlos Pérez', '699000111'),
     cita(4, '17:00', 'Tinte blanco + Corte', 'Fernando Ramos', '600222333'),
-    cita(-1, '18:30', 'Corte', 'Miguel Torres', '600444555', 'atendida'),
-    // Primeras reservas de la web en enero de 2027 (para ver la reserva online)
+    cita(-1, '18:30', 'Corte', 'Miguel Torres', '600444555', EstadoCitaEnum.Atendida),
+    // Primeras reservas de la web en enero de 2027 (para ver la reserva online).
     ...['10:00', '10:30', '11:00', '12:00', '17:00', '18:30'].map((h, i) =>
       ({ ...cita(diasHasta(2027, 0, 4), h, 'Corte', `Cliente web ${i + 1}`, `61000000${i}`), origen: 'web' })
     ),
@@ -84,7 +85,7 @@ const tablas = {
   ],
   bloqueos: [
     { id: nuevoId(), inicio: el(3, '16:00'), fin: el(3, '22:00'), motivo: 'Médico', todo_el_dia: false },
-    // Reyes: cerrado todo el día
+    // Reyes: cerrado todo el día.
     { id: nuevoId(), inicio: el(diasHasta(2027, 0, 6), '00:00'), fin: el(diasHasta(2027, 0, 7), '00:00'), motivo: 'Reyes', todo_el_dia: true },
   ],
 }
@@ -93,7 +94,7 @@ const tablas = {
 window.__demoTablas = tablas
 
 // ─── Constructor de consultas mínimo (lo que usa la app) ───────────────────
-function consulta(nombre) {
+const consulta = (nombre) => {
   const filtros = []
   const ordenes = []
   let modo = 'select'
@@ -115,7 +116,7 @@ function consulta(nombre) {
     or(expr) {
       const conds = expr.split(',').map((e) => {
         const [c, , patron] = e.split('.')
-        // ilike de Postgres no ignora tildes, así que aquí tampoco.
+        // El ilike de Postgres no ignora tildes, así que aquí tampoco.
         const t = patron.replaceAll('%', '').toLowerCase()
         return (r) => String(r[c] ?? '').toLowerCase().includes(t)
       })
@@ -123,18 +124,20 @@ function consulta(nombre) {
       return q
     },
     limit(n) { limite = n; return q },
+    // Imita al cliente de Supabase, que se puede esperar con await: para eso hace falta then().
+    // eslint-disable-next-line no-restricted-syntax
     then(ok, mal) { return Promise.resolve(ejecutar()).then(ok, mal) },
   }
 
   const pasa = (r) => filtros.every((f) => f(r))
 
-  function ejecutar() {
+  const ejecutar = () => {
     const tabla = tablas[nombre] ?? (tablas[nombre] = [])
 
     if (modo === 'insert') {
       if (nombre === 'citas') {
         const choca = carga.some((n) =>
-          tabla.some((c) => c.estado !== 'cancelada' && n.inicio < c.fin && c.inicio < n.fin)
+          tabla.some((c) => c.estado !== EstadoCitaEnum.Cancelada && n.inicio < c.fin && c.inicio < n.fin)
         )
         if (choca) return { data: null, error: { code: '23P01', message: 'overlap' } }
       }
@@ -180,7 +183,7 @@ export const supabase = {
     if (nombre === 'es_barbero') return { data: true, error: null }
     if (nombre !== 'citas_ocupadas') return { data: [], error: null }
     const ocupados = [
-      ...tablas.citas.filter((c) => c.estado !== 'cancelada'),
+      ...tablas.citas.filter((c) => c.estado !== EstadoCitaEnum.Cancelada),
       ...tablas.bloqueos,
     ].filter((o) => o.inicio < p_hasta && o.fin > p_desde)
     await new Promise((r) => setTimeout(r, 300))

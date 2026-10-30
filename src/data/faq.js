@@ -13,8 +13,8 @@ import { RESERVAS_ONLINE, inicioReservas } from './features'
 
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
 
-// "1 de enero de 2027"
-function fechaInicioTexto() {
+// "1 de enero de 2027".
+const fechaInicioTexto = () => {
   const d = inicioReservas()
   return `${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`
 }
@@ -22,7 +22,7 @@ function fechaInicioTexto() {
 const ORDEN_SEMANA = [1, 2, 3, 4, 5, 6, 0]
 
 // Convierte los tramos de un día en texto ("de 10:00 a 22:00" / "cerrado").
-function tramosATexto(tramos) {
+const tramosATexto = (tramos) => {
   if (!tramos || tramos.length === 0) return 'cerrado'
   return tramos.map(([de, a]) => `de ${de} a ${a}`).join(' y ')
 }
@@ -33,7 +33,7 @@ function tramosATexto(tramos) {
  * Se genera desde el mismo horario que muestra la web: así la FAQ no puede
  * contradecir a la sección de Horario.
  */
-export function resumenHorario(horario) {
+export const resumenHorario = (horario) => {
   const dias = ORDEN_SEMANA.map((d) => horario.find((h) => h.dia === d)).filter(Boolean)
   if (dias.length === 0) return ''
 
@@ -59,7 +59,7 @@ export function resumenHorario(horario) {
 }
 
 /** Construye las preguntas a partir de los datos reales del negocio. */
-export function construirFaq(horario) {
+export const construirFaq = (horario) => {
   const corte = SERVICIOS.find((s) => s.nombre === 'Corte')
   const otros = SERVICIOS.filter((s) => s.nombre !== 'Corte')
 

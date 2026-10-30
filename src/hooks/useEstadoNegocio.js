@@ -12,7 +12,7 @@ import { estadoNegocio } from '../utils/horario'
  *
  * Devuelve { estado, horario, ahora }.
  */
-export function useEstadoNegocio() {
+export const useEstadoNegocio = () => {
   const [ahora, setAhora] = useState(() => new Date())
   const [horario, setHorario] = useState(HORARIO)
 
@@ -25,9 +25,11 @@ export function useEstadoNegocio() {
   // Carga el horario real (Supabase); mientras, vale el estático.
   useEffect(() => {
     let vivo = true
-    getHorario().then((h) => {
+    const cargar = async () => {
+      const h = await getHorario()
       if (vivo) setHorario(h)
-    })
+    }
+    cargar()
     return () => {
       vivo = false
     }

@@ -1,3 +1,4 @@
+// #region Imports
 import { useEffect, useMemo, useState } from 'react'
 import { m } from 'motion/react'
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
@@ -5,6 +6,7 @@ import { getCitas } from '../../../lib/citas'
 import { mismoDia, inicioDia } from '../../../utils/fechas'
 import { ventanaReserva, rangoConsulta, libresDelDia } from './reglas'
 import { EASE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 const SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
@@ -15,7 +17,8 @@ const SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
  * completo, cerrado o fuera de la ventana de reserva. Así el cliente no entra
  * en un día para descubrir que no hay nada.
  */
-export default function PasoFecha({ servicio, fecha, horario, onElegir }) {
+const PasoFecha = ({ servicio, fecha, horario, onElegir }) => {
+  // #region Declaraciones, variables y hooks
   const { primero, ultimo } = useMemo(() => ventanaReserva(), [])
   const [mes, setMes] = useState(() => {
     const base = fecha ?? primero
@@ -31,22 +34,27 @@ export default function PasoFecha({ servicio, fecha, horario, onElegir }) {
     inicio.setDate(1 - ((mes.getDay() + 6) % 7))
     const fin = new Date(mes.getFullYear(), mes.getMonth() + 1, 0)
     fin.setDate(fin.getDate() + (6 - ((fin.getDay() + 6) % 7)))
-    const lista = []
-    for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) lista.push(new Date(d))
-    return lista
+    const result = []
+    for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) result.push(new Date(d))
+    return result
   }, [mes])
 
   const mesMs = mes.getTime()
   useEffect(() => {
     let vivo = true
     const { desde, hasta } = rangoConsulta(dias[0], dias[dias.length - 1])
-    getCitas(desde, hasta)
-      .then((o) => {
+    const cargar = async () => {
+      // Si no se puede leer la agenda, se avisa y se ofrece reintentar.
+      try {
+        const o = await getCitas(desde, hasta)
         if (!vivo) return
         setError(false)
         setOcupados(o)
-      })
-      .catch(() => vivo && setError(true))
+      } catch {
+        if (vivo) setError(true)
+      }
+    }
+    cargar()
     return () => {
       vivo = false
     }
@@ -60,7 +68,9 @@ export default function PasoFecha({ servicio, fecha, horario, onElegir }) {
   const hayAnterior = new Date(mes.getFullYear(), mes.getMonth(), 0) >= primero
   const haySiguiente = new Date(mes.getFullYear(), mes.getMonth() + 1, 1) <= ultimo
   const ahora = new Date()
+  // #endregion
 
+  // #region Renderizado
   return (
     <div>
       <h2 className="mb-6 text-center font-display text-2xl font-semibold sm:text-3xl">¿Qué día te viene bien?</h2>
@@ -169,4 +179,7 @@ export default function PasoFecha({ servicio, fecha, horario, onElegir }) {
       </div>
     </div>
   )
+  // #endregion
 }
+
+export default PasoFecha

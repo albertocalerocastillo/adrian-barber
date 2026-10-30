@@ -1,3 +1,4 @@
+// #region Imports
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CalendarDays, Clock, Scissors, LogOut, ExternalLink } from 'lucide-react'
@@ -9,6 +10,7 @@ import AjustesHorario from './AjustesHorario'
 import AjustesServicios from './AjustesServicios'
 import { AvisoProvider } from './Aviso'
 import { logout, esBarbero } from '../../../lib/panel'
+// #endregion
 
 const SECCIONES = [
   { id: 'agenda', texto: 'Agenda', Icono: CalendarDays },
@@ -28,9 +30,10 @@ const SECCIONES = [
  * cambiando el horario y salta a la agenda a mirar algo, al volver sigue
  * todo como lo dejó.
  */
-export default function PanelComponent() {
+const PanelComponent = () => {
+  // #region Declaraciones, variables y hooks
   const { sesion, cargando } = useAuth()
-  // null = comprobando; se guarda junto al usuario comprobado para no
+  // Con ok a null se está comprobando; se guarda junto al usuario comprobado para no
   // arrastrar el resultado de otra sesión.
   const [permiso, setPermiso] = useState({ usuario: null, ok: null })
   const usuario = sesion?.user?.id ?? sesion?.user?.email ?? null
@@ -38,7 +41,11 @@ export default function PanelComponent() {
   useEffect(() => {
     if (!usuario) return
     let vivo = true
-    esBarbero().then((ok) => vivo && setPermiso({ usuario, ok }))
+    const comprobar = async () => {
+      const ok = await esBarbero()
+      if (vivo) setPermiso({ usuario, ok })
+    }
+    comprobar()
     return () => {
       vivo = false
     }
@@ -89,15 +96,18 @@ export default function PanelComponent() {
       </div>
     )
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <AvisoProvider>
       <Escritorio email={sesion.user?.email} />
     </AvisoProvider>
   )
+  // #endregion
 }
 
-function Escritorio({ email }) {
+const Escritorio = ({ email }) => {
   const [pantalla, setPantalla] = useState('agenda')
 
   const ir = (id) => {
@@ -175,7 +185,7 @@ function Escritorio({ email }) {
               <span className="text-[0.65rem] tracking-kicker text-acento">Panel</span>
             </div>
 
-            {/* En tablet hay sitio para las secciones arriba */}
+            {/* En tablet hay sitio para las secciones arriba. */}
             <nav className="hidden items-center gap-1 md:flex" aria-label="Secciones del panel">
               {SECCIONES.map(({ id, texto, Icono }) => (
                 <button
@@ -235,7 +245,7 @@ function Escritorio({ email }) {
               }`}
             >
               <span className="relative">
-                {/* Pastilla detrás del icono activo, que crece al elegirlo */}
+                {/* Pastilla detrás del icono activo, que crece al elegirlo. */}
                 <span
                   className={`absolute -inset-x-4 -inset-y-1 rounded-full bg-acento/15 transition-all duration-300 ease-[var(--ease-suave)] ${
                     activa ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
@@ -251,3 +261,5 @@ function Escritorio({ email }) {
     </div>
   )
 }
+
+export default PanelComponent

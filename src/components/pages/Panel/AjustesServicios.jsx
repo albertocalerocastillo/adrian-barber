@@ -1,3 +1,4 @@
+// #region Imports
 import { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, m } from 'motion/react'
 import { Plus, Trash2, EyeOff, Sparkles, MessageCircle } from 'lucide-react'
@@ -6,14 +7,15 @@ import { CabeceraSeccion, Interruptor, Contador, BarraGuardar, Esqueleto } from 
 import { getServicios, guardarServicios } from '../../../lib/config'
 import { ICONOS } from '../../../theme/icons'
 import { EASE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 // Para comparar si hay cambios, sin la clave interna de cada tarjeta.
 const huella = (lista) =>
   JSON.stringify(
     lista.map((s) => {
-      const limpio = { ...s }
-      delete limpio._key
-      return limpio
+      const result = { ...s }
+      delete result._key
+      return result
     })
   )
 
@@ -22,7 +24,8 @@ const huella = (lista) =>
  * web). Se editan en local y se guardan de golpe con la barra de abajo, igual
  * que el horario. El icono y el "destacado" se fijan en el código/seed.
  */
-export default function AjustesServicios({ activa = true }) {
+const AjustesServicios = ({ activa = true }) => {
+  // #region Declaraciones, variables y hooks
   const avisar = useAviso()
   const [servicios, setServicios] = useState(null)
   const [original, setOriginal] = useState('')
@@ -35,11 +38,13 @@ export default function AjustesServicios({ activa = true }) {
 
   useEffect(() => {
     let vivo = true
-    getServicios().then((lista) => {
+    const cargar = async () => {
+      const lista = await getServicios()
       if (!vivo) return
       setServicios(lista.map(conKey))
       setOriginal(huella(lista))
-    })
+    }
+    cargar()
     return () => {
       vivo = false
     }
@@ -57,9 +62,9 @@ export default function AjustesServicios({ activa = true }) {
       texto: `«${s.nombre || 'Servicio'}» quitado. Falta guardar.`,
       deshacer: () =>
         setServicios((ss) => {
-          const copia = [...ss]
-          copia.splice(posicion, 0, s)
-          return copia
+          const result = [...ss]
+          result.splice(posicion, 0, s)
+          return result
         }),
     })
   }
@@ -70,7 +75,7 @@ export default function AjustesServicios({ activa = true }) {
       conKey({ nombre: '', descripcion: '', duracion: 30, precio: 10, icono: 'Scissors', destacado: false, activo: true, online: true }),
     ])
 
-  async function onGuardar() {
+  const onGuardar = async () => {
     if (guardando || !servicios) return
     if (servicios.some((s) => !s.nombre.trim())) {
       avisar({ texto: 'Hay un servicio sin nombre. Pónselo o quítalo.', tipo: 'error' })
@@ -86,7 +91,9 @@ export default function AjustesServicios({ activa = true }) {
       avisar({ texto: res.error || 'No se pudo guardar.', tipo: 'error' })
     }
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <>
       <CabeceraSeccion
@@ -240,4 +247,7 @@ export default function AjustesServicios({ activa = true }) {
       />
     </>
   )
+  // #endregion
 }
+
+export default AjustesServicios

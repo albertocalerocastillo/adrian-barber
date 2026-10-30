@@ -18,7 +18,7 @@ const FUENTES_CRITICAS = [
  *  - preconnect a Supabase, para que la conexión esté abierta cuando React
  *    pida el horario y los servicios.
  */
-function precargaCritica(supabaseUrl) {
+const precargaCritica = (supabaseUrl) => {
   return {
     name: 'precarga-critica',
     apply: 'build',

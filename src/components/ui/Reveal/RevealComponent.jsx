@@ -1,5 +1,7 @@
+// #region Imports
 import { m } from 'motion/react'
 import { EASE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 const DESPLAZAMIENTO = 36
 
@@ -21,13 +23,13 @@ const OCULTO = {
  *  - as: etiqueta a renderizar (por defecto 'div').
  *  - className: clases extra.
  */
-export default function RevealComponent({
+const RevealComponent = ({
   children,
   delay = 0,
   desde = 'abajo',
   as: Tag = 'div',
   className = '',
-}) {
+}) => {
   const Componente = m[Tag]
 
   return (
@@ -42,3 +44,5 @@ export default function RevealComponent({
     </Componente>
   )
 }
+
+export default RevealComponent
