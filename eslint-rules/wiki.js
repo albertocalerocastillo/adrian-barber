@@ -139,9 +139,33 @@ const summaryEnExportadas = {
 }
 // #endregion
 
+// #region Summary en interfaces
+const summaryEnInterfaces = {
+  meta: {
+    type: 'suggestion',
+    docs: { description: 'Cada propiedad de una interfaz exportada lleva su Summary /** … */.' },
+    messages: { summary: 'Falta el Summary (/** … */) de la propiedad «{{nombre}}».' },
+  },
+  create(context) {
+    const codigo = context.sourceCode
+    return {
+      'ExportNamedDeclaration > TSInterfaceDeclaration TSInterfaceBody > *'(miembro) {
+        const tieneSummary = codigo
+          .getCommentsBefore(miembro)
+          .some((comentario) => comentario.type === 'Block' && comentario.value.startsWith('*'))
+        if (!tieneSummary) {
+          context.report({ node: miembro, messageId: 'summary', data: { nombre: miembro.key?.name ?? '?' } })
+        }
+      },
+    }
+  },
+}
+// #endregion
+
 export default {
   rules: {
     'comentario-con-punto': comentarioConPunto,
     'summary-en-exportadas': summaryEnExportadas,
+    'summary-en-interfaces': summaryEnInterfaces,
   },
 }

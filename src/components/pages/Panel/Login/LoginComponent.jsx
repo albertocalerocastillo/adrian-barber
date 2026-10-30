@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { m } from 'motion/react'
 import { Lock, ArrowLeft, Eye, EyeOff, Mail } from 'lucide-react'
-import { PrimaryButtonComponent } from '../Controls/ControlsComponent'
+import PrimaryButtonComponent from '../Controls/PrimaryButton/PrimaryButtonComponent'
 import { EASE_SMOOTH } from '../../../../theme/animation'
 import { AuthenticationService } from '../../../../services/AuthenticationService'
 // #endregion
