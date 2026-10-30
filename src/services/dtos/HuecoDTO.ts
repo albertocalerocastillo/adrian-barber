@@ -1,4 +1,4 @@
-import { EstadoHuecoEnum } from '../enums/EstadoHuecoEnum'
+import type { EstadoHuecoEnum } from '../enums/EstadoHuecoEnum'
 
 /** Hora de inicio de la rejilla de reserva. */
 export interface HuecoDTO {

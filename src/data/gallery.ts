@@ -31,8 +31,9 @@ export interface FotoGaleria {
   src: string;
   /** Texto alternativo (también cuenta para Google). */
   alt: string;
-  /** Ancho y alto reales, para reservar el hueco antes de cargar. */
+  /** Ancho real, para reservar el hueco antes de cargar. */
   w: number;
+  /** Alto real, para reservar el hueco antes de cargar. */
   h: number;
   /** Si la foto es alta (ocupa dos filas en la rejilla). */
   alto?: string;

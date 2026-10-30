@@ -1,7 +1,11 @@
 // #region Imports
 import { useState } from 'react'
 import SheetComponent from '../Sheet/SheetComponent'
-import { FieldComponent, SegmentedControlComponent, PrimaryButtonComponent, DateShortcutsComponent, INPUT_CLASS_NAME } from '../Controls/ControlsComponent'
+import FieldComponent from '../Controls/Field/FieldComponent'
+import SegmentedControlComponent from '../Controls/SegmentedControl/SegmentedControlComponent'
+import PrimaryButtonComponent from '../Controls/PrimaryButton/PrimaryButtonComponent'
+import DateShortcutsComponent from '../Controls/DateShortcuts/DateShortcutsComponent'
+import { INPUT_CLASS_NAME } from '../Controls/controlClasses'
 import { atTime, addMinutes, MINUTES_PER_DAY } from '../../../../utils/availability'
 import { startOfDay, formatLongDate, toInputDate } from '../../../../utils/dates'
 import { AgendaService } from '../../../../services/AgendaService'

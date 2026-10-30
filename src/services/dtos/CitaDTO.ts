@@ -1,4 +1,4 @@
-import { EstadoCitaEnum } from '../enums/EstadoCitaEnum'
+import type { EstadoCitaEnum } from '../enums/EstadoCitaEnum'
 
 /** Cita completa, tal como la ve el panel (tabla `citas`, en camelCase). */
 export interface CitaDTO {

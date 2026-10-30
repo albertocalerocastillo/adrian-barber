@@ -14,7 +14,9 @@ import RescheduleDialogComponent from '../RescheduleDialog/RescheduleDialogCompo
 import CustomerSearchDialogComponent from '../CustomerSearchDialog/CustomerSearchDialogComponent'
 import MonthViewComponent from '../MonthView/MonthViewComponent'
 import { useToast } from '../Toast/ToastContext'
-import { SectionHeaderComponent, SegmentedControlComponent, SkeletonComponent } from '../Controls/ControlsComponent'
+import SectionHeaderComponent from '../Controls/SectionHeader/SectionHeaderComponent'
+import SegmentedControlComponent from '../Controls/SegmentedControl/SegmentedControlComponent'
+import SkeletonComponent from '../Controls/Skeleton/SkeletonComponent'
 import { atTime, addMinutes, MINUTES_PER_DAY } from '../../../../utils/availability'
 import {
   formatLongDate, formatShortDate, formatTime as fmtHora, startOfDay, startOfWeek, isSameDay, toInputDate,
