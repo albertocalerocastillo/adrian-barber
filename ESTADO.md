@@ -164,7 +164,7 @@ email a `barberos` con el bloque del final del SQL):
    la reserva. Mapa de Google solo al pulsar "Ver mapa". Tipografías dentro de
    la web (fuera Google Fonts: mandaba la IP del visitante a Google). Sin
    cookies de analítica → no hace falta banner.
- - ⬜ **Falta de Adrián:** email para el aviso legal (NIF ya puesto) (`LEGAL` en
+ - ✅ NIF y email en el aviso legal (`LEGAL` en
    data/contacto.js; mientras estén vacíos esas líneas no se muestran).
  - ⬜ Borrar en Vercel `VITE_CALLMEBOT_PHONE` / `VITE_CALLMEBOT_APIKEY` (ya no
    se usan). Quitado el móvil de Alberto de este archivo (sigue en el
