@@ -7,8 +7,8 @@
 // ⚠️ SOLO datos verificados. Nada de suponer: si no se sabe (si hace falta
 // cita, si acepta tarjeta, si hace barba suelta…), no se pone hasta que lo
 // confirme Adrián. Una FAQ que miente es peor que no tenerla.
-import { NEGOCIO, TELEFONO_VISIBLE } from './contacto'
-import { SERVICIOS, PROMO } from './servicios'
+import { NEGOCIO, TELEFONO_VISIBLE } from './contact'
+import { SERVICIOS, PROMO } from './services'
 import { RESERVAS_ONLINE, inicioReservas } from './features'
 
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']

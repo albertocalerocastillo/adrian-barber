@@ -1,9 +1,9 @@
 // #region Imports
 import { useEffect, useMemo } from 'react'
 import { Plus } from 'lucide-react'
-import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
-import RevealComponent from '../../ui/Reveal/RevealComponent'
-import { useEstadoNegocio } from '../../../hooks/useEstadoNegocio'
+import SectionHeadingComponent from '../../core/SectionHeading/SectionHeadingComponent'
+import RevealComponent from '../../core/Reveal/RevealComponent'
+import { useBusinessStatus } from '../../../hooks/useBusinessStatus'
 import { construirFaq } from '../../../data/faq'
 // #endregion
 
@@ -20,7 +20,7 @@ const ID_MARCADO = 'faq-jsonld'
  */
 const FaqComponent = () => {
   // #region Declaraciones, variables y hooks
-  const { horario } = useEstadoNegocio()
+  const { horario } = useBusinessStatus()
   const preguntas = useMemo(() => construirFaq(horario), [horario])
 
   // Inyecta el JSON-LD y lo retira al desmontar, para no dejar marcado huérfano.

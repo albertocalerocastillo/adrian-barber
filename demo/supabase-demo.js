@@ -8,8 +8,8 @@
  * - Todo cambio se queda en memoria y se pierde al recargar. Nunca se toca la
  *   base de datos real ni datos de clientes.
  */
-import { SERVICIOS } from '../src/data/servicios'
-import { EstadoCitaEnum } from '../src/enums/EstadoCitaEnum'
+import { SERVICIOS } from '../src/data/services'
+import { EstadoCitaEnum } from '../src/services/enums/EstadoCitaEnum'
 
 const hoy = new Date()
 hoy.setHours(0, 0, 0, 0)

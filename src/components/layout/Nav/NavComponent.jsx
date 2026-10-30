@@ -2,17 +2,17 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, m, useMotionValueEvent, useScroll } from 'motion/react'
 import { Menu, X, Phone, MapPin } from 'lucide-react'
-import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
-import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
-import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
-import { EASE_SUAVE } from '../../../theme/animacion'
+import BrandLogoComponent from '../../core/BrandLogo/BrandLogoComponent'
+import BookingButtonComponent from '../../core/BookingButton/BookingButtonComponent'
+import InstagramIconComponent from '../../core/InstagramIcon/InstagramIconComponent'
+import { EASE_SMOOTH } from '../../../theme/animation'
 import {
   NEGOCIO,
   TELEFONO,
   TELEFONO_VISIBLE,
   INSTAGRAM,
   INSTAGRAM_URL,
-} from '../../../data/contacto'
+} from '../../../data/contact'
 // #endregion
 
 const ENLACES = [
@@ -67,7 +67,7 @@ const NavComponent = () => {
             : 'border-b border-transparent bg-transparent'
         }`}
         animate={{ y: oculta && !menuAbierto ? '-100%' : '0%' }}
-        transition={{ duration: 0.45, ease: EASE_SUAVE }}
+        transition={{ duration: 0.45, ease: EASE_SMOOTH }}
       >
         <nav
           className={`mx-auto flex max-w-7xl items-center justify-between px-5 transition-[padding] duration-500 md:px-8 ${
@@ -76,7 +76,7 @@ const NavComponent = () => {
         >
           {/* Logo. */}
           <a href="#inicio" className="al-tocar shrink-0" aria-label="Inicio" onClick={cerrar}>
-            <LogoAdriComponent
+            <BrandLogoComponent
               variante="monograma"
               className={`w-auto transition-[height] duration-500 ${solida ? 'h-9' : 'h-10 lg:h-12'}`}
             />
@@ -99,7 +99,7 @@ const NavComponent = () => {
           <div className="flex items-center gap-3">
             {/* CTA (tablet y escritorio). */}
             <div className="hidden md:block">
-              <CitaButtonComponent />
+              <BookingButtonComponent />
             </div>
 
             {/* Botón menú (móvil y tablet). */}
@@ -124,7 +124,7 @@ const NavComponent = () => {
             initial={{ clipPath: 'circle(0% at 100% 0%)' }}
             animate={{ clipPath: 'circle(150% at 100% 0%)' }}
             exit={{ clipPath: 'circle(0% at 100% 0%)' }}
-            transition={{ duration: 0.6, ease: EASE_SUAVE }}
+            transition={{ duration: 0.6, ease: EASE_SMOOTH }}
           >
             {/* Sello de fondo, muy tenue. */}
             <img
@@ -140,7 +140,7 @@ const NavComponent = () => {
                   key={e.href}
                   initial={{ opacity: 0, x: 40 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.15 + i * 0.06, duration: 0.5, ease: EASE_SUAVE }}
+                  transition={{ delay: 0.15 + i * 0.06, duration: 0.5, ease: EASE_SMOOTH }}
                 >
                   <a
                     href={e.href}
@@ -158,9 +158,9 @@ const NavComponent = () => {
               className="relative mt-10 flex flex-col gap-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55, duration: 0.5, ease: EASE_SUAVE }}
+              transition={{ delay: 0.55, duration: 0.5, ease: EASE_SMOOTH }}
             >
-              <CitaButtonComponent tamano="lg" className="w-full md:w-auto md:self-start" />
+              <BookingButtonComponent tamano="lg" className="w-full md:w-auto md:self-start" />
               <div className="flex flex-col gap-3 text-sm text-hueso/65">
                 <a href={`tel:${TELEFONO}`} className="flex items-center gap-3 hover:text-acento">
                   <Phone size={16} className="text-acento" /> {TELEFONO_VISIBLE}
@@ -174,7 +174,7 @@ const NavComponent = () => {
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 hover:text-acento"
                 >
-                  <InstagramIcon size={16} /> @{INSTAGRAM}
+                  <InstagramIconComponent size={16} /> @{INSTAGRAM}
                 </a>
               </div>
             </m.div>
