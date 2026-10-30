@@ -6,6 +6,7 @@ import type { IAgendaService } from './IAgendaService'
 import type { CitaDTO } from './dtos/CitaDTO'
 import type { BloqueoDTO } from './dtos/BloqueoDTO'
 import type { ResultadoOperacionDTO } from './dtos/ResultadoOperacionDTO'
+import type { OrigenCitaEnum } from './enums/OrigenCitaEnum'
 
 // #region Constantes
 // Mensajes de error para Adrián.
@@ -35,6 +36,7 @@ interface FilaCita {
   fin: string;
   estado: EstadoCitaEnum;
   notas: string | null;
+  origen?: OrigenCitaEnum;
 }
 
 /** Fila de Supabase → CitaDTO (camelCase). */
@@ -48,6 +50,7 @@ const aCitaDTO = (fila: FilaCita): CitaDTO => {
     fin: fila.fin,
     estado: fila.estado,
     notas: fila.notas ?? null,
+    origen: fila.origen,
   }
   return result
 }

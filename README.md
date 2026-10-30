@@ -74,7 +74,7 @@ cambio ocurre solo, sin tocar código.
 | Interfaz | React 19, React Router 7, Tailwind CSS v4, lucide-react |
 | Animación | Motion |
 | Tipografía | Playfair Display y Lora, autoalojadas con Fontsource |
-| Build | Vite 8 (JavaScript, sin TypeScript) |
+| Lenguaje y build | TypeScript (estricto, sin `any`) + Vite 8 |
 | Datos | Supabase: PostgreSQL con RLS, funciones SQL y Auth |
 | Avisos | Supabase Edge Function (`aviso-cita`) + CallMeBot para WhatsApp |
 | Hosting | Vercel, con despliegue automático desde `main` |
@@ -83,29 +83,33 @@ cambio ocurre solo, sin tocar código.
 
 ```
 src/
-├── components/
-│   ├── layout/      Nav, Footer
-│   ├── sections/    Hero, Cinta, Servicios, SobreMi, Galeria, Resenas, Faq, Horario, Ubicacion, CtaFinal
-│   ├── pages/       Home/, Reserva/ (pasos + reglas), Panel/ (agenda, horario, servicios), Legal/
-│   └── ui/          Sello, TiltCard, Magnetic, Marquee, ProgresoScroll, Lightbox, EstadoBadge…
-├── data/            servicios.js, horarios.js, contacto.js, faq.js, features.js (flags y reglas)
-├── hooks/           useAuth, useEstadoNegocio, useCountUp, useScrolled
-├── lib/             supabase.js, citas.js, config.js, panel.js, aviso.js
-├── utils/           disponibilidad.js (motor de huecos), fechas.js, horario.js
-└── theme/           theme.css (tokens), animacion.js, icons.js
+├── components/            Una carpeta por componente: NombreComponent.tsx + INombreProps.ts
+│   ├── core/              Piezas reutilizables: BookingButton, Reveal, TiltCard, Magnetic, Lightbox…
+│   ├── layout/            Nav, Footer
+│   ├── sections/          Hero, Ribbon, Services, AboutMe, Gallery, Reviews, Faq, OpeningHours, Location, FinalCta
+│   └── pages/             Home, Legal, NotFound, Booking/ (pasos de la reserva),
+│                          Panel/ (Agenda, ajustes, diálogos y Controls/ del panel)
+├── services/              Acceso a datos, cada uno con su interfaz IXxxService
+│   ├── BookingService, AgendaService, AuthenticationService, ConfigurationService, NotificationService
+│   ├── dtos/              CitaDTO, ServicioDTO, HorarioDiaDTO, BloqueoDTO…
+│   └── enums/             EstadoCitaEnum, VistaAgendaEnum, RouteEnum…
+├── data/                  services.ts, openingHours.ts, contact.ts, faq.ts, features.ts (flags y reglas)
+├── hooks/                 useAuth, useBusinessStatus, useCountUp, useScrolled
+├── utils/                 availability.ts (motor de huecos), dates.ts, schedule.ts, wait.ts
+└── theme/                 theme.css (tokens), animation.ts, icons.ts
 supabase/
 ├── schema.sql, policies.sql, seed.sql, setup-completo.sql
-├── migracion-*.sql  reservas 2027, seguridad, horario, iconos
+├── migracion-*.sql        reservas 2027, seguridad, horario, iconos
 └── functions/aviso-cita/
-demo/supabase-demo.ts  Supabase simulado para revisar el panel sin datos reales
+demo/supabase-demo.ts      Supabase simulado para revisar el panel sin datos reales
 ```
 
 **Flujo de datos**
 
-- **Configuración:** servicios y horario se leen de Supabase (`lib/config.js`); si no hay
+- **Configuración:** servicios y horario se leen de Supabase (`ConfigurationService`); si no hay
   conexión o no está configurado, se usan los datos estáticos de `src/data/`.
 - **Huecos:** la web pide a la función `citas_ocupadas()` solo los tramos ocupados (sin datos de
-  clientes) y `utils/disponibilidad.js` calcula los huecos libres con horario, días libres y reglas.
+  clientes) y `utils/availability.ts` calcula los huecos libres con horario, días libres y reglas.
 - **Reserva:** la cita se inserta desde el navegador y la base de datos la valida con un trigger
   (`validar_cita_web()`) que aplica las mismas reglas de fecha, antelación y duración.
   Una **restricción de exclusión** de PostgreSQL (`EXCLUDE USING gist` sobre `tstzrange`) hace
@@ -154,7 +158,8 @@ npm run dev            # http://localhost:5173
 | --- | --- |
 | `npm run dev` | Servidor de desarrollo de Vite |
 | `npm run demo` | Panel en http://localhost:5174/admin con un Supabase simulado; nada se guarda (`/admin?login` empieza en la pantalla de acceso) |
-| `npm run build` | Build de producción en `dist/` |
+| `npm run build` | Comprueba los tipos y genera el build de producción en `dist/` |
+| `npm run typecheck` | Solo la comprobación de tipos de TypeScript |
 | `npm run preview` | Sirve el build |
 | `npm run lint` | ESLint con las normas de estilo (ver abajo) |
 
@@ -173,22 +178,27 @@ panel a la tabla `barberos` (bloque final de `migracion-seguridad.sql`).
 
 ### Estilo de código
 
-`npm run lint` comprueba solas la mayoría de las normas
+El código sigue la guía de estilo de frontend de mis proyectos de empresa (React + TypeScript).
+`npm run lint` y `npm run typecheck` comprueban solas casi todas las normas
 ([`eslint.config.js`](eslint.config.js) y las reglas propias de [`eslint-rules/wiki.js`](eslint-rules/wiki.js)):
 
-- `const` siempre; `let` solo si no hay otra; nunca `var`.
-- Funciones flecha (`const nombre = () => {}`), también los componentes, y `async/await` en vez de `.then()`.
+- TypeScript estricto: nada de `any`, `interface` en vez de `type`, propiedades separadas por `;`,
+  genéricos en los hooks (`useState<CitaDTO[]>`), tipos importados con `import type`.
+- Cada componente en su carpeta, con sus props en `INombreProps.ts` y un `/** Summary */` en cada
+  propiedad; toda función exportada y todo servicio (su interfaz `IXxxService`) lleva su Summary.
+- Inglés para lo técnico (componentes, carpetas, servicios, hooks, props de los componentes de
+  `core/`) y español para la lógica de negocio (métodos como `crearCita`, DTOs, comentarios).
+- `const` siempre; `let` solo si no hay otra; nunca `var`. Funciones flecha y `async/await`, sin `.then()`.
 - Comentarios en su propia línea encima del código, empezando en mayúscula y acabando en punto.
-- Toda función exportada lleva su bloque `/** … */` explicando qué hace.
 
 Y a mano:
 
 - La variable que se devuelve al final de una función se llama `result`.
-- Nada de textos o números con significado sueltos: van en un enumerado ([`src/enums`](src/enums),
-  p. ej. `EstadoCitaEnum.Pendiente`) o en una constante (`MINUTOS_DIA`).
-- Los componentes se ordenan en regiones funcionales: `// #region Imports`,
-  `// #region Declaraciones, variables y hooks`, `// #region Renderizado` (y las que hagan falta).
-- Nada de código comentado ni de `try/catch` salvo para controlar un error concreto.
+- Nada de textos o números con significado sueltos: van en un enumerado
+  ([`src/services/enums`](src/services/enums), p. ej. `EstadoCitaEnum.Pendiente`) o en una constante.
+- Regiones funcionales: `// #region Imports`, `// #region Declaraciones, variables y hooks`,
+  `// #region Renderizado` (y las que hagan falta).
+- Objetos inmutables, nada de código comentado y `try/catch` solo para controlar un error concreto.
 
 ## Despliegue
 

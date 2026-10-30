@@ -5,6 +5,15 @@
 
 ## 🔖 HANDOFF (leer esto primero al abrir chat nuevo)
 
+**30/10/2026 — Código según la guía de estilo de frontend de Alberto (wiki de TMS).** Rama
+`refactor/estilo-wiki`: todo en **TypeScript estricto** (`npm run build` comprueba tipos),
+carpeta por componente con `INombreProps.ts`, servicios con interfaz en `src/services/`
+(antes `src/lib/`), DTOs en camelCase (`CitaDTO.clienteNombre`…), enums en
+`src/services/enums`, utilidades en inglés (`utils/dates.ts`, `availability.ts`). Las rutas de
+ficheros que se citan más abajo son anteriores a este cambio (p. ej. `data/contacto.js` →
+`data/contact.ts`, `lib/config.js` → `services/ConfigurationService.ts`). Excepciones a la wiki:
+nada de Kendo/SASS (aquí Tailwind) ni ficheros de traducción (la web es solo en español).
+
 **Estado:** la web funciona como **INFORMATIVA**. Adrián dijo que **no quiere la
 reserva online hasta 2027**, así que está oculta tras el flag `RESERVAS_ONLINE`
 (`src/data/features.js` = `false`): "Pedir cita" abre **WhatsApp** y `/reserva`
