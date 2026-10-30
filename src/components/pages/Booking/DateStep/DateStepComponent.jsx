@@ -2,10 +2,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { m } from 'motion/react'
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
-import { getCitas } from '../../../../services/BookingService'
 import { isSameDay, startOfDay } from '../../../../utils/dates'
 import { ventanaReserva, rangoConsulta, libresDelDia } from '../bookingRules'
 import { EASE_SMOOTH } from '../../../../theme/animation'
+import { BookingService } from '../../../../services/BookingService'
 // #endregion
 
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
@@ -46,7 +46,7 @@ const DateStepComponent = ({ servicio, fecha, horario, onElegir }) => {
     const cargar = async () => {
       // Si no se puede leer la agenda, se avisa y se ofrece reintentar.
       try {
-        const o = await getCitas(desde, hasta)
+        const o = await BookingService.getCitas(desde, hasta)
         if (!vivo) return
         setError(false)
         setOcupados(o)

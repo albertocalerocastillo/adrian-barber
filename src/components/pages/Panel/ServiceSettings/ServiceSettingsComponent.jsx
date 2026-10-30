@@ -4,9 +4,9 @@ import { AnimatePresence, m } from 'motion/react'
 import { Plus, Trash2, EyeOff, Sparkles, MessageCircle } from 'lucide-react'
 import { useToast } from '../Toast/ToastContext'
 import { SectionHeaderComponent, SwitchComponent, StepperComponent, SaveBarComponent, SkeletonComponent } from '../Controls/ControlsComponent'
-import { getServicios, guardarServicios } from '../../../../services/ConfigurationService'
 import { ICONS } from '../../../../theme/icons'
 import { EASE_SMOOTH } from '../../../../theme/animation'
+import { ConfigurationService } from '../../../../services/ConfigurationService'
 // #endregion
 
 // Para comparar si hay cambios, sin la clave interna de cada tarjeta.
@@ -39,7 +39,7 @@ const ServiceSettingsComponent = ({ activa = true }) => {
   useEffect(() => {
     let vivo = true
     const cargar = async () => {
-      const lista = await getServicios()
+      const lista = await ConfigurationService.getServicios()
       if (!vivo) return
       setServicios(lista.map(conKey))
       setOriginal(huella(lista))
@@ -82,7 +82,7 @@ const ServiceSettingsComponent = ({ activa = true }) => {
       return
     }
     setGuardando(true)
-    const res = await guardarServicios(servicios)
+    const res = await ConfigurationService.guardarServicios(servicios)
     setGuardando(false)
     if (res.ok) {
       setOriginal(huella(servicios))

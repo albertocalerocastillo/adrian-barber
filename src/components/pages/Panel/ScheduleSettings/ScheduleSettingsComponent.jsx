@@ -4,8 +4,8 @@ import { AnimatePresence, m } from 'motion/react'
 import { Plus, X, Copy, Info } from 'lucide-react'
 import { useToast } from '../Toast/ToastContext'
 import { SectionHeaderComponent, SwitchComponent, SaveBarComponent, SkeletonComponent } from '../Controls/ControlsComponent'
-import { getHorario, guardarHorario } from '../../../../services/ConfigurationService'
 import { EASE_SMOOTH } from '../../../../theme/animation'
+import { ConfigurationService } from '../../../../services/ConfigurationService'
 // #endregion
 
 const copia = (dias) => dias.map((d) => ({ ...d, tramos: d.tramos.map((t) => [...t]) }))
@@ -25,7 +25,7 @@ const ScheduleSettingsComponent = ({ activa = true }) => {
   useEffect(() => {
     let vivo = true
     const cargar = async () => {
-      const h = await getHorario()
+      const h = await ConfigurationService.getHorario()
       if (!vivo) return
       setDias(copia(h))
       setOriginal(copia(h))
@@ -71,7 +71,7 @@ const ScheduleSettingsComponent = ({ activa = true }) => {
       return
     }
     setGuardando(true)
-    const res = await guardarHorario(dias)
+    const res = await ConfigurationService.guardarHorario(dias)
     setGuardando(false)
     if (res.ok) {
       setOriginal(copia(dias))

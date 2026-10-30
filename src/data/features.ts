@@ -27,7 +27,7 @@ export const RESERVA = {
 }
 
 /** Primer día reservable como fecha local (medianoche). */
-export const inicioReservas = () => {
+export const inicioReservas = (): Date => {
   const [y, m, d] = RESERVA.desde.split('-').map(Number)
   return new Date(y, m - 1, d)
 }
@@ -38,6 +38,6 @@ export const inicioReservas = () => {
  * esperar a enero) y la reserva online se ofrece como opción para después.
  * El 1 de enero cambian solos, sin tocar nada.
  */
-export const reservaEmpezada = (ahora = new Date()) => {
+export const reservaEmpezada = (ahora: Date = new Date()): boolean => {
   return RESERVAS_ONLINE && ahora >= inicioReservas()
 }

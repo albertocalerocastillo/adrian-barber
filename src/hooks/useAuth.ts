@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../services/SupabaseService'
 
 /**
@@ -8,23 +9,24 @@ import { supabase } from '../services/SupabaseService'
  *  - cargando: true mientras se comprueba la sesión inicial.
  */
 export const useAuth = () => {
-  const [sesion, setSesion] = useState(null)
+  const [sesion, setSesion] = useState<Session | null>(null)
   // Si no hay Supabase configurado no hay nada que cargar.
-  const [cargando, setCargando] = useState(Boolean(supabase))
+  const [cargando, setCargando] = useState<boolean>(Boolean(supabase))
 
   useEffect(() => {
-    if (!supabase) return
+    const cliente = supabase
+    if (!cliente) return undefined
     let vivo = true
 
     const cargar = async () => {
-      const { data } = await supabase.auth.getSession()
+      const { data } = await cliente.auth.getSession()
       if (!vivo) return
       setSesion(data.session)
       setCargando(false)
     }
     cargar()
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_evento, nueva) => {
+    const { data: sub } = cliente.auth.onAuthStateChange((_evento, nueva) => {
       setSesion(nueva)
     })
 

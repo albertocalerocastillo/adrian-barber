@@ -10,7 +10,10 @@
 
 // Confirmado por Adrián el 29/10/2026: lunes a viernes de 9:00 a 22:00 con
 // media hora para comer (14:00–14:30); sábado y domingo cerrado.
-export const HORARIO = [
+import type { HorarioDiaDTO } from '../services/dtos/HorarioDiaDTO'
+
+/** Horario estático de la semana (si no hay Supabase). */
+export const HORARIO: HorarioDiaDTO[] = [
   { dia: 1, nombre: 'Lunes',     tramos: [['09:00', '14:00'], ['14:30', '22:00']] },
   { dia: 2, nombre: 'Martes',    tramos: [['09:00', '14:00'], ['14:30', '22:00']] },
   { dia: 3, nombre: 'Miércoles', tramos: [['09:00', '14:00'], ['14:30', '22:00']] },

@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react'
 import { HORARIO } from '../data/openingHours'
-import { getHorario } from '../services/ConfigurationService'
+import { ConfigurationService } from '../services/ConfigurationService'
+import type { HorarioDiaDTO } from '../services/dtos/HorarioDiaDTO'
 import { estadoNegocio } from '../utils/schedule'
+
+// Cada cuánto se recalcula si está abierto.
+const REFRESCO_MS = 60_000
 
 /**
  * Estado "abierto / cerrado ahora" del negocio, en vivo.
@@ -13,12 +17,12 @@ import { estadoNegocio } from '../utils/schedule'
  * Devuelve { estado, horario, ahora }.
  */
 export const useBusinessStatus = () => {
-  const [ahora, setAhora] = useState(() => new Date())
-  const [horario, setHorario] = useState(HORARIO)
+  const [ahora, setAhora] = useState<Date>(() => new Date())
+  const [horario, setHorario] = useState<HorarioDiaDTO[]>(HORARIO)
 
   // Refresca cada minuto para que el estado no se quede obsoleto.
   useEffect(() => {
-    const id = setInterval(() => setAhora(new Date()), 60_000)
+    const id = setInterval(() => setAhora(new Date()), REFRESCO_MS)
     return () => clearInterval(id)
   }, [])
 
@@ -26,7 +30,7 @@ export const useBusinessStatus = () => {
   useEffect(() => {
     let vivo = true
     const cargar = async () => {
-      const h = await getHorario()
+      const h = await ConfigurationService.getHorario()
       if (vivo) setHorario(h)
     }
     cargar()

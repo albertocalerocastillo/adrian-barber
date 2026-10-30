@@ -2,11 +2,11 @@
 import { useState, useEffect } from 'react'
 import { m } from 'motion/react'
 import { CalendarX, RefreshCw, Sun, Sunset } from 'lucide-react'
-import { getCitas } from '../../../../services/BookingService'
 import { formatTimeInZone } from '../../../../utils/dates'
 import { RESERVA } from '../../../../data/features'
 import { horasDelDia, rangoConsulta } from '../bookingRules'
 import { EASE_SMOOTH } from '../../../../theme/animation'
+import { BookingService } from '../../../../services/BookingService'
 // #endregion
 
 /**
@@ -27,7 +27,7 @@ const TimeStepComponent = ({ servicio, fecha, horario, hora, aviso, onElegir }) 
     const cargar = async () => {
       // Si no se puede leer la agenda, se avisa y se ofrece reintentar.
       try {
-        const ocupados = await getCitas(desde, hasta)
+        const ocupados = await BookingService.getCitas(desde, hasta)
         if (!vivo) return
         setError(false)
         setRejilla(horasDelDia({ fecha, servicio, horario, ocupados }))

@@ -17,9 +17,11 @@ import {
   ChevronRight,
   Menu,
   X,
+  type LucideIcon,
 } from 'lucide-react'
 
-export const ICONS = {
+/** Iconos que se pueden nombrar desde los datos. */
+export const ICONS: Record<string, LucideIcon> = {
   Scissors,
   UserRound,
   Paintbrush,
