@@ -15,6 +15,7 @@ import { SPRING_SMOOTH, entryOrder } from '../../../theme/animation'
 // (fachada o interior, en HORIZONTAL), suéltala en src/assets/local.jpg y
 // cambia solo este import. Es el único cambio necesario.
 import fondoHero from '../../../assets/galeria/corte-2.jpg'
+import { ButtonSizeEnum } from '../../../services/enums/ButtonSizeEnum'
 // #endregion
 
 // Titular: cada palabra sube por separado. La segunda línea va en dorado.
@@ -168,7 +169,7 @@ const HeroComponent = () => {
             style={entryOrder(4)}
           >
             <MagneticComponent>
-              <BookingButtonComponent tamano="lg" />
+              <BookingButtonComponent size={ButtonSizeEnum.Lg} />
             </MagneticComponent>
             <a
               href="#servicios"
@@ -200,7 +201,7 @@ const HeroComponent = () => {
           </div>
 
           <div className="entra mt-5" style={entryOrder(6)}>
-            <OnlineBookingLinkComponent claro />
+            <OnlineBookingLinkComponent light />
           </div>
 
           {/* Cerrado: en vez de dejar al cliente colgado (y que se vaya a otra

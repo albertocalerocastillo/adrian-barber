@@ -97,7 +97,7 @@ supabase/
 ├── schema.sql, policies.sql, seed.sql, setup-completo.sql
 ├── migracion-*.sql  reservas 2027, seguridad, horario, iconos
 └── functions/aviso-cita/
-demo/supabase-demo.js  Supabase simulado para revisar el panel sin datos reales
+demo/supabase-demo.ts  Supabase simulado para revisar el panel sin datos reales
 ```
 
 **Flujo de datos**

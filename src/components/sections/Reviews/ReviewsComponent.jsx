@@ -42,7 +42,7 @@ const ReviewsComponent = () => {
       />
 
       <div className="relative mx-auto max-w-6xl px-5 md:px-8">
-        <SectionHeadingComponent kicker="Lo que dicen" titulo="Reseñas" claro />
+        <SectionHeadingComponent kicker="Lo que dicen" title="Reseñas" light />
 
         {/* Nota media. */}
         <RevealComponent className="mt-14 flex flex-col items-center text-center">
@@ -104,7 +104,7 @@ const ReviewsComponent = () => {
                 delay={i * 110}
                 className={i === TESTIMONIOS.length - 1 && TESTIMONIOS.length % 2 ? 'md:col-span-2 lg:col-span-1' : ''}
               >
-                <TiltCardComponent inclinacion={2}>
+                <TiltCardComponent tilt={2}>
                   <figure className="relative flex h-full flex-col border border-tinta-700 bg-tinta-800/80 p-7 backdrop-blur-sm transition-colors duration-500 hover:border-acento/40 md:p-8">
                     <Quote
                       aria-hidden="true"

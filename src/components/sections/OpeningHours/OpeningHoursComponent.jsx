@@ -7,6 +7,8 @@ import StatusBadgeComponent from '../../core/StatusBadge/StatusBadgeComponent'
 import { useBusinessStatus } from '../../../hooks/useBusinessStatus'
 import { diaHoy, formatoTramos } from '../../../utils/schedule'
 import { resumenHorario } from '../../../data/faq'
+import { ButtonSizeEnum } from '../../../services/enums/ButtonSizeEnum'
+import { RevealFromEnum } from '../../../services/enums/RevealFromEnum'
 // #endregion
 
 /**
@@ -30,14 +32,14 @@ const OpeningHoursComponent = () => {
               resumen sale del mismo horario que la tabla: no pueden
               contradecirse. */}
           <div className="lg:hidden">
-            <SectionHeadingComponent kicker="Cuándo venir" titulo="Horario" texto={resumen} />
+            <SectionHeadingComponent kicker="Cuándo venir" title="Horario" text={resumen} />
           </div>
           <div className="hidden lg:block">
             <SectionHeadingComponent
               kicker="Cuándo venir"
-              titulo="Horario"
-              texto={resumen}
-              centrado={false}
+              title="Horario"
+              text={resumen}
+              centered={false}
             />
           </div>
 
@@ -46,12 +48,12 @@ const OpeningHoursComponent = () => {
           </RevealComponent>
 
           <RevealComponent delay={200} className="mt-8 hidden lg:block">
-            <BookingButtonComponent tamano="lg" />
+            <BookingButtonComponent size={ButtonSizeEnum.Lg} />
           </RevealComponent>
         </div>
 
         {/* Tabla de horario. */}
-        <RevealComponent delay={120} desde="derecha">
+        <RevealComponent delay={120} from={RevealFromEnum.Right}>
           <ul className="overflow-hidden border border-hueso-200 bg-white shadow-xl shadow-tinta/5">
             {horario.map((d, i) => {
               const esHoy = d.dia === hoy
@@ -97,7 +99,7 @@ const OpeningHoursComponent = () => {
         </RevealComponent>
 
         <RevealComponent className="text-center lg:hidden">
-          <BookingButtonComponent tamano="lg" />
+          <BookingButtonComponent size={ButtonSizeEnum.Lg} />
         </RevealComponent>
       </div>
     </section>

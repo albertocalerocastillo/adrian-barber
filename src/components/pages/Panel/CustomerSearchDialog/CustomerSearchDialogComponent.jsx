@@ -59,7 +59,7 @@ const CustomerSearchDialogComponent = ({ onClose, onIrA }) => {
 
   // #region Renderizado
   return (
-    <SheetComponent titulo="Buscar cliente" subtitulo="Por nombre o por móvil." onCerrar={onClose}>
+    <SheetComponent title="Buscar cliente" subtitle="Por nombre o por móvil." onClose={onClose}>
       <div className="relative">
         <Search size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-tinta/35" />
         <input

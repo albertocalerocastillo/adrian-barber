@@ -59,17 +59,17 @@ const BlockTimeDialogComponent = ({ fechaInicial, onClose, onCreado }) => {
   // #region Renderizado
   return (
     <SheetComponent
-      titulo="Día libre"
-      subtitulo="Cierra un día o un rato. Esos huecos desaparecen de la web."
-      onCerrar={onClose}
-      pie={
+      title="Día libre"
+      subtitle="Cierra un día o un rato. Esos huecos desaparecen de la web."
+      onClose={onClose}
+      footer={
         <div>
           {error && (
             <p role="alert" className="mb-3 rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-700">
               {error}
             </p>
           )}
-          <PrimaryButtonComponent type="button" onClick={onGuardar} cargando={guardando} className="w-full">
+          <PrimaryButtonComponent type="button" onClick={onGuardar} loading={guardando} className="w-full">
             Cerrar {todoElDia ? 'el día' : `de ${desde} a ${hasta}`}
           </PrimaryButtonComponent>
         </div>
@@ -77,17 +77,17 @@ const BlockTimeDialogComponent = ({ fechaInicial, onClose, onCreado }) => {
     >
       <form onSubmit={onGuardar} className="space-y-6">
         <FieldComponent label="Día">
-          <DateShortcutsComponent valor={fechaStr} onCambio={setFechaStr} />
+          <DateShortcutsComponent value={fechaStr} onChange={setFechaStr} />
         </FieldComponent>
 
         <FieldComponent label="¿Cuánto?">
           <SegmentedControlComponent
-            opciones={[
-              { valor: true, texto: 'Todo el día' },
-              { valor: false, texto: 'Unas horas' },
+            options={[
+              { value: true, text: 'Todo el día' },
+              { value: false, text: 'Unas horas' },
             ]}
-            valor={todoElDia}
-            onCambio={setTodoElDia}
+            value={todoElDia}
+            onChange={setTodoElDia}
           />
           {!todoElDia && (
             <div className="mt-3 grid grid-cols-2 gap-3">

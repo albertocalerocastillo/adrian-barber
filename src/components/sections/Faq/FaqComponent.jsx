@@ -54,14 +54,14 @@ const FaqComponent = () => {
         {/* En escritorio el título se queda fijo mientras se leen las preguntas. */}
         <div className="lg:sticky lg:top-28 lg:self-start">
           <div className="lg:hidden">
-            <SectionHeadingComponent kicker="Dudas" titulo="Preguntas frecuentes" />
+            <SectionHeadingComponent kicker="Dudas" title="Preguntas frecuentes" />
           </div>
           <div className="hidden lg:block">
             <SectionHeadingComponent
               kicker="Dudas"
-              titulo="Preguntas frecuentes"
-              texto="Lo que más me preguntáis. ¿No está la tuya? Escríbeme y te contesto."
-              centrado={false}
+              title="Preguntas frecuentes"
+              text="Lo que más me preguntáis. ¿No está la tuya? Escríbeme y te contesto."
+              centered={false}
             />
           </div>
         </div>

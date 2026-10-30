@@ -7,6 +7,7 @@ import LightboxComponent from '../../core/Lightbox/LightboxComponent'
 import InstagramIconComponent from '../../core/InstagramIcon/InstagramIconComponent'
 import { GALERIA } from '../../../data/gallery'
 import { INSTAGRAM, INSTAGRAM_URL } from '../../../data/contact'
+import { RevealFromEnum } from '../../../services/enums/RevealFromEnum'
 // #endregion
 
 /**
@@ -30,8 +31,8 @@ const GalleryComponent = () => {
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <SectionHeadingComponent
           kicker="El trabajo"
-          titulo="Galería"
-          texto="Trabajos reales, recién salidos de la silla."
+          title="Galería"
+          text="Trabajos reales, recién salidos de la silla."
         />
 
         {/* Filas que se rellenan en orden, no "masonry" de columnas: las fotos
@@ -45,7 +46,7 @@ const GalleryComponent = () => {
             <RevealComponent
               key={foto.id}
               delay={(i % 4) * 90}
-              desde="escala"
+              from={RevealFromEnum.Scale}
               className="w-[calc((100%-0.75rem)/2)] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3.75rem)/4)]"
             >
               <button
@@ -87,11 +88,11 @@ const GalleryComponent = () => {
       </div>
 
       <LightboxComponent
-        fotos={GALERIA}
-        indice={indice}
-        onCerrar={cerrar}
-        onAnterior={anterior}
-        onSiguiente={siguiente}
+        photos={GALERIA}
+        index={indice}
+        onClose={cerrar}
+        onPrevious={anterior}
+        onNext={siguiente}
       />
     </section>
   )

@@ -10,6 +10,7 @@ import { NEGOCIO, INSTAGRAM, INSTAGRAM_URL } from '../../../data/contact'
 // suyo (antes había una foto de stock de un desconocido).
 // Para ponerla: suelta la foto en src/assets/adrian.jpg y cambia este import.
 import fotoSobreMi from '../../../assets/galeria/corte-3.jpg'
+import { RevealFromEnum } from '../../../services/enums/RevealFromEnum'
 // #endregion
 
 const VALORES = [
@@ -56,7 +57,7 @@ const AboutMeComponent = () => {
     <section ref={seccion} id="sobre-mi" className="grain relative overflow-hidden bg-tinta py-24 text-hueso md:py-32">
       <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 md:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
         {/* Foto. */}
-        <RevealComponent desde="izquierda" className="relative mx-auto w-full max-w-md lg:max-w-none">
+        <RevealComponent from={RevealFromEnum.Left} className="relative mx-auto w-full max-w-md lg:max-w-none">
           <div className="relative overflow-hidden">
             <m.img
               src={fotoSobreMi}

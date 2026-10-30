@@ -162,17 +162,17 @@ const NewAppointmentDialogComponent = ({ fechaInicial, horaInicial, onClose, onC
   // #region Renderizado
   return (
     <SheetComponent
-      titulo="Nueva cita"
-      subtitulo="Para quien llama o pasa por la puerta."
-      onCerrar={onClose}
-      pie={
+      title="Nueva cita"
+      subtitle="Para quien llama o pasa por la puerta."
+      onClose={onClose}
+      footer={
         <div>
           {error && (
             <p role="alert" className="mb-3 rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-700">
               {error}
             </p>
           )}
-          <PrimaryButtonComponent type="button" onClick={onGuardar} cargando={guardando} className="w-full">
+          <PrimaryButtonComponent type="button" onClick={onGuardar} loading={guardando} className="w-full">
             {!horaISO
               ? 'Guardar cita'
               : fechas.length > 1
@@ -214,11 +214,11 @@ const NewAppointmentDialogComponent = ({ fechaInicial, horaInicial, onClose, onC
         </FieldComponent>
 
         <FieldComponent label="Día">
-          <DateShortcutsComponent valor={fechaStr} onCambio={cambiarFecha} />
+          <DateShortcutsComponent value={fechaStr} onChange={cambiarFecha} />
         </FieldComponent>
 
         <FieldComponent label="Hora">
-          <TimePickerComponent rejilla={rejilla} valor={horaISO} onCambio={setHoraISO} />
+          <TimePickerComponent slots={rejilla} value={horaISO} onChange={setHoraISO} />
         </FieldComponent>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -252,18 +252,18 @@ const NewAppointmentDialogComponent = ({ fechaInicial, horaInicial, onClose, onC
               <span className="font-semibold">Repetir cada semana</span>
               <span className="block text-xs text-tinta/50">Para los fijos: misma hora, varias semanas.</span>
             </p>
-            <SwitchComponent activo={repetir} onCambio={setRepetir} etiqueta="Repetir cada semana" />
+            <SwitchComponent active={repetir} onChange={setRepetir} label="Repetir cada semana" />
           </div>
 
           {repetir && (
             <div className="mt-4 space-y-3">
               <div className="max-w-[14rem]">
                 <StepperComponent
-                  valor={semanas}
-                  onCambio={(v) => setSemanas(Math.min(SEMANAS_MAX, Math.max(SEMANAS_MIN, v)))}
+                  value={semanas}
+                  onChange={(v) => setSemanas(Math.min(SEMANAS_MAX, Math.max(SEMANAS_MIN, v)))}
                   min={SEMANAS_MIN}
-                  sufijo="semanas"
-                  etiqueta="semanas"
+                  suffix="semanas"
+                  label="semanas"
                 />
               </div>
               {fechas.length > 1 ? (
