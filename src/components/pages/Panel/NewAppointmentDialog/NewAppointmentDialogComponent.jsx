@@ -183,7 +183,7 @@ const NewAppointmentDialogComponent = ({ fechaInicial, horaInicial, onClose, onC
       }
     >
       <form onSubmit={onGuardar} className="space-y-6">
-        <FieldComponent etiqueta="Servicio">
+        <FieldComponent label="Servicio">
           <div className="grid gap-2 sm:grid-cols-2">
             {servicios.map((s) => {
               const Icono = ICONS[s.icono] || ICONS.Scissors
@@ -213,16 +213,16 @@ const NewAppointmentDialogComponent = ({ fechaInicial, horaInicial, onClose, onC
           </div>
         </FieldComponent>
 
-        <FieldComponent etiqueta="Día">
+        <FieldComponent label="Día">
           <DateShortcutsComponent valor={fechaStr} onCambio={cambiarFecha} />
         </FieldComponent>
 
-        <FieldComponent etiqueta="Hora">
+        <FieldComponent label="Hora">
           <TimePickerComponent rejilla={rejilla} valor={horaISO} onCambio={setHoraISO} />
         </FieldComponent>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <FieldComponent etiqueta="Nombre">
+          <FieldComponent label="Nombre">
             <input
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
@@ -231,7 +231,7 @@ const NewAppointmentDialogComponent = ({ fechaInicial, horaInicial, onClose, onC
               placeholder="Nombre del cliente"
             />
           </FieldComponent>
-          <FieldComponent etiqueta="Móvil (opcional)">
+          <FieldComponent label="Móvil (opcional)">
             <input
               value={movil}
               onChange={(e) => setMovil(e.target.value)}

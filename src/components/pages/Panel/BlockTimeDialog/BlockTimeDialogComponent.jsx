@@ -76,11 +76,11 @@ const BlockTimeDialogComponent = ({ fechaInicial, onClose, onCreado }) => {
       }
     >
       <form onSubmit={onGuardar} className="space-y-6">
-        <FieldComponent etiqueta="Día">
+        <FieldComponent label="Día">
           <DateShortcutsComponent valor={fechaStr} onCambio={setFechaStr} />
         </FieldComponent>
 
-        <FieldComponent etiqueta="¿Cuánto?">
+        <FieldComponent label="¿Cuánto?">
           <SegmentedControlComponent
             opciones={[
               { valor: true, texto: 'Todo el día' },
@@ -103,7 +103,7 @@ const BlockTimeDialogComponent = ({ fechaInicial, onClose, onCreado }) => {
           )}
         </FieldComponent>
 
-        <FieldComponent etiqueta="Motivo (opcional)" ayuda="Solo lo ves tú.">
+        <FieldComponent label="Motivo (opcional)" help="Solo lo ves tú.">
           <div className="mb-2 flex flex-wrap gap-2">
             {MOTIVOS.map((mo) => (
               <button
