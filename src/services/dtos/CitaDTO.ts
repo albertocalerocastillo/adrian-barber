@@ -1,4 +1,5 @@
 import type { EstadoCitaEnum } from '../enums/EstadoCitaEnum'
+import type { OrigenCitaEnum } from '../enums/OrigenCitaEnum'
 
 /** Cita completa, tal como la ve el panel (tabla `citas`, en camelCase). */
 export interface CitaDTO {
@@ -18,4 +19,6 @@ export interface CitaDTO {
   estado: EstadoCitaEnum;
   /** Notas de Adrián. */
   notas: string | null;
+  /** Por dónde entró la cita (las de la web llevan una etiqueta). */
+  origen?: OrigenCitaEnum;
 }
