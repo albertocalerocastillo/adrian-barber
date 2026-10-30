@@ -19,14 +19,12 @@ import { atTime, addMinutes, MINUTES_PER_DAY } from '../../../../utils/availabil
 import {
   formatLongDate, formatShortDate, formatTime as fmtHora, startOfDay, startOfWeek, isSameDay, toInputDate,
 } from '../../../../utils/dates'
-import {
-  listarCitas, listarBloqueos, cambiarEstado, borrarBloqueo, crearBloqueo, moverCita,
-} from '../../../../services/AgendaService'
-import { getHorario, getServicios } from '../../../../services/ConfigurationService'
 import { EASE_SMOOTH } from '../../../../theme/animation'
 import { EstadoCitaEnum } from '../../../../services/enums/EstadoCitaEnum'
 import { VistaAgendaEnum } from '../../../../services/enums/VistaAgendaEnum'
 import { HojaAgendaEnum } from '../../../../services/enums/HojaAgendaEnum'
+import { AgendaService } from '../../../../services/AgendaService'
+import { ConfigurationService } from '../../../../services/ConfigurationService'
 // #endregion
 
 // #region Constantes
@@ -81,7 +79,7 @@ const AgendaComponent = ({ activa = true }) => {
   useEffect(() => {
     let vivo = true
     const cargar = async () => {
-      const [h, s] = await Promise.all([getHorario(), getServicios()])
+      const [h, s] = await Promise.all([ConfigurationService.getHorario(), ConfigurationService.getServicios()])
       if (!vivo) return
       setHorario(h)
       setServicios(s)
@@ -102,7 +100,7 @@ const AgendaComponent = ({ activa = true }) => {
     const hasta = addMinutes(desde, 42 * MINUTES_PER_DAY)
     let vivo = true
     const cargar = async () => {
-      const [citas, bloqueos] = await Promise.all([listarCitas(desde, hasta), listarBloqueos(desde, hasta)])
+      const [citas, bloqueos] = await Promise.all([AgendaService.listarCitas(desde, hasta), AgendaService.listarBloqueos(desde, hasta)])
       if (vivo) setDatos({ citas, bloqueos })
     }
     cargar()
@@ -132,7 +130,7 @@ const AgendaComponent = ({ activa = true }) => {
   const cambiar = async (cita, estado, texto) => {
     const anterior = cita.estado
     fijarEstadoLocal(cita.id, estado)
-    const res = await cambiarEstado(cita.id, estado)
+    const res = await AgendaService.cambiarEstado(cita.id, estado)
     if (!res.ok) {
       fijarEstadoLocal(cita.id, anterior)
       avisar({ texto: 'No se pudo guardar. Revisa la conexión.', tipo: 'error' })
@@ -142,19 +140,19 @@ const AgendaComponent = ({ activa = true }) => {
       texto,
       deshacer: async () => {
         fijarEstadoLocal(cita.id, anterior)
-        await cambiarEstado(cita.id, anterior)
+        await AgendaService.cambiarEstado(cita.id, anterior)
       },
     })
   }
 
   const quitarBloqueo = async (b) => {
-    const res = await borrarBloqueo(b.id)
+    const res = await AgendaService.borrarBloqueo(b.id)
     if (!res.ok) return avisar({ texto: 'No se pudo quitar.', tipo: 'error' })
     recargar()
     avisar({
       texto: 'Vuelve a estar abierto',
       deshacer: async () => {
-        await crearBloqueo({ inicio: new Date(b.inicio), fin: new Date(b.fin), motivo: b.motivo })
+        await AgendaService.crearBloqueo({ inicio: new Date(b.inicio), fin: new Date(b.fin), motivo: b.motivo })
         recargar()
       },
     })
@@ -163,9 +161,9 @@ const AgendaComponent = ({ activa = true }) => {
   const onMovida = async (cita, inicioAnterior, finAnterior) => {
     recargar()
     avisar({
-      texto: `Cita de ${cita.cliente_nombre.split(' ')[0]} cambiada`,
+      texto: `Cita de ${cita.clienteNombre.split(' ')[0]} cambiada`,
       deshacer: async () => {
-        await moverCita(cita.id, inicioAnterior, finAnterior)
+        await AgendaService.moverCita(cita.id, inicioAnterior, finAnterior)
         recargar()
       },
     })
@@ -507,7 +505,7 @@ const Resumen = ({ citas, precios }) => {
   const activas = citas.filter((c) => c.estado !== EstadoCitaEnum.Cancelada)
   const atendidas = activas.filter((c) => c.estado === EstadoCitaEnum.Atendida).length
   const pendientes = activas.length - atendidas
-  const caja = activas.reduce((t, c) => t + (precios.get(c.servicio_nombre) ?? 0), 0)
+  const caja = activas.reduce((t, c) => t + (precios.get(c.servicioNombre) ?? 0), 0)
   const hecho = activas.length ? atendidas / activas.length : 0
 
   const tarjetas = [
@@ -564,7 +562,7 @@ const Siguiente = ({ citas, ahora, precios, onEstado }) => {
   const ini = new Date(siguiente.inicio)
   const fin = new Date(siguiente.fin)
   const enCurso = ini <= ahora
-  const movil = (siguiente.cliente_movil || '').replace(/\s+/g, '')
+  const movil = (siguiente.clienteMovil || '').replace(/\s+/g, '')
 
   return (
     <m.section
@@ -593,10 +591,10 @@ const Siguiente = ({ citas, ahora, precios, onEstado }) => {
             )}
             {enCurso ? 'Ahora en la silla' : `Siguiente · ${cuandoTexto(ini, ahora)}`}
           </p>
-          <p className="mt-2 truncate font-display text-3xl font-bold sm:text-4xl">{siguiente.cliente_nombre}</p>
+          <p className="mt-2 truncate font-display text-3xl font-bold sm:text-4xl">{siguiente.clienteNombre}</p>
           <p className="mt-1 text-sm text-hueso/65">
-            {fmtHora(ini)} – {fmtHora(fin)} · {siguiente.servicio_nombre}
-            {precios.has(siguiente.servicio_nombre) && ` · ${formatoEuros(precios.get(siguiente.servicio_nombre))} €`}
+            {fmtHora(ini)} – {fmtHora(fin)} · {siguiente.servicioNombre}
+            {precios.has(siguiente.servicioNombre) && ` · ${formatoEuros(precios.get(siguiente.servicioNombre))} €`}
           </p>
         </div>
 
@@ -605,7 +603,7 @@ const Siguiente = ({ citas, ahora, precios, onEstado }) => {
             <>
               <a
                 href={`tel:${movil}`}
-                aria-label={`Llamar a ${siguiente.cliente_nombre}`}
+                aria-label={`Llamar a ${siguiente.clienteNombre}`}
                 className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
               >
                 <Phone size={19} />
@@ -614,7 +612,7 @@ const Siguiente = ({ citas, ahora, precios, onEstado }) => {
                 href={`https://wa.me/34${movil}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`WhatsApp a ${siguiente.cliente_nombre}`}
+                aria-label={`WhatsApp a ${siguiente.clienteNombre}`}
                 className="flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white transition-transform hover:scale-105"
               >
                 <WhatsAppIconComponent size={20} />
@@ -623,7 +621,7 @@ const Siguiente = ({ citas, ahora, precios, onEstado }) => {
           )}
           <button
             type="button"
-            onClick={() => onEstado(siguiente, EstadoCitaEnum.Atendida, `${siguiente.cliente_nombre.split(' ')[0]}, atendido`)}
+            onClick={() => onEstado(siguiente, EstadoCitaEnum.Atendida, `${siguiente.clienteNombre.split(' ')[0]}, atendido`)}
             className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-acento px-6 font-semibold text-tinta transition-all hover:bg-acento-claro active:scale-[0.97] sm:flex-none"
           >
             <Check size={18} /> Atendido
@@ -789,7 +787,7 @@ const VistaDia = ({ dia, ahora, horario, citas, bloqueos, precios, onEstado, onM
                 {canceladas.map((c) => (
                   <li key={c.id} className="flex items-center justify-between gap-3 rounded-xl bg-tinta/5 px-4 py-3 text-sm">
                     <span className="min-w-0 truncate text-tinta/45 line-through">
-                      {fmtHora(new Date(c.inicio))} · {c.cliente_nombre} · {c.servicio_nombre}
+                      {fmtHora(new Date(c.inicio))} · {c.clienteNombre} · {c.servicioNombre}
                     </span>
                     <button
                       type="button"
@@ -814,9 +812,9 @@ const CitaCard = ({ cita, ahora, precios, onEstado, onMover }) => {
   const fin = new Date(cita.fin)
   const atendida = cita.estado === EstadoCitaEnum.Atendida
   const enCurso = !atendida && ini <= ahora && ahora < fin
-  const movil = (cita.cliente_movil || '').replace(/\s+/g, '')
-  const precio = precios.get(cita.servicio_nombre)
-  const nombre = cita.cliente_nombre.split(' ')[0]
+  const movil = (cita.clienteMovil || '').replace(/\s+/g, '')
+  const precio = precios.get(cita.servicioNombre)
+  const nombre = cita.clienteNombre.split(' ')[0]
 
   return (
     <article
@@ -830,7 +828,7 @@ const CitaCard = ({ cita, ahora, precios, onEstado, onMover }) => {
             {fmtHora(ini)} – {fmtHora(fin)}
           </p>
           <p className={`flex items-center gap-2 font-display text-lg font-bold sm:text-xl ${atendida ? 'text-tinta/55' : ''}`}>
-            <span className="truncate">{cita.cliente_nombre}</span>
+            <span className="truncate">{cita.clienteNombre}</span>
             {/* Reservada por el cliente desde la web (no metida a mano). */}
             {cita.origen === 'web' && (
               <span title="Reservada desde la web" className="shrink-0 rounded-full bg-tinta px-2 py-0.5 font-body text-[0.6rem] font-semibold uppercase tracking-wider text-acento">
@@ -839,7 +837,7 @@ const CitaCard = ({ cita, ahora, precios, onEstado, onMover }) => {
             )}
           </p>
           <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-sm text-tinta/55">
-            <span>{cita.servicio_nombre}</span>
+            <span>{cita.servicioNombre}</span>
             <span className="hidden items-center gap-1 sm:flex">
               <span className="text-tinta/25">·</span>
               <Clock size={13} /> {fmtHora(ini)}–{fmtHora(fin)}
@@ -1028,7 +1026,7 @@ const VistaSemana = ({ inicio, citas, bloqueos, horario, ahora, onDia }) => {
                     c.estado === EstadoCitaEnum.Atendida ? 'bg-green-100 text-green-800' : 'bg-acento/15 text-tinta'
                   }`}
                 >
-                  <span className="tabular-nums">{fmtHora(new Date(c.inicio))}</span> {c.cliente_nombre.split(' ')[0]}
+                  <span className="tabular-nums">{fmtHora(new Date(c.inicio))}</span> {c.clienteNombre.split(' ')[0]}
                 </span>
               ))}
             </div>

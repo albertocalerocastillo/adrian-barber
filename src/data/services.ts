@@ -8,7 +8,10 @@
 //
 // duracion: minutos · online: si se puede reservar desde la web · icono: nombre de un icono de lucide-react (theme/icons.js).
 
-export const SERVICIOS = [
+import type { ServicioDTO } from '../services/dtos/ServicioDTO'
+
+/** Servicios estáticos (si no hay Supabase). */
+export const SERVICIOS: ServicioDTO[] = [
   {
     id: 'corte',
     nombre: 'Corte',

@@ -10,11 +10,11 @@ import DateStepComponent from '../Booking/DateStep/DateStepComponent'
 import TimeStepComponent from '../Booking/TimeStep/TimeStepComponent'
 import DetailsStepComponent from '../Booking/DetailsStep/DetailsStepComponent'
 import ConfirmationComponent from '../Booking/Confirmation/ConfirmationComponent'
-import { getHorario, getServicios } from '../../../services/ConfigurationService'
 import { formatLongDate, formatTimeInZone } from '../../../utils/dates'
 import { RESERVA, reservaEmpezada, inicioReservas } from '../../../data/features'
 import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contact'
 import { EASE_SMOOTH } from '../../../theme/animation'
+import { ConfigurationService } from '../../../services/ConfigurationService'
 // #endregion
 
 const PASOS = ['Servicio', 'Día', 'Hora', 'Tus datos']
@@ -46,7 +46,7 @@ const BookingComponent = () => {
   useEffect(() => {
     let vivo = true
     const cargar = async () => {
-      const [h, ss] = await Promise.all([getHorario(), getServicios()])
+      const [h, ss] = await Promise.all([ConfigurationService.getHorario(), ConfigurationService.getServicios()])
       if (!vivo) return
       setHorario(h)
       const activos = ss.filter((s) => s.activo !== false)

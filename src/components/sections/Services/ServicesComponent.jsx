@@ -8,8 +8,8 @@ import BookingButtonComponent from '../../core/BookingButton/BookingButtonCompon
 import OnlineBookingLinkComponent from '../../core/OnlineBookingLink/OnlineBookingLinkComponent'
 import { useCountUp } from '../../../hooks/useCountUp'
 import { PROMO } from '../../../data/services'
-import { getServicios } from '../../../services/ConfigurationService'
 import { ICONS } from '../../../theme/icons'
+import { ConfigurationService } from '../../../services/ConfigurationService'
 // #endregion
 
 /**
@@ -27,7 +27,7 @@ const ServicesComponent = () => {
   useEffect(() => {
     let vivo = true
     const cargar = async () => {
-      const ss = await getServicios()
+      const ss = await ConfigurationService.getServicios()
       if (vivo) setServicios(ss.filter((s) => s.activo !== false))
     }
     cargar()

@@ -10,11 +10,20 @@
 import { NEGOCIO, TELEFONO_VISIBLE } from './contact'
 import { SERVICIOS, PROMO } from './services'
 import { RESERVAS_ONLINE, inicioReservas } from './features'
+import type { HorarioDiaDTO } from '../services/dtos/HorarioDiaDTO'
+
+/** Pregunta frecuente con su respuesta. */
+export interface PreguntaFaq {
+  /** Pregunta tal como la haría un cliente. */
+  pregunta: string;
+  /** Respuesta con datos reales del negocio. */
+  respuesta: string;
+}
 
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
 
 // "1 de enero de 2027".
-const fechaInicioTexto = () => {
+const fechaInicioTexto = (): string => {
   const d = inicioReservas()
   return `${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`
 }
@@ -22,7 +31,7 @@ const fechaInicioTexto = () => {
 const ORDEN_SEMANA = [1, 2, 3, 4, 5, 6, 0]
 
 // Convierte los tramos de un día en texto ("de 10:00 a 22:00" / "cerrado").
-const tramosATexto = (tramos) => {
+const tramosATexto = (tramos: HorarioDiaDTO['tramos']): string => {
   if (!tramos || tramos.length === 0) return 'cerrado'
   return tramos.map(([de, a]) => `de ${de} a ${a}`).join(' y ')
 }
@@ -33,11 +42,11 @@ const tramosATexto = (tramos) => {
  * Se genera desde el mismo horario que muestra la web: así la FAQ no puede
  * contradecir a la sección de Horario.
  */
-export const resumenHorario = (horario) => {
-  const dias = ORDEN_SEMANA.map((d) => horario.find((h) => h.dia === d)).filter(Boolean)
+export const resumenHorario = (horario: HorarioDiaDTO[]): string => {
+  const dias = ORDEN_SEMANA.map((d) => horario.find((h) => h.dia === d)).filter((d): d is HorarioDiaDTO => Boolean(d))
   if (dias.length === 0) return ''
 
-  const grupos = []
+  const grupos: { texto: string; dias: string[] }[] = []
   for (const dia of dias) {
     const texto = tramosATexto(dia.tramos)
     const ultimo = grupos[grupos.length - 1]
@@ -59,7 +68,7 @@ export const resumenHorario = (horario) => {
 }
 
 /** Construye las preguntas a partir de los datos reales del negocio. */
-export const construirFaq = (horario) => {
+export const construirFaq = (horario: HorarioDiaDTO[]): PreguntaFaq[] => {
   const corte = SERVICIOS.find((s) => s.nombre === 'Corte')
   const otros = SERVICIOS.filter((s) => s.nombre !== 'Corte')
 

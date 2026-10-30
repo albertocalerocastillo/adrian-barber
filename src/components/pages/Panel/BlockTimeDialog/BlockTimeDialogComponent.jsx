@@ -4,7 +4,7 @@ import SheetComponent from '../Sheet/SheetComponent'
 import { FieldComponent, SegmentedControlComponent, PrimaryButtonComponent, DateShortcutsComponent, INPUT_CLASS_NAME } from '../Controls/ControlsComponent'
 import { atTime, addMinutes, MINUTES_PER_DAY } from '../../../../utils/availability'
 import { startOfDay, formatLongDate, toInputDate } from '../../../../utils/dates'
-import { crearBloqueo } from '../../../../services/AgendaService'
+import { AgendaService } from '../../../../services/AgendaService'
 // #endregion
 
 const MOTIVOS = ['Vacaciones', 'Médico', 'Descanso', 'Formación']
@@ -41,7 +41,7 @@ const BlockTimeDialogComponent = ({ fechaInicial, onClose, onCreado }) => {
     }
     setGuardando(true)
     setError('')
-    const res = await crearBloqueo({ inicio: ini, fin, motivo: motivo.trim() })
+    const res = await AgendaService.crearBloqueo({ inicio: ini, fin, motivo: motivo.trim() })
     setGuardando(false)
     if (res.ok) {
       onCreado(`${formatLongDate(fecha)}: ${todoElDia ? 'cerrado todo el día' : `cerrado de ${desde} a ${hasta}`}`)

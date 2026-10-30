@@ -118,7 +118,7 @@ const MonthViewComponent = ({ mes, dia, ahora, citas, bloqueos, horario, onDia }
                         elegido ? 'bg-white/10' : c.estado === EstadoCitaEnum.Atendida ? 'bg-green-100 text-green-800' : 'bg-acento/15'
                       }`}
                     >
-                      <span className="tabular-nums">{fmtHora(new Date(c.inicio))}</span> {c.cliente_nombre.split(' ')[0]}
+                      <span className="tabular-nums">{fmtHora(new Date(c.inicio))}</span> {c.clienteNombre.split(' ')[0]}
                     </span>
                   ))}
                   {suyas.length > 3 && (

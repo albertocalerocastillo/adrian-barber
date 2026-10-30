@@ -2,9 +2,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Loader2, AlertCircle, User, Phone, ShieldCheck } from 'lucide-react'
-import { crearCita } from '../../../../services/BookingService'
 import { addMinutes } from '../../../../utils/availability'
 import { limpiarMovil } from '../bookingRules'
+import { BookingService } from '../../../../services/BookingService'
 // #endregion
 
 const claseCampo =
@@ -43,7 +43,7 @@ const DetailsStepComponent = ({ servicio, hora, onConfirmado, onHoraPerdida }) =
       inicio: hora,
       fin: addMinutes(hora, servicio.duracion),
     }
-    const res = await crearCita(datos)
+    const res = await BookingService.crearCita(datos)
     setEnviando(false)
 
     if (res.ok) onConfirmado(datos)

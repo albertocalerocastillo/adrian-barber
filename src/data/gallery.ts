@@ -12,7 +12,7 @@
 // verse coja.
 
 // Vite incluye en el build todas las imágenes de la carpeta (import.meta.glob).
-const modulos = import.meta.glob(
+const modulos = import.meta.glob<string>(
   '../assets/galeria/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}',
   { eager: true, query: '?url', import: 'default' }
 )
@@ -23,7 +23,22 @@ const modulos = import.meta.glob(
 const RATIO_W = 640
 const RATIO_H = 1138
 
-const fotosLocales = Object.entries(modulos)
+/** Foto de la galería. */
+export interface FotoGaleria {
+  /** Identificador único. */
+  id: string;
+  /** Dirección de la imagen. */
+  src: string;
+  /** Texto alternativo (también cuenta para Google). */
+  alt: string;
+  /** Ancho y alto reales, para reservar el hueco antes de cargar. */
+  w: number;
+  h: number;
+  /** Si la foto es alta (ocupa dos filas en la rejilla). */
+  alto?: string;
+}
+
+const fotosLocales: FotoGaleria[] = Object.entries(modulos)
   // Orden ascendente y "natural" (corte-2 antes que corte-10).
   .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
   .map(([ruta, url]) => ({
@@ -35,7 +50,7 @@ const fotosLocales = Object.entries(modulos)
   }))
 
 // Placeholders (solo si aún no hay fotos reales en src/assets/galeria/).
-const PLACEHOLDERS = [
+const PLACEHOLDERS: FotoGaleria[] = [
   { id: 'ph1', src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=900&q=80', alt: 'Corte de pelo degradado clásico en barbería de La Rinconada, Sevilla', alto: 'tall', w: 900, h: 1350 },
   { id: 'ph2', src: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=900&q=80', alt: 'Arreglo de barba a navaja en A.S Peluquería y Barbería, La Rinconada', w: 900, h: 1125 },
   { id: 'ph3', src: 'https://images.unsplash.com/photo-1621607512214-68297480165e?w=900&q=80', alt: 'Detalle de degradado lateral, barbería en La Rinconada (Sevilla)', w: 900, h: 1125 },
@@ -44,5 +59,6 @@ const PLACEHOLDERS = [
   { id: 'ph6', src: 'https://images.unsplash.com/photo-1517832606299-7ae9b720a186?w=900&q=80', alt: 'Peinado y perfilado, peluquería en La Rinconada (Sevilla)', w: 900, h: 1125 },
 ]
 
-export const GALERIA = fotosLocales.length ? fotosLocales : PLACEHOLDERS
+/** Fotos que enseña la web (las reales o, si no hay, las de ejemplo). */
+export const GALERIA: FotoGaleria[] = fotosLocales.length ? fotosLocales : PLACEHOLDERS
 export const HAY_FOTOS_REALES = fotosLocales.length > 0

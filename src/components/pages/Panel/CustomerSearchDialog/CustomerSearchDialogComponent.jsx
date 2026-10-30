@@ -6,9 +6,9 @@ import SheetComponent from '../Sheet/SheetComponent'
 import WhatsAppIconComponent from '../../../core/WhatsAppIcon/WhatsAppIconComponent'
 import { INPUT_CLASS_NAME } from '../Controls/ControlsComponent'
 import { formatTime as fmtHora, formatShortDate } from '../../../../utils/dates'
-import { buscarCitas } from '../../../../services/AgendaService'
 import { EASE_SMOOTH } from '../../../../theme/animation'
 import { EstadoCitaEnum } from '../../../../services/enums/EstadoCitaEnum'
+import { AgendaService } from '../../../../services/AgendaService'
 // #endregion
 
 const ESTADOS = {
@@ -42,7 +42,7 @@ const CustomerSearchDialogComponent = ({ onClose, onIrA }) => {
     if (buscado.length < 2) return
     let vivo = true
     const id = setTimeout(async () => {
-      const citas = await buscarCitas(buscado)
+      const citas = await AgendaService.buscarCitas(buscado)
       if (vivo) setResultado({ para: buscado, citas })
     }, 300)
     return () => {
@@ -172,7 +172,7 @@ const Lista = ({ titulo, citas, onIrA, destacar = false }) => {
                 </span>
                 <span className="min-w-0 flex-1 text-sm">
                   <span className="block font-semibold tabular-nums">{fmtHora(ini)}</span>
-                  <span className="block truncate text-tinta/55">{c.servicio_nombre}</span>
+                  <span className="block truncate text-tinta/55">{c.servicioNombre}</span>
                 </span>
                 <span className={`shrink-0 rounded-full px-2.5 py-1 text-[0.65rem] font-semibold ${estado.clase}`}>{estado.texto}</span>
                 <ChevronRight size={16} className="shrink-0 text-tinta/25 transition-transform group-hover:translate-x-0.5" />
@@ -189,9 +189,9 @@ const Lista = ({ titulo, citas, onIrA, destacar = false }) => {
 const agrupar = (citas) => {
   const grupos = new Map()
   for (const c of citas) {
-    const movil = (c.cliente_movil || '').replace(/\D/g, '')
-    const clave = movil || `n:${c.cliente_nombre.trim().toLowerCase()}`
-    if (!grupos.has(clave)) grupos.set(clave, { clave, nombre: c.cliente_nombre.trim(), movil, citas: [] })
+    const movil = (c.clienteMovil || '').replace(/\D/g, '')
+    const clave = movil || `n:${c.clienteNombre.trim().toLowerCase()}`
+    if (!grupos.has(clave)) grupos.set(clave, { clave, nombre: c.clienteNombre.trim(), movil, citas: [] })
     grupos.get(clave).citas.push(c)
   }
   // Las citas llegan de la más nueva a la más vieja: el orden de los grupos

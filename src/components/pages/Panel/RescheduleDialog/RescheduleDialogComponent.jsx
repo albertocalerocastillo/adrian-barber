@@ -9,9 +9,9 @@ import { FieldComponent, PrimaryButtonComponent, DateShortcutsComponent } from '
 import WhatsAppIconComponent from '../../../core/WhatsAppIcon/WhatsAppIconComponent'
 import { addMinutes } from '../../../../utils/availability'
 import { formatTime as fmtHora, formatLongDate, toInputDate } from '../../../../utils/dates'
-import { moverCita } from '../../../../services/AgendaService'
-import { getHorario } from '../../../../services/ConfigurationService'
 import { EASE_SMOOTH } from '../../../../theme/animation'
+import { AgendaService } from '../../../../services/AgendaService'
+import { ConfigurationService } from '../../../../services/ConfigurationService'
 // #endregion
 
 /**
@@ -37,7 +37,7 @@ const RescheduleDialogComponent = ({ cita, onClose, onMovida }) => {
   useEffect(() => {
     let vivo = true
     const cargar = async () => {
-      const h = await getHorario()
+      const h = await ConfigurationService.getHorario()
       if (vivo) setHorario(h)
     }
     cargar()
@@ -64,7 +64,7 @@ const RescheduleDialogComponent = ({ cita, onClose, onMovida }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fechaStr, horario, duracion, cita.id])
 
-  const nombre = cita.cliente_nombre.split(' ')[0]
+  const nombre = cita.clienteNombre.split(' ')[0]
 
   const onGuardar = async () => {
     if (guardando) return
@@ -72,7 +72,7 @@ const RescheduleDialogComponent = ({ cita, onClose, onMovida }) => {
     setGuardando(true)
     setError('')
     const inicio = new Date(horaISO)
-    const res = await moverCita(cita.id, inicio, addMinutes(inicio, duracion))
+    const res = await AgendaService.moverCita(cita.id, inicio, addMinutes(inicio, duracion))
     setGuardando(false)
     if (!res.ok) return setError(res.error)
     onMovida(cita, new Date(cita.inicio), new Date(cita.fin))
@@ -81,7 +81,7 @@ const RescheduleDialogComponent = ({ cita, onClose, onMovida }) => {
 
   if (hecha) {
     const mensaje = `Hola ${nombre}, te he cambiado la cita al ${formatLongDate(hecha).toLowerCase()} a las ${fmtHora(hecha)}. ¡Nos vemos! Adrián`
-    const whatsapp = buildWhatsappLink(cita.cliente_movil, mensaje)
+    const whatsapp = buildWhatsappLink(cita.clienteMovil, mensaje)
     return (
       <SheetComponent titulo="Cita cambiada" onCerrar={onClose}>
         <m.div
@@ -93,7 +93,7 @@ const RescheduleDialogComponent = ({ cita, onClose, onMovida }) => {
           <span className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-700">
             <CalendarCheck size={30} />
           </span>
-          <p className="mt-4 font-display text-2xl font-bold">{cita.cliente_nombre}</p>
+          <p className="mt-4 font-display text-2xl font-bold">{cita.clienteNombre}</p>
           <p className="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm">
             <span className="text-tinta/45 line-through">
               {formatLongDate(inicioOriginal)} · {fmtHora(inicioOriginal)}
@@ -137,7 +137,7 @@ const RescheduleDialogComponent = ({ cita, onClose, onMovida }) => {
   return (
     <SheetComponent
       titulo="Cambiar hora"
-      subtitulo={`${cita.cliente_nombre} · ${cita.servicio_nombre}`}
+      subtitulo={`${cita.clienteNombre} · ${cita.servicioNombre}`}
       onCerrar={onClose}
       pie={
         <div>

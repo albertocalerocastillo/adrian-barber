@@ -9,7 +9,7 @@ import AgendaComponent from './Agenda/AgendaComponent'
 import ScheduleSettingsComponent from './ScheduleSettings/ScheduleSettingsComponent'
 import ServiceSettingsComponent from './ServiceSettings/ServiceSettingsComponent'
 import { ToastProviderComponent } from './Toast/ToastProviderComponent'
-import { logout, esBarbero } from '../../../services/AgendaService'
+import { AuthenticationService } from '../../../services/AuthenticationService'
 // #endregion
 
 const SECCIONES = [
@@ -42,7 +42,7 @@ const PanelComponent = () => {
     if (!usuario) return
     let vivo = true
     const comprobar = async () => {
-      const ok = await esBarbero()
+      const ok = await AuthenticationService.esBarbero()
       if (vivo) setPermiso({ usuario, ok })
     }
     comprobar()
@@ -88,7 +88,7 @@ const PanelComponent = () => {
         </p>
         <button
           type="button"
-          onClick={logout}
+          onClick={AuthenticationService.logout}
           className="mt-8 rounded-full bg-acento px-6 py-3 font-semibold text-tinta transition-colors hover:bg-acento-claro"
         >
           Salir
@@ -167,7 +167,7 @@ const Escritorio = ({ email }) => {
           </Link>
           <button
             type="button"
-            onClick={logout}
+            onClick={AuthenticationService.logout}
             className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-hueso/60 transition-colors hover:bg-white/5 hover:text-hueso"
           >
             <LogOut size={16} /> Salir
@@ -204,7 +204,7 @@ const Escritorio = ({ email }) => {
 
             <button
               type="button"
-              onClick={logout}
+              onClick={AuthenticationService.logout}
               aria-label="Salir"
               className="-mr-2 flex h-11 items-center gap-2 rounded-full px-3 text-sm text-hueso/65 transition-colors hover:text-acento"
             >

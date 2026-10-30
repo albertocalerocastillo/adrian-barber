@@ -7,9 +7,9 @@ import { huecosDelDia } from '../agendaSlots'
 import { FieldComponent, PrimaryButtonComponent, DateShortcutsComponent, SwitchComponent, StepperComponent, INPUT_CLASS_NAME } from '../Controls/ControlsComponent'
 import { addMinutes } from '../../../../utils/availability'
 import { formatTime as fmtHora, formatShortDate, toInputDate } from '../../../../utils/dates'
-import { listarBloqueos, crearCitaManual } from '../../../../services/AgendaService'
-import { getHorario, getServicios } from '../../../../services/ConfigurationService'
 import { ICONS } from '../../../../theme/icons'
+import { AgendaService } from '../../../../services/AgendaService'
+import { ConfigurationService } from '../../../../services/ConfigurationService'
 // #endregion
 
 const SEMANAS_MIN = 2
@@ -64,7 +64,7 @@ const NewAppointmentDialogComponent = ({ fechaInicial, horaInicial, onClose, onC
   useEffect(() => {
     let vivo = true
     const cargar = async () => {
-      const [h, ss] = await Promise.all([getHorario(), getServicios()])
+      const [h, ss] = await Promise.all([ConfigurationService.getHorario(), ConfigurationService.getServicios()])
       if (!vivo) return
       const activos = ss.filter((s) => s.activo !== false)
       setHorario(h)
@@ -114,7 +114,7 @@ const NewAppointmentDialogComponent = ({ fechaInicial, horaInicial, onClose, onC
 
     // Días libres que pisan alguna de las semanas: esas se saltan.
     const ultima = fechas.at(-1)
-    const bloqueos = fechas.length > 1 ? await listarBloqueos(fechas[0], addMinutes(ultima, servicio.duracion)) : []
+    const bloqueos = fechas.length > 1 ? await AgendaService.listarBloqueos(fechas[0], addMinutes(ultima, servicio.duracion)) : []
 
     const guardadas = []
     const saltadas = []
@@ -125,7 +125,7 @@ const NewAppointmentDialogComponent = ({ fechaInicial, horaInicial, onClose, onC
         saltadas.push(inicio)
         continue
       }
-      const res = await crearCitaManual({
+      const res = await AgendaService.crearCitaManual({
         servicioId: servicio.id,
         servicioNombre: servicio.nombre,
         clienteNombre: nombre.trim(),

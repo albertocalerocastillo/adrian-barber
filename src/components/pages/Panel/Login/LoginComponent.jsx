@@ -3,9 +3,9 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { m } from 'motion/react'
 import { Lock, ArrowLeft, Eye, EyeOff, Mail } from 'lucide-react'
-import { login } from '../../../../services/AgendaService'
 import { PrimaryButtonComponent } from '../Controls/ControlsComponent'
 import { EASE_SMOOTH } from '../../../../theme/animation'
+import { AuthenticationService } from '../../../../services/AuthenticationService'
 // #endregion
 
 const claseCampo =
@@ -37,7 +37,7 @@ const LoginComponent = () => {
     }
     setEnviando(true)
     setError('')
-    const res = await login(email.trim(), password)
+    const res = await AuthenticationService.login(email.trim(), password)
     setEnviando(false)
     if (!res.ok) {
       setError(res.error)

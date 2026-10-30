@@ -1,7 +1,7 @@
 import { generarRejilla, addMinutes, MINUTES_PER_DAY } from '../../../utils/availability'
 import { startOfDay } from '../../../utils/dates'
-import { listarCitas, listarBloqueos } from '../../../services/AgendaService'
 import { EstadoCitaEnum } from '../../../services/enums/EstadoCitaEnum'
+import { AgendaService } from '../../../services/AgendaService'
 
 /**
  * Horas libres de un día para un servicio de `duracion` minutos, de cuarto en
@@ -11,7 +11,7 @@ import { EstadoCitaEnum } from '../../../services/enums/EstadoCitaEnum'
 export const huecosDelDia = async ({ fecha, duracion, horario, excluirId }) => {
   const desde = startOfDay(fecha)
   const hasta = addMinutes(desde, MINUTES_PER_DAY)
-  const [citas, bloqueos] = await Promise.all([listarCitas(desde, hasta), listarBloqueos(desde, hasta)])
+  const [citas, bloqueos] = await Promise.all([AgendaService.listarCitas(desde, hasta), AgendaService.listarBloqueos(desde, hasta)])
   return generarRejilla({
     fecha,
     duracionMin: duracion,
