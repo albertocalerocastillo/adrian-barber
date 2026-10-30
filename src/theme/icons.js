@@ -19,7 +19,7 @@ import {
   X,
 } from 'lucide-react'
 
-export const ICONOS = {
+export const ICONS = {
   Scissors,
   UserRound,
   Paintbrush,

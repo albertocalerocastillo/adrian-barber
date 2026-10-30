@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CalendarDays, Clock, Scissors, LogOut, ExternalLink } from 'lucide-react'
 import { useAuth } from '../../../hooks/useAuth'
-import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
-import LoginPanel from './LoginPanel'
-import AgendaPanel from './AgendaPanel'
-import AjustesHorario from './AjustesHorario'
-import AjustesServicios from './AjustesServicios'
-import { AvisoProvider } from './Aviso'
-import { logout, esBarbero } from '../../../lib/panel'
+import BrandLogoComponent from '../../core/BrandLogo/BrandLogoComponent'
+import LoginComponent from './Login/LoginComponent'
+import AgendaComponent from './Agenda/AgendaComponent'
+import ScheduleSettingsComponent from './ScheduleSettings/ScheduleSettingsComponent'
+import ServiceSettingsComponent from './ServiceSettings/ServiceSettingsComponent'
+import { ToastProviderComponent } from './Toast/ToastProviderComponent'
+import { logout, esBarbero } from '../../../services/AgendaService'
 // #endregion
 
 const SECCIONES = [
@@ -69,19 +69,19 @@ const PanelComponent = () => {
   if (cargando || comprobando) {
     return (
       <div className="grain flex min-h-screen items-center justify-center bg-tinta-900">
-        <LogoAdriComponent className="h-24 w-24 animate-pulse" />
+        <BrandLogoComponent className="h-24 w-24 animate-pulse" />
       </div>
     )
   }
 
-  if (!sesion) return <LoginPanel />
+  if (!sesion) return <LoginComponent />
 
   // Sesión iniciada, pero la cuenta no está en la lista de barberos: la BD no
   // le enseña nada, así que se le dice claro en vez de mostrar un panel vacío.
   if (!permiso.ok) {
     return (
       <div className="grain flex min-h-screen flex-col items-center justify-center bg-tinta-900 px-6 text-center text-hueso">
-        <LogoAdriComponent className="h-24 w-24" />
+        <BrandLogoComponent className="h-24 w-24" />
         <h1 className="mt-6 font-display text-3xl font-bold">Esta cuenta no tiene acceso</h1>
         <p className="mt-3 max-w-sm text-hueso/60">
           {sesion.user?.email} no está autorizada para usar el panel. Si es tuya, pide que la añadan.
@@ -100,9 +100,9 @@ const PanelComponent = () => {
 
   // #region Renderizado
   return (
-    <AvisoProvider>
+    <ToastProviderComponent>
       <Escritorio email={sesion.user?.email} />
-    </AvisoProvider>
+    </ToastProviderComponent>
   )
   // #endregion
 }
@@ -128,7 +128,7 @@ const Escritorio = ({ email }) => {
       <aside className="pizarra sticky top-0 hidden h-screen flex-col justify-between p-6 text-hueso lg:flex">
         <div>
           <div className="flex items-center gap-3">
-            <LogoAdriComponent className="h-14 w-14" />
+            <BrandLogoComponent className="h-14 w-14" />
             <div>
               <p className="font-display text-lg font-bold leading-tight">A.S Barbería</p>
               <p className="text-[0.65rem] tracking-kicker text-acento">Panel</p>
@@ -180,7 +180,7 @@ const Escritorio = ({ email }) => {
         <header className="pizarra sticky top-0 z-30 border-b border-acento/15 text-hueso lg:hidden">
           <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
             <div className="flex items-center gap-3">
-              <LogoAdriComponent variante="monograma" className="h-8 w-auto" />
+              <BrandLogoComponent variante="monograma" className="h-8 w-auto" />
               <span className="h-5 w-px bg-white/15" />
               <span className="text-[0.65rem] tracking-kicker text-acento">Panel</span>
             </div>
@@ -216,13 +216,13 @@ const Escritorio = ({ email }) => {
 
         <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-12">
           <div {...seccion('agenda')}>
-            <AgendaPanel activa={pantalla === 'agenda'} />
+            <AgendaComponent activa={pantalla === 'agenda'} />
           </div>
           <div {...seccion('horario')}>
-            <AjustesHorario activa={pantalla === 'horario'} />
+            <ScheduleSettingsComponent activa={pantalla === 'horario'} />
           </div>
           <div {...seccion('servicios')}>
-            <AjustesServicios activa={pantalla === 'servicios'} />
+            <ServiceSettingsComponent activa={pantalla === 'servicios'} />
           </div>
         </main>
       </div>

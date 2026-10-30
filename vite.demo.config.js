@@ -18,8 +18,8 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        // './supabase' (desde lib/) y '../lib/supabase' (desde hooks/ u otros).
-        find: /^(?:\.\/|(?:\.\.\/)+lib\/)supabase(\.js)?$/,
+        // './SupabaseService' (desde services/) y '../services/SupabaseService' (desde hooks/ u otros).
+        find: /^(?:\.\/|(?:\.\.\/)+services\/)SupabaseService(\.[jt]s)?$/,
         replacement: fileURLToPath(new URL('./demo/supabase-demo.js', import.meta.url)),
       },
     ],

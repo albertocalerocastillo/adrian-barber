@@ -2,17 +2,17 @@
 import NavComponent from '../../layout/Nav/NavComponent'
 import FooterComponent from '../../layout/Footer/FooterComponent'
 import HeroComponent from '../../sections/Hero/HeroComponent'
-import CintaComponent from '../../sections/Cinta/CintaComponent'
-import ServiciosComponent from '../../sections/Servicios/ServiciosComponent'
-import SobreMiComponent from '../../sections/SobreMi/SobreMiComponent'
-import GaleriaComponent from '../../sections/Galeria/GaleriaComponent'
-import ResenasComponent from '../../sections/Resenas/ResenasComponent'
-import HorarioComponent from '../../sections/Horario/HorarioComponent'
-import UbicacionComponent from '../../sections/Ubicacion/UbicacionComponent'
+import RibbonComponent from '../../sections/Ribbon/RibbonComponent'
+import ServicesComponent from '../../sections/Services/ServicesComponent'
+import AboutMeComponent from '../../sections/AboutMe/AboutMeComponent'
+import GalleryComponent from '../../sections/Gallery/GalleryComponent'
+import ReviewsComponent from '../../sections/Reviews/ReviewsComponent'
+import OpeningHoursComponent from '../../sections/OpeningHours/OpeningHoursComponent'
+import LocationComponent from '../../sections/Location/LocationComponent'
 import FaqComponent from '../../sections/Faq/FaqComponent'
-import CtaFinalComponent from '../../sections/CtaFinal/CtaFinalComponent'
-import FloatingActionsComponent from '../../ui/FloatingActions/FloatingActionsComponent'
-import ProgresoScrollComponent from '../../ui/ProgresoScroll/ProgresoScrollComponent'
+import FinalCtaComponent from '../../sections/FinalCta/FinalCtaComponent'
+import FloatingActionsComponent from '../../core/FloatingActions/FloatingActionsComponent'
+import ScrollProgressComponent from '../../core/ScrollProgress/ScrollProgressComponent'
 // #endregion
 
 /**
@@ -29,19 +29,19 @@ const HomeComponent = () => {
   // #region Renderizado
   return (
     <div className="min-h-screen overflow-x-clip bg-hueso text-tinta">
-      <ProgresoScrollComponent />
+      <ScrollProgressComponent />
       <NavComponent />
       <main>
         <HeroComponent />
-        <CintaComponent />
-        <ServiciosComponent />
-        <SobreMiComponent />
-        <GaleriaComponent />
-        <ResenasComponent />
-        <HorarioComponent />
-        <UbicacionComponent />
+        <RibbonComponent />
+        <ServicesComponent />
+        <AboutMeComponent />
+        <GalleryComponent />
+        <ReviewsComponent />
+        <OpeningHoursComponent />
+        <LocationComponent />
         <FaqComponent />
-        <CtaFinalComponent />
+        <FinalCtaComponent />
       </main>
       <FooterComponent />
       <FloatingActionsComponent />

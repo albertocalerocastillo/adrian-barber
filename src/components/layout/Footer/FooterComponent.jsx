@@ -1,10 +1,10 @@
 // #region Imports
 import { Link } from 'react-router-dom'
 import { Phone, MapPin, ArrowUp } from 'lucide-react'
-import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
-import InstagramIcon from '../../ui/InstagramIcon/InstagramIcon'
-import WhatsAppIcon from '../../ui/WhatsAppIcon/WhatsAppIcon'
-import { useEstadoNegocio } from '../../../hooks/useEstadoNegocio'
+import BrandLogoComponent from '../../core/BrandLogo/BrandLogoComponent'
+import InstagramIconComponent from '../../core/InstagramIcon/InstagramIconComponent'
+import WhatsAppIconComponent from '../../core/WhatsAppIcon/WhatsAppIconComponent'
+import { useBusinessStatus } from '../../../hooks/useBusinessStatus'
 import { resumenHorario } from '../../../data/faq'
 import {
   NEGOCIO,
@@ -15,7 +15,7 @@ import {
   INSTAGRAM,
   INSTAGRAM_URL,
   MAPS_URL,
-} from '../../../data/contacto'
+} from '../../../data/contact'
 // #endregion
 
 const ENLACES = [
@@ -34,12 +34,12 @@ const FooterComponent = () => {
   // #region Declaraciones, variables y hooks
   const anio = new Date().getFullYear()
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MENSAJE)}`
-  const { horario } = useEstadoNegocio()
+  const { horario } = useBusinessStatus()
 
   const redes = [
     { href: `tel:${TELEFONO}`, etiqueta: `Llamar al ${TELEFONO_VISIBLE}`, icono: <Phone size={18} />, fuera: false },
-    { href: wa, etiqueta: 'WhatsApp', icono: <WhatsAppIcon size={18} />, fuera: true },
-    { href: INSTAGRAM_URL, etiqueta: 'Instagram', icono: <InstagramIcon size={18} />, fuera: true },
+    { href: wa, etiqueta: 'WhatsApp', icono: <WhatsAppIconComponent size={18} />, fuera: true },
+    { href: INSTAGRAM_URL, etiqueta: 'Instagram', icono: <InstagramIconComponent size={18} />, fuera: true },
   ]
   // #endregion
 
@@ -50,7 +50,7 @@ const FooterComponent = () => {
       <div className="mx-auto grid max-w-6xl gap-12 px-5 text-center md:grid-cols-2 md:px-8 md:text-left lg:grid-cols-[1.2fr_0.8fr_1fr]">
         {/* Sello + frase. */}
         <div className="flex flex-col items-center gap-5 md:items-start">
-          <LogoAdriComponent className="h-32 w-32 md:h-36 md:w-36" loading="lazy" />
+          <BrandLogoComponent className="h-32 w-32 md:h-36 md:w-36" loading="lazy" />
           <p className="max-w-xs text-sm leading-relaxed text-hueso/55">
             Peluquería y barbería de {NEGOCIO.barbero} en {NEGOCIO.localidad}, {NEGOCIO.provincia}.
           </p>
@@ -115,7 +115,7 @@ const FooterComponent = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 hover:text-acento"
               >
-                <InstagramIcon size={17} />
+                <InstagramIconComponent size={17} />
                 @{INSTAGRAM}
               </a>
             </li>

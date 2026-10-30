@@ -36,7 +36,7 @@
   --color-vino:         #6e2329;
   --color-vino-claro:   #8a2f37;
 
-  /* Curva de toda la web (la misma que EASE_SUAVE en theme/animacion.js) */
+  /* Curva de toda la web (la misma que EASE_SMOOTH en theme/animation.js) */
   --ease-suave: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
@@ -127,7 +127,7 @@
 
   /* ─── Motion por CSS ───────────────────────────────────────
      Lo que se ve al cargar va por CSS (no espera a React) y lo que
-     reacciona al scroll o al ratón, con Motion (theme/animacion.js). */
+     reacciona al scroll o al ratón, con Motion (theme/animation.js). */
 
   /* Bloques del hero que aparecen al cargar, escalonados con --orden. */
   .entra {

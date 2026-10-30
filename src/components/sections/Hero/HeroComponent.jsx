@@ -2,14 +2,14 @@
 import { useRef } from 'react'
 import { m, useScroll, useSpring, useTransform } from 'motion/react'
 import { MapPin, Star, ArrowDown } from 'lucide-react'
-import CitaButtonComponent from '../../ui/CitaButton/CitaButtonComponent'
-import MagneticComponent from '../../ui/Magnetic/MagneticComponent'
-import EstadoBadgeComponent from '../../ui/EstadoBadge/EstadoBadgeComponent'
-import ReservaOnlineComponent from '../../ui/ReservaOnline/ReservaOnlineComponent'
-import { useEstadoNegocio } from '../../../hooks/useEstadoNegocio'
-import { NEGOCIO, GOOGLE_VALORACION } from '../../../data/contacto'
-import { SERVICIOS } from '../../../data/servicios'
-import { MUELLE_SUAVE, ordenEntrada } from '../../../theme/animacion'
+import BookingButtonComponent from '../../core/BookingButton/BookingButtonComponent'
+import MagneticComponent from '../../core/Magnetic/MagneticComponent'
+import StatusBadgeComponent from '../../core/StatusBadge/StatusBadgeComponent'
+import OnlineBookingLinkComponent from '../../core/OnlineBookingLink/OnlineBookingLinkComponent'
+import { useBusinessStatus } from '../../../hooks/useBusinessStatus'
+import { NEGOCIO, GOOGLE_VALORACION } from '../../../data/contact'
+import { SERVICIOS } from '../../../data/services'
+import { SPRING_SMOOTH, entryOrder } from '../../../theme/animation'
 
 // ⚠️ TEMPORAL: foto de fondo del hero. Cuando Adrián mande una foto del LOCAL
 // (fachada o interior, en HORIZONTAL), suéltala en src/assets/local.jpg y
@@ -47,10 +47,10 @@ const SELLO_SIZES = '(min-width: 1024px) 30rem, (min-width: 768px) 20rem, (min-w
  */
 const HeroComponent = () => {
   // #region Declaraciones, variables y hooks
-  const { estado } = useEstadoNegocio()
+  const { estado } = useBusinessStatus()
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
-  const progreso = useSpring(scrollYProgress, MUELLE_SUAVE)
+  const progreso = useSpring(scrollYProgress, SPRING_SMOOTH)
   const textoY = useTransform(progreso, [0, 1], [0, -110])
   const textoOpacidad = useTransform(progreso, [0, 0.75], [1, 0])
   const selloY = useTransform(progreso, [0, 1], [0, 140])
@@ -127,7 +127,7 @@ const HeroComponent = () => {
         >
           <p
             className="entra mb-5 inline-flex items-center gap-2 text-[0.7rem] tracking-kicker text-acento sm:text-xs"
-            style={ordenEntrada(0)}
+            style={entryOrder(0)}
           >
             <MapPin size={14} className="shrink-0" />
             <span className="hidden sm:inline">Peluquería y barbería ·</span> {NEGOCIO.ciudad}
@@ -142,7 +142,7 @@ const HeroComponent = () => {
                   <span key={orden}>
                     {i > 0 && ' '}
                     <span className="palabra">
-                      <span style={ordenEntrada(orden)}>{p}</span>
+                      <span style={entryOrder(orden)}>{p}</span>
                     </span>
                   </span>
                 ))}{' '}
@@ -155,7 +155,7 @@ const HeroComponent = () => {
 
           <p
             className="entra mx-auto mt-6 max-w-xl text-base leading-relaxed text-hueso/75 sm:text-lg lg:mx-0 [@media(max-height:760px)_and_(min-width:1024px)]:mt-4"
-            style={ordenEntrada(3)}
+            style={entryOrder(3)}
           >
             Corte con cejas, barba y diseños por{' '}
             <strong className="font-semibold text-hueso">{PRECIO_CORTE} €</strong>. Sin prisas,
@@ -165,10 +165,10 @@ const HeroComponent = () => {
           {/* CTAs. */}
           <div
             className="entra mt-8 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start [@media(max-height:760px)_and_(min-width:1024px)]:mt-6"
-            style={ordenEntrada(4)}
+            style={entryOrder(4)}
           >
             <MagneticComponent>
-              <CitaButtonComponent tamano="lg" />
+              <BookingButtonComponent tamano="lg" />
             </MagneticComponent>
             <a
               href="#servicios"
@@ -182,7 +182,7 @@ const HeroComponent = () => {
           {/* Prueba social + ¿puedo ir ya? */}
           <div
             className="entra mt-8 flex flex-col items-center gap-x-4 gap-y-3 sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start [@media(max-height:760px)_and_(min-width:1024px)]:mt-6"
-            style={ordenEntrada(5)}
+            style={entryOrder(5)}
           >
             <a href="#resenas" className="group flex items-center gap-3">
               <span className="flex gap-0.5 text-acento">
@@ -196,17 +196,17 @@ const HeroComponent = () => {
               </span>
             </a>
             <span className="hidden h-5 w-px bg-hueso/20 sm:block lg:hidden xl:block" />
-            <EstadoBadgeComponent estado={estado} claro href="#horario" />
+            <StatusBadgeComponent estado={estado} claro href="#horario" />
           </div>
 
-          <div className="entra mt-5" style={ordenEntrada(6)}>
-            <ReservaOnlineComponent claro />
+          <div className="entra mt-5" style={entryOrder(6)}>
+            <OnlineBookingLinkComponent claro />
           </div>
 
           {/* Cerrado: en vez de dejar al cliente colgado (y que se vaya a otra
               barbería), se le dice que escriba igualmente. */}
           {!estado.abierto && (
-            <p className="entra mt-4 text-xs text-hueso/50" style={ordenEntrada(6)}>
+            <p className="entra mt-4 text-xs text-hueso/50" style={entryOrder(6)}>
               Está cerrado, pero puedes escribir igualmente: te contesta en cuanto abra.
             </p>
           )}

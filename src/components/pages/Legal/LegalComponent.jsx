@@ -2,13 +2,13 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
-import { NEGOCIO, LEGAL, TELEFONO_VISIBLE, WHATSAPP } from '../../../data/contacto'
+import BrandLogoComponent from '../../core/BrandLogo/BrandLogoComponent'
+import { NEGOCIO, LEGAL, TELEFONO_VISIBLE, WHATSAPP } from '../../../data/contact'
 // #endregion
 
 /**
  * Páginas legales: aviso legal (LSSI), privacidad (RGPD) y cookies.
- * Los datos del titular salen de LEGAL (data/contacto.js), para cambiarlos
+ * Los datos del titular salen de LEGAL (data/contact.js), para cambiarlos
  * en un solo sitio. Están escritas en claro, sin jerga, y describen lo que
  * la web hace DE VERDAD (si algún día se añade analítica o publicidad, hay
  * que actualizarlas y poner un aviso de cookies).
@@ -33,7 +33,7 @@ const LegalComponent = ({ tipo }) => {
       <header className="pizarra border-b border-acento/15">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-5">
           <Link to="/" aria-label="Volver al inicio">
-            <LogoAdriComponent variante="monograma" className="h-9 w-auto" />
+            <BrandLogoComponent variante="monograma" className="h-9 w-auto" />
           </Link>
           <Link to="/" className="flex items-center gap-1.5 text-sm text-hueso/70 transition-colors hover:text-acento">
             <ArrowLeft size={16} /> Inicio

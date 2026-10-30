@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../services/SupabaseService'
 
 /**
  * Gestiona la sesión de Supabase Auth para el panel del barbero.
