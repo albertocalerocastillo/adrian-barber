@@ -1,3 +1,4 @@
+// #region Imports
 import { useRef } from 'react'
 import { m, useScroll, useTransform } from 'motion/react'
 import { Phone } from 'lucide-react'
@@ -7,21 +8,25 @@ import RevealComponent from '../../ui/Reveal/RevealComponent'
 import ReservaOnlineComponent from '../../ui/ReservaOnline/ReservaOnlineComponent'
 import { TELEFONO, TELEFONO_VISIBLE } from '../../../data/contacto'
 import { reservaEmpezada } from '../../../data/features'
+// #endregion
 
 /**
  * Último empujón antes del pie: quien ha llegado hasta aquí ya está
  * convencido, así que se le pone el botón delante y grande. El sello gira
  * con el scroll a modo de remate.
  */
-export default function CtaFinalComponent() {
+const CtaFinalComponent = () => {
+  // #region Declaraciones, variables y hooks
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
   const giro = useTransform(scrollYProgress, [0, 1], [-60, 60])
   const escala = useTransform(scrollYProgress, [0, 0.5], [0.8, 1])
+  // #endregion
 
+  // #region Renderizado
   return (
     <section ref={ref} className="grain relative overflow-hidden bg-vino py-24 text-hueso md:py-32">
-      {/* Sello enorme de fondo */}
+      {/* Sello enorme de fondo. */}
       <m.img
         src="/logo-sello.webp"
         alt=""
@@ -62,4 +67,7 @@ export default function CtaFinalComponent() {
       </div>
     </section>
   )
+  // #endregion
 }
+
+export default CtaFinalComponent

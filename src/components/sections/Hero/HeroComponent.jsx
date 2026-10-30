@@ -1,3 +1,4 @@
+// #region Imports
 import { useRef } from 'react'
 import { m, useScroll, useSpring, useTransform } from 'motion/react'
 import { MapPin, Star, ArrowDown } from 'lucide-react'
@@ -14,6 +15,7 @@ import { MUELLE_SUAVE, ordenEntrada } from '../../../theme/animacion'
 // (fachada o interior, en HORIZONTAL), suéltala en src/assets/local.jpg y
 // cambia solo este import. Es el único cambio necesario.
 import fondoHero from '../../../assets/galeria/corte-2.jpg'
+// #endregion
 
 // Titular: cada palabra sube por separado. La segunda línea va en dorado.
 // Se numeran aquí, una sola vez, para escalonar la animación.
@@ -43,7 +45,8 @@ const SELLO_SIZES = '(min-width: 1024px) 30rem, (min-width: 768px) 20rem, (min-w
  *  - Al bajar: el texto sube y se desvanece y el sello se queda atrás
  *    (parallax), mientras la foto de fondo hace un zoom lento.
  */
-export default function HeroComponent() {
+const HeroComponent = () => {
+  // #region Declaraciones, variables y hooks
   const { estado } = useEstadoNegocio()
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
@@ -53,14 +56,16 @@ export default function HeroComponent() {
   const selloY = useTransform(progreso, [0, 1], [0, 140])
   const selloGiro = useTransform(progreso, [0, 1], [0, 25])
   const fondoY = useTransform(progreso, [0, 1], ['0%', '18%'])
+  // #endregion
 
+  // #region Renderizado
   return (
     <section
       ref={ref}
       id="inicio"
       className="grain relative flex min-h-svh items-center overflow-hidden bg-tinta-900 text-hueso"
     >
-      {/* Foto de fondo con zoom lento + parallax */}
+      {/* Foto de fondo con zoom lento + parallax. */}
       <m.div className="absolute inset-0" style={{ y: fondoY }} aria-hidden="true">
         <div
           className="ken-burns absolute inset-0 bg-cover bg-center"
@@ -68,10 +73,10 @@ export default function HeroComponent() {
         />
       </m.div>
 
-      {/* Velo: más oscuro en el lado del texto para que se lea siempre */}
+      {/* Velo: más oscuro en el lado del texto para que se lea siempre. */}
       <div className="absolute inset-0 bg-gradient-to-b from-tinta-900/90 via-tinta-900/85 to-tinta-900 lg:bg-gradient-to-r lg:from-tinta-900/97 lg:via-tinta-900/88 lg:to-tinta-900/70" />
 
-      {/* Halo dorado detrás del sello y toque granate abajo */}
+      {/* Halo dorado detrás del sello y toque granate abajo. */}
       <div
         className="absolute inset-0"
         aria-hidden="true"
@@ -87,7 +92,7 @@ export default function HeroComponent() {
           className="relative mx-auto w-[min(62vw,17rem)] sm:w-72 md:w-80 lg:order-2 lg:w-full lg:max-w-[30rem] [@media(max-height:760px)_and_(min-width:1024px)]:max-w-[24rem]"
           style={{ y: selloY, rotate: selloGiro }}
         >
-          {/* Anillos que giran despacio detrás */}
+          {/* Anillos que giran despacio detrás. */}
           <div
             aria-hidden="true"
             className="gira-lento absolute -inset-[7%] rounded-full border border-dashed border-acento/30"
@@ -99,7 +104,7 @@ export default function HeroComponent() {
             <span className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-acento" />
           </div>
 
-          {/* srcSet/sizes deben coincidir con la precarga de index.html, o el
+          {/* Los srcSet/sizes deben coincidir con la precarga de index.html, o el
               navegador descargaría el sello dos veces. Van ANTES que src: React
               pone los atributos en este orden y, con src primero, el navegador
               empezaría a bajar el grande antes de ver los otros tamaños. */}
@@ -157,7 +162,7 @@ export default function HeroComponent() {
             con oficio y trato de barrio. Soy Adrián, tu barbero de confianza.
           </p>
 
-          {/* CTAs */}
+          {/* CTAs. */}
           <div
             className="entra mt-8 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start [@media(max-height:760px)_and_(min-width:1024px)]:mt-6"
             style={ordenEntrada(4)}
@@ -208,7 +213,7 @@ export default function HeroComponent() {
         </m.div>
       </div>
 
-      {/* Indicador para invitar a bajar (solo escritorio) */}
+      {/* Indicador para invitar a bajar (solo escritorio). */}
       <m.a
         href="#servicios"
         aria-label="Ver servicios"
@@ -226,4 +231,7 @@ export default function HeroComponent() {
       </m.a>
     </section>
   )
+  // #endregion
 }
+
+export default HeroComponent

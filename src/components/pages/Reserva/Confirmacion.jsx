@@ -1,3 +1,4 @@
+// #region Imports
 import { Link } from 'react-router-dom'
 import { m } from 'motion/react'
 import { CalendarPlus, Home, MapPin } from 'lucide-react'
@@ -7,12 +8,13 @@ import { fechaLarga, horaEn } from '../../../utils/fechas'
 import { RESERVA } from '../../../data/features'
 import { NEGOCIO, WHATSAPP, MAPS_URL } from '../../../data/contacto'
 import { EASE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
-// "20270104T090000Z" (formato de los calendarios)
+// "20270104T090000Z" (formato de los calendarios).
 const aUtcCompacto = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
 
 /** Archivo .ics: lo abren el calendario del iPhone, Outlook y casi todos. */
-function enlaceIcs({ titulo, inicio, fin, lugar, aviso }) {
+const enlaceIcs = ({ titulo, inicio, fin, lugar, aviso }) => {
   const ics = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -40,7 +42,8 @@ function enlaceIcs({ titulo, inicio, fin, lugar, aviso }) {
  * del móvil (con recordatorio 2 horas antes) y WhatsApp por si hay que
  * cambiarla o anularla.
  */
-export default function Confirmacion({ servicio, hora, nombre }) {
+const Confirmacion = ({ servicio, hora, nombre }) => {
+  // #region Declaraciones, variables y hooks
   const fin = sumarMin(hora, servicio.duracion)
   const desde = horaEn(hora, RESERVA.zona)
   const hasta = horaEn(fin, RESERVA.zona)
@@ -57,10 +60,12 @@ export default function Confirmacion({ servicio, hora, nombre }) {
     `Hola Adrián, soy ${nombre}. Tengo cita el ${fechaLarga(hora).toLowerCase()} a las ${desde} ` +
     `(${servicio.nombre}) y necesito cambiarla.`
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(mensaje)}`
+  // #endregion
 
+  // #region Renderizado
   return (
     <div className="mx-auto max-w-md text-center">
-      {/* Check que se dibuja */}
+      {/* Check que se dibuja. */}
       <m.div
         className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-acento shadow-xl shadow-acento/40"
         initial={{ scale: 0 }}
@@ -81,7 +86,7 @@ export default function Confirmacion({ servicio, hora, nombre }) {
         <h1 className="font-display text-4xl font-bold">¡Hecho, {nombre.split(' ')[0]}!</h1>
         <p className="mt-2 text-tinta/60">Tu cita está reservada. Te esperamos.</p>
 
-        {/* Resumen tipo tique */}
+        {/* Resumen tipo tique. */}
         <div className="grain relative mt-8 overflow-hidden rounded-3xl bg-tinta p-6 text-left text-hueso shadow-xl shadow-tinta/20">
           <img
             src="/logo-sello.webp"
@@ -109,7 +114,7 @@ export default function Confirmacion({ servicio, hora, nombre }) {
           </a>
         </div>
 
-        {/* Calendario */}
+        {/* Calendario. */}
         <div className="mt-6 grid grid-cols-2 gap-3">
           <a
             href={google}
@@ -150,4 +155,7 @@ export default function Confirmacion({ servicio, hora, nombre }) {
       </m.div>
     </div>
   )
+  // #endregion
 }
+
+export default Confirmacion

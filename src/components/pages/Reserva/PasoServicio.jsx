@@ -1,8 +1,10 @@
+// #region Imports
 import { m } from 'motion/react'
 import { Clock, ChevronRight, Sparkles, MessageCircle } from 'lucide-react'
 import { ICONOS } from '../../../theme/icons'
 import { EASE_SUAVE } from '../../../theme/animacion'
 import { WHATSAPP } from '../../../data/contacto'
+// #endregion
 
 /** "A", "A y B", "A, B y C". */
 const enumerar = (nombres) =>
@@ -14,7 +16,8 @@ const enumerar = (nombres) =>
  * se cargan de Supabase. `soloWhatsapp` son los que Adrián prefiere cerrar
  * hablando (mechas, tinte): no se reservan aquí, solo se avisa de cómo pedirlos.
  */
-export default function PasoServicio({ servicios, servicio, onElegir, soloWhatsapp = [] }) {
+const PasoServicio = ({ servicios, servicio, onElegir, soloWhatsapp = [] }) => {
+  // #region Declaraciones, variables y hooks
   if (servicios === null) {
     return (
       <div className="space-y-3" aria-label="Cargando servicios">
@@ -24,7 +27,9 @@ export default function PasoServicio({ servicios, servicio, onElegir, soloWhatsa
       </div>
     )
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <div>
       <h2 className="mb-6 text-center font-display text-2xl font-semibold sm:text-3xl">¿Qué te hacemos?</h2>
@@ -93,4 +98,7 @@ export default function PasoServicio({ servicios, servicio, onElegir, soloWhatsa
       )}
     </div>
   )
+  // #endregion
 }
+
+export default PasoServicio

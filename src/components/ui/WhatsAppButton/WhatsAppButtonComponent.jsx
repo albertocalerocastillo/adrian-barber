@@ -1,5 +1,7 @@
+// #region Imports
 import WhatsAppIcon from '../WhatsAppIcon/WhatsAppIcon'
 import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
+// #endregion
 
 /**
  * Botón/enlace a WhatsApp con el mensaje predefinido.
@@ -11,11 +13,11 @@ import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
  *  - variante: 'solido' (verde WhatsApp) | 'oscuro' | 'claro'.
  *  - className: clases extra.
  */
-export default function WhatsAppButtonComponent({
+const WhatsAppButtonComponent = ({
   texto = 'Escríbenos por WhatsApp',
   variante = 'solido',
   className = '',
-}) {
+}) => {
   const href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MENSAJE)}`
 
   const estilos = {
@@ -36,3 +38,5 @@ export default function WhatsAppButtonComponent({
     </a>
   )
 }
+
+export default WhatsAppButtonComponent

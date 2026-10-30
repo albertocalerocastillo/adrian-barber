@@ -1,7 +1,8 @@
 /**
  * Icono SVG de Instagram (lucide-react eliminó los iconos de marcas en v1.x).
  */
-export default function InstagramIcon({ size = 24, strokeWidth = 1.5, className = '' }) {
+const InstagramIcon = ({ size = 24, strokeWidth = 1.5, className = '' }) => {
+  // #region Renderizado
   return (
     <svg
       width={size}
@@ -19,4 +20,7 @@ export default function InstagramIcon({ size = 24, strokeWidth = 1.5, className 
       <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
     </svg>
   )
+  // #endregion
 }
+
+export default InstagramIcon

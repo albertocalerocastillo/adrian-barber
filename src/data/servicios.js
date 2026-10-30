@@ -6,7 +6,7 @@
 // En la Fase 2 estos datos pasarán a la tabla `servicios` de Supabase y se
 // gestionarán desde el panel.
 //
-// duracion: minutos · online: si se puede reservar desde la web · icono: nombre de un icono de lucide-react (theme/icons.js)
+// duracion: minutos · online: si se puede reservar desde la web · icono: nombre de un icono de lucide-react (theme/icons.js).
 
 export const SERVICIOS = [
   {

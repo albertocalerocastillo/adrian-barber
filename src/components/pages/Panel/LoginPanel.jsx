@@ -1,3 +1,4 @@
+// #region Imports
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { m } from 'motion/react'
@@ -5,6 +6,7 @@ import { Lock, ArrowLeft, Eye, EyeOff, Mail } from 'lucide-react'
 import { login } from '../../../lib/panel'
 import { BotonPrincipal } from './Controles'
 import { EASE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 const claseCampo =
   'w-full rounded-xl border border-white/10 bg-white/5 py-3.5 pl-11 pr-4 text-hueso outline-none transition-all placeholder:text-hueso/25 focus:border-acento focus:bg-white/[0.07] focus:ring-4 focus:ring-acento/15'
@@ -16,7 +18,8 @@ const claseCampo =
  * En escritorio, el sello a la izquierda y el formulario a la derecha; en el
  * móvil, el sello arriba y el formulario debajo.
  */
-export default function LoginPanel() {
+const LoginPanel = () => {
+  // #region Declaraciones, variables y hooks
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [verClave, setVerClave] = useState(false)
@@ -24,7 +27,7 @@ export default function LoginPanel() {
   const [error, setError] = useState('')
   const [intento, setIntento] = useState(0)
 
-  async function onSubmit(e) {
+  const onSubmit = async (e) => {
     e.preventDefault()
     if (enviando) return
     if (!email.trim() || !password) {
@@ -42,10 +45,12 @@ export default function LoginPanel() {
     }
     // Si va bien, useAuth detecta la sesión y el panel cambia solo.
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <div className="grain relative flex min-h-svh items-center justify-center overflow-hidden bg-tinta-900 px-5 py-10 text-hueso">
-      {/* Halo dorado y sello gigante girando de fondo */}
+      {/* Halo dorado y sello gigante girando de fondo. */}
       <div
         aria-hidden="true"
         className="absolute inset-0"
@@ -59,7 +64,7 @@ export default function LoginPanel() {
       />
 
       <div className="relative grid w-full max-w-4xl items-center gap-10 lg:grid-cols-2 lg:gap-16">
-        {/* Marca */}
+        {/* Marca. */}
         <m.div
           className="flex flex-col items-center text-center lg:items-start lg:text-left"
           initial={{ opacity: 0, y: 20 }}
@@ -80,7 +85,7 @@ export default function LoginPanel() {
           </p>
         </m.div>
 
-        {/* Formulario (tiembla si hay error) */}
+        {/* Formulario (tiembla si hay error). */}
         <m.form
           key={intento}
           onSubmit={onSubmit}
@@ -151,4 +156,7 @@ export default function LoginPanel() {
       </div>
     </div>
   )
+  // #endregion
 }
+
+export default LoginPanel

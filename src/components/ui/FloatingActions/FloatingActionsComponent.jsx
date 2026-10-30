@@ -1,3 +1,4 @@
+// #region Imports
 import { Link } from 'react-router-dom'
 import { m } from 'motion/react'
 import { useScrolled } from '../../../hooks/useScrolled'
@@ -12,6 +13,7 @@ import {
   TELEFONO_VISIBLE,
   MAPS_URL,
 } from '../../../data/contacto'
+// #endregion
 
 /**
  * Acciones de contacto, SIEMPRE visibles (no dependen del scroll):
@@ -22,13 +24,16 @@ import {
  * Ojo: la barra de móvil tapa el final de la página, así que la home reserva
  * espacio abajo (ver HomeComponent).
  */
-export default function FloatingActionsComponent() {
+const FloatingActionsComponent = () => {
+  // #region Declaraciones, variables y hooks
   const visible = useScrolled(600)
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MENSAJE)}`
 
   const claseCita =
     'flex items-center gap-2 bg-acento px-5 py-3.5 text-xs font-semibold uppercase tracking-widest text-tinta shadow-xl shadow-acento/30 transition-transform hover:scale-105'
+  // #endregion
 
+  // #region Renderizado
   return (
     <>
       {/* ─── MÓVIL: barra fija inferior ─────────────────────── */}
@@ -106,4 +111,7 @@ export default function FloatingActionsComponent() {
       </m.div>
     </>
   )
+  // #endregion
 }
+
+export default FloatingActionsComponent

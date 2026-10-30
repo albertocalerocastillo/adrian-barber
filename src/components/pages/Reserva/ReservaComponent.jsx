@@ -1,3 +1,4 @@
+// #region Imports
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, m } from 'motion/react'
@@ -14,6 +15,7 @@ import { fechaLarga, horaEn } from '../../../utils/fechas'
 import { RESERVA, reservaEmpezada, inicioReservas } from '../../../data/features'
 import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
 import { EASE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 const PASOS = ['Servicio', 'Día', 'Hora', 'Tus datos']
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
@@ -26,13 +28,15 @@ const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', '
  * y perdía todo lo elegido). Si alguien entra a un paso sin haber elegido lo
  * de antes, se le lleva al primero que le falte.
  */
-export default function ReservaComponent() {
+const ReservaComponent = () => {
+  // #region Declaraciones, variables y hooks
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
   const [servicio, setServicio] = useState(null)
   const [fecha, setFecha] = useState(null)
   const [hora, setHora] = useState(null)
-  const [cita, setCita] = useState(null) // datos guardados al confirmar
+  // Datos guardados al confirmar.
+  const [cita, setCita] = useState(null)
   const [avisoHora, setAvisoHora] = useState('')
   const [horario, setHorario] = useState(null)
   const [servicios, setServicios] = useState(null)
@@ -41,13 +45,15 @@ export default function ReservaComponent() {
 
   useEffect(() => {
     let vivo = true
-    Promise.all([getHorario(), getServicios()]).then(([h, ss]) => {
+    const cargar = async () => {
+      const [h, ss] = await Promise.all([getHorario(), getServicios()])
       if (!vivo) return
       setHorario(h)
       const activos = ss.filter((s) => s.activo !== false)
       setServicios(activos.filter((s) => s.online !== false))
       setSoloWhatsapp(activos.filter((s) => s.online === false))
-    })
+    }
+    cargar()
     return () => {
       vivo = false
     }
@@ -77,10 +83,12 @@ export default function ReservaComponent() {
   const antesDeEmpezar = !reservaEmpezada()
   const inicio = inicioReservas()
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MENSAJE)}`
+  // #endregion
 
+  // #region Renderizado
   return (
     <div className="flex min-h-screen flex-col bg-hueso text-tinta">
-      {/* Cabecera */}
+      {/* Cabecera. */}
       <header className="pizarra sticky top-0 z-30 border-b border-acento/15">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-5">
           <Link to="/" aria-label="Volver al inicio">
@@ -91,7 +99,7 @@ export default function ReservaComponent() {
             Inicio
           </Link>
         </div>
-        {/* Progreso */}
+        {/* Progreso. */}
         {paso < 5 && (
           <m.div
             className="h-0.5 origin-left bg-acento"
@@ -110,7 +118,7 @@ export default function ReservaComponent() {
             </div>
 
             {/* Aún no ha empezado: se avisa (solo al principio, para no empujar
-                hacia abajo cada paso) y se da la salida por WhatsApp */}
+                hacia abajo cada paso) y se da la salida por WhatsApp. */}
             {antesDeEmpezar && paso === 1 && (
               <div className="mx-auto mb-8 flex max-w-xl flex-col items-center gap-3 rounded-2xl bg-acento/10 p-4 text-center text-sm sm:flex-row sm:text-left">
                 <CalendarClock size={22} className="shrink-0 text-acento-oscuro" />
@@ -222,10 +230,11 @@ export default function ReservaComponent() {
       </main>
     </div>
   )
+  // #endregion
 }
 
 /** Puntos de los pasos. Los ya hechos se pueden pulsar para volver. */
-function Pasos({ paso, onIr }) {
+const Pasos = ({ paso, onIr }) => {
   return (
     <ol className="mx-auto mb-6 flex max-w-md items-center">
       {PASOS.map((nombre, i) => {
@@ -265,7 +274,7 @@ function Pasos({ paso, onIr }) {
 }
 
 /** Lo elegido hasta ahora, siempre a la vista. */
-function Resumen({ servicio, fecha, hora }) {
+const Resumen = ({ servicio, fecha, hora }) => {
   if (!servicio) return null
   const piezas = [
     { Icono: Scissors, texto: `${servicio.nombre} · ${servicio.precio} €` },
@@ -293,3 +302,5 @@ function Resumen({ servicio, fecha, hora }) {
     </div>
   )
 }
+
+export default ReservaComponent

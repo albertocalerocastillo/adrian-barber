@@ -1,3 +1,4 @@
+// #region Imports
 import { useState, useEffect } from 'react'
 import { m } from 'motion/react'
 import { ArrowRight, CalendarCheck } from 'lucide-react'
@@ -11,6 +12,7 @@ import { hora as fmtHora, fechaLarga, aInputDate } from '../../../utils/fechas'
 import { moverCita } from '../../../lib/panel'
 import { getHorario } from '../../../lib/config'
 import { EASE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 /**
  * Cambiar una cita de día u hora ("¿me lo pasas al jueves?"). Se elige el día
@@ -19,7 +21,8 @@ import { EASE_SUAVE } from '../../../theme/animacion'
  *
  * Props: cita, onClose, onMovida(cita, inicioAnterior, finAnterior).
  */
-export default function MoverCitaModal({ cita, onClose, onMovida }) {
+const MoverCitaModal = ({ cita, onClose, onMovida }) => {
+  // #region Declaraciones, variables y hooks
   const inicioOriginal = new Date(cita.inicio)
   const duracion = Math.round((new Date(cita.fin) - inicioOriginal) / 60000)
   const [horario, setHorario] = useState(null)
@@ -28,11 +31,16 @@ export default function MoverCitaModal({ cita, onClose, onMovida }) {
   const [horaISO, setHoraISO] = useState('')
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
-  const [hecha, setHecha] = useState(null) // nueva hora, cuando ya se ha guardado
+  // Nueva hora, cuando ya se ha guardado.
+  const [hecha, setHecha] = useState(null)
 
   useEffect(() => {
     let vivo = true
-    getHorario().then((h) => vivo && setHorario(h))
+    const cargar = async () => {
+      const h = await getHorario()
+      if (vivo) setHorario(h)
+    }
+    cargar()
     return () => {
       vivo = false
     }
@@ -41,22 +49,24 @@ export default function MoverCitaModal({ cita, onClose, onMovida }) {
   useEffect(() => {
     if (!horario) return
     let vivo = true
-    huecosDelDia({ fecha: new Date(`${fechaStr}T00:00:00`), duracion, horario, excluirId: cita.id }).then((libres) => {
+    const cargar = async () => {
+      const libres = await huecosDelDia({ fecha: new Date(`${fechaStr}T00:00:00`), duracion, horario, excluirId: cita.id })
       if (!vivo) return
       // La hora que ya tiene no se ofrece: no sería un cambio.
       setRejilla(libres.filter((s) => s.inicio.getTime() !== inicioOriginal.getTime()))
       setHoraISO('')
-    })
+    }
+    cargar()
     return () => {
       vivo = false
     }
-    // inicioOriginal sale de la cita, que no cambia mientras la hoja está abierta.
+    // El inicioOriginal sale de la cita, que no cambia mientras la hoja está abierta.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fechaStr, horario, duracion, cita.id])
 
   const nombre = cita.cliente_nombre.split(' ')[0]
 
-  async function onGuardar() {
+  const onGuardar = async () => {
     if (guardando) return
     if (!horaISO) return setError('Elige la hora nueva.')
     setGuardando(true)
@@ -121,7 +131,9 @@ export default function MoverCitaModal({ cita, onClose, onMovida }) {
       </Hoja>
     )
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <Hoja
       titulo="Cambiar hora"
@@ -162,4 +174,7 @@ export default function MoverCitaModal({ cita, onClose, onMovida }) {
       </div>
     </Hoja>
   )
+  // #endregion
 }
+
+export default MoverCitaModal

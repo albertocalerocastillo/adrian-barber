@@ -1,3 +1,4 @@
+// #region Imports
 import { Clock } from 'lucide-react'
 import SectionHeadingComponent from '../../ui/SectionHeading/SectionHeadingComponent'
 import RevealComponent from '../../ui/Reveal/RevealComponent'
@@ -6,17 +7,21 @@ import EstadoBadgeComponent from '../../ui/EstadoBadge/EstadoBadgeComponent'
 import { useEstadoNegocio } from '../../../hooks/useEstadoNegocio'
 import { diaHoy, formatoTramos } from '../../../utils/horario'
 import { resumenHorario } from '../../../data/faq'
+// #endregion
 
 /**
  * Horario semanal con el día de hoy resaltado y un badge en vivo de
  * "Abierto / Cerrado ahora". En escritorio, el título y el botón a la
  * izquierda y la tabla a la derecha; en móvil, uno debajo de otro.
  */
-export default function HorarioComponent() {
+const HorarioComponent = () => {
+  // #region Declaraciones, variables y hooks
   const { estado, horario, ahora } = useEstadoNegocio()
   const hoy = diaHoy(ahora)
   const resumen = `${resumenHorario(horario)}. Escríbeme antes y te digo hueco.`
+  // #endregion
 
+  // #region Renderizado
   return (
     <section id="horario" className="overflow-x-clip bg-hueso py-24 md:py-32">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 md:px-8 lg:grid-cols-2 lg:gap-20">
@@ -45,7 +50,7 @@ export default function HorarioComponent() {
           </RevealComponent>
         </div>
 
-        {/* Tabla de horario */}
+        {/* Tabla de horario. */}
         <RevealComponent delay={120} desde="derecha">
           <ul className="overflow-hidden border border-hueso-200 bg-white shadow-xl shadow-tinta/5">
             {horario.map((d, i) => {
@@ -97,4 +102,7 @@ export default function HorarioComponent() {
       </div>
     </section>
   )
+  // #endregion
 }
+
+export default HorarioComponent

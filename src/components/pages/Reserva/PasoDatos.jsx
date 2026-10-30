@@ -1,9 +1,11 @@
+// #region Imports
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Loader2, AlertCircle, User, Phone, ShieldCheck } from 'lucide-react'
 import { crearCita } from '../../../lib/citas'
 import { sumarMin } from '../../../utils/disponibilidad'
 import { limpiarMovil } from './reglas'
+// #endregion
 
 const claseCampo =
   'w-full rounded-2xl border bg-white py-4 pl-12 pr-4 text-base text-tinta outline-none transition-all placeholder:text-tinta/30 focus:border-acento focus:ring-4 focus:ring-acento/15'
@@ -14,7 +16,8 @@ const claseCampo =
  * Si la base de datos rechaza la hora (alguien la ha cogido justo antes, o se
  * ha cerrado ese rato), se vuelve a la elección de hora con el aviso.
  */
-export default function PasoDatos({ servicio, hora, onConfirmado, onHoraPerdida }) {
+const PasoDatos = ({ servicio, hora, onConfirmado, onHoraPerdida }) => {
+  // #region Declaraciones, variables y hooks
   const [nombre, setNombre] = useState('')
   const [movil, setMovil] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -25,7 +28,7 @@ export default function PasoDatos({ servicio, hora, onConfirmado, onHoraPerdida 
   const movilLimpio = limpiarMovil(movil)
   const formOk = nombreOk && !!movilLimpio
 
-  async function onSubmit(e) {
+  const onSubmit = async (e) => {
     e.preventDefault()
     setTocado(true)
     if (!formOk || enviando) return
@@ -47,7 +50,9 @@ export default function PasoDatos({ servicio, hora, onConfirmado, onHoraPerdida 
     else if (res.volverAHoras) onHoraPerdida(res.error)
     else setError(res.error)
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <div>
       <h2 className="mb-6 text-center font-display text-2xl font-semibold sm:text-3xl">¿A nombre de quién?</h2>
@@ -127,4 +132,7 @@ export default function PasoDatos({ servicio, hora, onConfirmado, onHoraPerdida 
       </form>
     </div>
   )
+  // #endregion
 }
+
+export default PasoDatos

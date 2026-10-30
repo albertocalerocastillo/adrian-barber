@@ -1,3 +1,4 @@
+// #region Imports
 import { useEffect, useState } from 'react'
 import { AnimatePresence, m, useMotionValueEvent, useScroll } from 'motion/react'
 import { Menu, X, Phone, MapPin } from 'lucide-react'
@@ -12,6 +13,7 @@ import {
   INSTAGRAM,
   INSTAGRAM_URL,
 } from '../../../data/contacto'
+// #endregion
 
 const ENLACES = [
   { href: '#servicios', texto: 'Servicios' },
@@ -30,7 +32,8 @@ const ENLACES = [
  *    que es justo cuando el usuario busca el menú.
  *  - En móvil y tablet, menú a pantalla completa con los enlaces escalonados.
  */
-export default function NavComponent() {
+const NavComponent = () => {
+  // #region Declaraciones, variables y hooks
   const { scrollY } = useScroll()
   const [solida, setSolida] = useState(false)
   const [oculta, setOculta] = useState(false)
@@ -52,7 +55,9 @@ export default function NavComponent() {
   }, [menuAbierto])
 
   const cerrar = () => setMenuAbierto(false)
+  // #endregion
 
+  // #region Renderizado
   return (
     <>
       <m.header
@@ -69,7 +74,7 @@ export default function NavComponent() {
             solida ? 'py-2.5' : 'py-4 lg:py-5'
           }`}
         >
-          {/* Logo */}
+          {/* Logo. */}
           <a href="#inicio" className="al-tocar shrink-0" aria-label="Inicio" onClick={cerrar}>
             <LogoAdriComponent
               variante="monograma"
@@ -77,7 +82,7 @@ export default function NavComponent() {
             />
           </a>
 
-          {/* Enlaces escritorio (en tablet no caben bien: van al menú) */}
+          {/* Enlaces escritorio (en tablet no caben bien: van al menú). */}
           <ul className="hidden items-center gap-7 lg:flex xl:gap-9">
             {ENLACES.map((e) => (
               <li key={e.href}>
@@ -92,12 +97,12 @@ export default function NavComponent() {
           </ul>
 
           <div className="flex items-center gap-3">
-            {/* CTA (tablet y escritorio) */}
+            {/* CTA (tablet y escritorio). */}
             <div className="hidden md:block">
               <CitaButtonComponent />
             </div>
 
-            {/* Botón menú (móvil y tablet) */}
+            {/* Botón menú (móvil y tablet). */}
             <button
               type="button"
               onClick={() => setMenuAbierto((v) => !v)}
@@ -111,7 +116,7 @@ export default function NavComponent() {
         </nav>
       </m.header>
 
-      {/* Menú a pantalla completa (móvil y tablet) */}
+      {/* Menú a pantalla completa (móvil y tablet). */}
       <AnimatePresence>
         {menuAbierto && (
           <m.div
@@ -121,7 +126,7 @@ export default function NavComponent() {
             exit={{ clipPath: 'circle(0% at 100% 0%)' }}
             transition={{ duration: 0.6, ease: EASE_SUAVE }}
           >
-            {/* Sello de fondo, muy tenue */}
+            {/* Sello de fondo, muy tenue. */}
             <img
               src="/logo-sello.webp"
               alt=""
@@ -178,4 +183,7 @@ export default function NavComponent() {
       </AnimatePresence>
     </>
   )
+  // #endregion
 }
+
+export default NavComponent

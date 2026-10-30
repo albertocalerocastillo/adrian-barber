@@ -156,7 +156,7 @@ npm run dev            # http://localhost:5173
 | `npm run demo` | Panel en http://localhost:5174/admin con un Supabase simulado; nada se guarda (`/admin?login` empieza en la pantalla de acceso) |
 | `npm run build` | Build de producción en `dist/` |
 | `npm run preview` | Sirve el build |
-| `npm run lint` | ESLint |
+| `npm run lint` | ESLint con las normas de estilo (ver abajo) |
 
 Variables de entorno (ver [`.env.example`](.env.example)): `VITE_SUPABASE_URL` y
 `VITE_SUPABASE_ANON_KEY`. Los secretos del aviso (`CALLMEBOT_PHONE`, `CALLMEBOT_APIKEY`) no van
@@ -170,6 +170,25 @@ supabase functions deploy aviso-cita
 La base de datos se crea con [`supabase/setup-completo.sql`](supabase/setup-completo.sql) y las
 migraciones `migracion-*.sql` en el SQL Editor de Supabase. Después hay que añadir cada cuenta del
 panel a la tabla `barberos` (bloque final de `migracion-seguridad.sql`).
+
+### Estilo de código
+
+`npm run lint` comprueba solas la mayoría de las normas
+([`eslint.config.js`](eslint.config.js) y las reglas propias de [`eslint-rules/wiki.js`](eslint-rules/wiki.js)):
+
+- `const` siempre; `let` solo si no hay otra; nunca `var`.
+- Funciones flecha (`const nombre = () => {}`), también los componentes, y `async/await` en vez de `.then()`.
+- Comentarios en su propia línea encima del código, empezando en mayúscula y acabando en punto.
+- Toda función exportada lleva su bloque `/** … */` explicando qué hace.
+
+Y a mano:
+
+- La variable que se devuelve al final de una función se llama `result`.
+- Nada de textos o números con significado sueltos: van en un enumerado ([`src/enums`](src/enums),
+  p. ej. `EstadoCitaEnum.Pendiente`) o en una constante (`MINUTOS_DIA`).
+- Los componentes se ordenan en regiones funcionales: `// #region Imports`,
+  `// #region Declaraciones, variables y hooks`, `// #region Renderizado` (y las que hagan falta).
+- Nada de código comentado ni de `try/catch` salvo para controlar un error concreto.
 
 ## Despliegue
 

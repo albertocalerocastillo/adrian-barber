@@ -1,5 +1,7 @@
+// #region Imports
 import { m, useMotionValue, useSpring } from 'motion/react'
 import { MUELLE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 const limitar = (v) => Math.max(-1, Math.min(1, v))
 
@@ -12,7 +14,8 @@ const limitar = (v) => Math.max(-1, Math.min(1, v))
  * tamaño: antes era proporcional y un botón ancho llegaba a moverse 36 px,
  * que parecía que se escapaba. Unos pocos píxeles se notan sin molestar.
  */
-export default function MagneticComponent({ children, maximo = 6, className = '' }) {
+const MagneticComponent = ({ children, maximo = 6, className = '' }) => {
+  // #region Declaraciones, variables y hooks
   const x = useSpring(useMotionValue(0), MUELLE_SUAVE)
   const y = useSpring(useMotionValue(0), MUELLE_SUAVE)
 
@@ -27,7 +30,9 @@ export default function MagneticComponent({ children, maximo = 6, className = ''
     x.set(0)
     y.set(0)
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <m.div
       className={`inline-block ${className}`}
@@ -38,4 +43,7 @@ export default function MagneticComponent({ children, maximo = 6, className = ''
       {children}
     </m.div>
   )
+  // #endregion
 }
+
+export default MagneticComponent

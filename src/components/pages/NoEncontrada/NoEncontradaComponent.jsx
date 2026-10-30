@@ -1,8 +1,10 @@
+// #region Imports
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Home } from 'lucide-react'
 import WhatsAppIcon from '../../ui/WhatsAppIcon/WhatsAppIcon'
 import { NEGOCIO, WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
+// #endregion
 
 /**
  * Página para URLs que no existen.
@@ -14,7 +16,8 @@ import { NEGOCIO, WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
  * servidor responde 200, así que sin esto Google podría indexar direcciones
  * inventadas como si fueran páginas buenas.
  */
-export default function NoEncontradaComponent() {
+const NoEncontradaComponent = () => {
+  // #region Declaraciones, variables y hooks
   useEffect(() => {
     // Se REAPROVECHA la etiqueta robots de index.html en vez de añadir otra:
     // dos etiquetas robots a la vez se contradicen y Google no sabe cuál vale.
@@ -36,7 +39,9 @@ export default function NoEncontradaComponent() {
   }, [])
 
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MENSAJE)}`
+  // #endregion
 
+  // #region Renderizado
   return (
     <main className="grain flex min-h-screen flex-col items-center justify-center bg-tinta px-5 text-center text-hueso">
       <img
@@ -78,4 +83,7 @@ export default function NoEncontradaComponent() {
       </div>
     </main>
   )
+  // #endregion
 }
+
+export default NoEncontradaComponent

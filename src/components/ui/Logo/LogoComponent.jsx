@@ -1,5 +1,7 @@
+// #region Imports
 import { useState } from 'react'
 import { NEGOCIO } from '../../../data/contacto'
+// #endregion
 
 /**
  * Logotipo de A.S Barbería — usa el LOGO ORIGINAL de Adrián, recortado y sin
@@ -16,7 +18,8 @@ import { NEGOCIO } from '../../../data/contacto'
  *  - conClaim: muestra el subtítulo en el fallback tipográfico.
  *  - alto: altura del logo en px (por defecto 46).
  */
-export default function LogoComponent({ claro = false, conClaim = true, alto = 46 }) {
+const LogoComponent = ({ claro = false, conClaim = true, alto = 46 }) => {
+  // #region Declaraciones, variables y hooks
   const [hayImagen, setHayImagen] = useState(true)
   const src = claro ? '/logo-blanco.png' : '/logo-negro.png'
 
@@ -35,7 +38,9 @@ export default function LogoComponent({ claro = false, conClaim = true, alto = 4
   // ── Fallback caligráfico (eco del logo manuscrito) ──
   const colorPrincipal = claro ? 'text-hueso' : 'text-tinta'
   const colorClaim = claro ? 'text-hueso/65' : 'text-tinta/55'
+  // #endregion
 
+  // #region Renderizado
   return (
     <span className="flex flex-col items-start leading-none select-none">
       <span className={`font-script text-3xl leading-none ${colorPrincipal}`}>
@@ -48,4 +53,7 @@ export default function LogoComponent({ claro = false, conClaim = true, alto = 4
       )}
     </span>
   )
+  // #endregion
 }
+
+export default LogoComponent

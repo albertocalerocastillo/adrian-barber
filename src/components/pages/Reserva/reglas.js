@@ -6,11 +6,11 @@
 // validar_cita_web): esto es para que el cliente vea solo lo que de verdad
 // puede reservar.
 import { RESERVA, inicioReservas } from '../../../data/features'
-import { generarRejilla, sumarMin } from '../../../utils/disponibilidad'
+import { generarRejilla, sumarMin, MINUTOS_DIA } from '../../../utils/disponibilidad'
 import { inicioDia } from '../../../utils/fechas'
 
 /** Primer y último día que se pueden elegir (fechas locales a medianoche). */
-export function ventanaReserva(ahora = new Date()) {
+export const ventanaReserva = (ahora = new Date()) => {
   const hoy = inicioDia(ahora)
   const inicio = inicioReservas()
   const primero = hoy > inicio ? hoy : inicio
@@ -20,13 +20,13 @@ export function ventanaReserva(ahora = new Date()) {
 }
 
 /** Rango de instantes a pedir a la BD para cubrir los días [desde, hasta]. */
-export function rangoConsulta(desde, hasta) {
+export const rangoConsulta = (desde, hasta) => {
   // Un día de margen a cada lado: así da igual el huso del navegador.
-  return { desde: sumarMin(inicioDia(desde), -24 * 60), hasta: sumarMin(inicioDia(hasta), 48 * 60) }
+  return { desde: sumarMin(inicioDia(desde), -MINUTOS_DIA), hasta: sumarMin(inicioDia(hasta), 2 * MINUTOS_DIA) }
 }
 
 /** Horas del día (libres y ocupadas) para un servicio. */
-export function horasDelDia({ fecha, servicio, horario, ocupados, ahora = new Date() }) {
+export const horasDelDia = ({ fecha, servicio, horario, ocupados, ahora = new Date() }) => {
   return generarRejilla({
     fecha,
     duracionMin: servicio.duracion,
@@ -39,13 +39,13 @@ export function horasDelDia({ fecha, servicio, horario, ocupados, ahora = new Da
   })
 }
 
-/** ¿Cuántas horas libres quedan ese día? (0 = completo o cerrado) */
-export function libresDelDia(opciones) {
+/** ¿Cuántas horas libres quedan ese día? (0 = completo o cerrado). */
+export const libresDelDia = (opciones) => {
   return horasDelDia(opciones).filter((h) => h.estado === 'libre').length
 }
 
 /** Móvil español (6/7/8/9 + 8 cifras), aceptando +34, 0034 y espacios. */
-export function limpiarMovil(v) {
+export const limpiarMovil = (v) => {
   const solo = v.replace(/[\s.-]/g, '').replace(/^(\+34|0034)/, '')
   return /^[6789]\d{8}$/.test(solo) ? solo : null
 }

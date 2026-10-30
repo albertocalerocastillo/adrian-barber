@@ -1,8 +1,10 @@
+// #region Imports
 import { useCallback, useRef, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
 import { Check, AlertCircle } from 'lucide-react'
 import { EASE_SUAVE } from '../../../theme/animacion'
 import { AvisoContexto } from './avisoContexto'
+// #endregion
 
 const DURACION_MS = 5000
 
@@ -12,9 +14,9 @@ const DURACION_MS = 5000
  * "¿seguro?" antes de cada toque, se hace y se ofrece deshacerlo, que es más
  * rápido para el día a día y igual de seguro.
  *
- * Uso: const avisar = useAviso(); avisar({ texto, tipo: 'error', deshacer })
+ * Uso: const avisar = useAviso(); avisar({ texto, tipo: 'error', deshacer }).
  */
-export function AvisoProvider({ children }) {
+export const AvisoProvider = ({ children }) => {
   const [aviso, setAviso] = useState(null)
   const temporizador = useRef(0)
 
@@ -67,7 +69,7 @@ export function AvisoProvider({ children }) {
                   Deshacer
                 </button>
               )}
-              {/* Hilo que se consume: cuánto queda para que se vaya */}
+              {/* Hilo que se consume: cuánto queda para que se vaya. */}
               <m.span
                 aria-hidden="true"
                 className="absolute inset-x-4 bottom-0 h-0.5 origin-left rounded-full bg-acento/50"

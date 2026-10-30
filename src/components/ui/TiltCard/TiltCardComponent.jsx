@@ -1,11 +1,14 @@
+// #region Imports
 import { m, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'motion/react'
 import { MUELLE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 /**
  * Tarjeta que se inclina en 3D siguiendo al ratón, con un brillo dorado que se
  * mueve con él. Solo con ratón: en pantallas táctiles se queda quieta.
  */
-export default function TiltCardComponent({ children, inclinacion = 3, brillo = 0.18, className = '' }) {
+const TiltCardComponent = ({ children, inclinacion = 3, brillo = 0.18, className = '' }) => {
+  // #region Declaraciones, variables y hooks
   // Posición del ratón dentro de la tarjeta, de 0 a 1 (0,5 = centro).
   const px = useMotionValue(0.5)
   const py = useMotionValue(0.5)
@@ -26,7 +29,9 @@ export default function TiltCardComponent({ children, inclinacion = 3, brillo = 
     px.set(0.5)
     py.set(0.5)
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <div className="group/tilt h-full [perspective:1200px]">
       <m.div
@@ -44,4 +49,7 @@ export default function TiltCardComponent({ children, inclinacion = 3, brillo = 
       </m.div>
     </div>
   )
+  // #endregion
 }
+
+export default TiltCardComponent

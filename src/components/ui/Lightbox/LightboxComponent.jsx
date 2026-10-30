@@ -1,5 +1,7 @@
+// #region Imports
 import { useEffect, useCallback, useRef } from 'react'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+// #endregion
 
 // Píxeles que hay que arrastrar para que cuente como deslizar (y no como un
 // toque tembloroso).
@@ -16,7 +18,8 @@ const MINIMO_DESLIZAR = 50
  *  - indice: índice de la foto mostrada (null = cerrado).
  *  - onCerrar, onAnterior, onSiguiente: callbacks.
  */
-export default function LightboxComponent({ fotos, indice, onCerrar, onAnterior, onSiguiente }) {
+const LightboxComponent = ({ fotos, indice, onCerrar, onAnterior, onSiguiente }) => {
+  // #region Declaraciones, variables y hooks
   const inicioX = useRef(null)
   const huboDeslizamiento = useRef(false)
 
@@ -66,7 +69,9 @@ export default function LightboxComponent({ fotos, indice, onCerrar, onAnterior,
     }
     onCerrar()
   }
+  // #endregion
 
+  // #region Renderizado
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-tinta/95 p-4 backdrop-blur-sm"
@@ -114,4 +119,7 @@ export default function LightboxComponent({ fotos, indice, onCerrar, onAnterior,
       </p>
     </div>
   )
+  // #endregion
 }
+
+export default LightboxComponent

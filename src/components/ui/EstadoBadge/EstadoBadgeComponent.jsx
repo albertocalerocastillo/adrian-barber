@@ -10,7 +10,7 @@
  *  - href: si se pasa, el badge lleva a esa ancla (p. ej. '#horario'). En la
  *    propia sección de Horario se omite, que no tiene sentido enlazarse a sí.
  */
-export default function EstadoBadgeComponent({ estado, claro = false, href }) {
+const EstadoBadgeComponent = ({ estado, claro = false, href }) => {
   const abierto = estado.abierto
 
   const colores = abierto
@@ -57,3 +57,5 @@ export default function EstadoBadgeComponent({ estado, claro = false, href }) {
 
   return <span className={clases}>{contenido}</span>
 }
+
+export default EstadoBadgeComponent

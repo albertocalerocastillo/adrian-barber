@@ -1,3 +1,4 @@
+// #region Imports
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 // Tipografías servidas desde la propia web (no desde Google Fonts): así el
@@ -9,6 +10,7 @@ import '@fontsource-variable/lora'
 import '@fontsource-variable/lora/wght-italic.css'
 import './theme/theme.css'
 import App from './App.jsx'
+// #endregion
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

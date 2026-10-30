@@ -1,3 +1,4 @@
+// #region Imports
 import { Link } from 'react-router-dom'
 import { Phone, MapPin, ArrowUp } from 'lucide-react'
 import LogoAdriComponent from '../../ui/LogoAdri/LogoAdriComponent'
@@ -15,6 +16,7 @@ import {
   INSTAGRAM_URL,
   MAPS_URL,
 } from '../../../data/contacto'
+// #endregion
 
 const ENLACES = [
   { href: '#servicios', texto: 'Servicios' },
@@ -28,7 +30,8 @@ const ENLACES = [
 /**
  * Pie de página: sello, enlaces, contacto y horario, y redes.
  */
-export default function FooterComponent() {
+const FooterComponent = () => {
+  // #region Declaraciones, variables y hooks
   const anio = new Date().getFullYear()
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MENSAJE)}`
   const { horario } = useEstadoNegocio()
@@ -38,12 +41,14 @@ export default function FooterComponent() {
     { href: wa, etiqueta: 'WhatsApp', icono: <WhatsAppIcon size={18} />, fuera: true },
     { href: INSTAGRAM_URL, etiqueta: 'Instagram', icono: <InstagramIcon size={18} />, fuera: true },
   ]
+  // #endregion
 
+  // #region Renderizado
   return (
-    // pb-16 en móvil: hueco para la barra fija de contacto de abajo.
+    // En móvil, el pb-16 deja hueco para la barra fija de contacto de abajo.
     <footer className="pizarra relative border-t border-acento/30 pb-16 pt-16 text-hueso md:pb-0 md:pt-20">
       <div className="mx-auto grid max-w-6xl gap-12 px-5 text-center md:grid-cols-2 md:px-8 md:text-left lg:grid-cols-[1.2fr_0.8fr_1fr]">
-        {/* Sello + frase */}
+        {/* Sello + frase. */}
         <div className="flex flex-col items-center gap-5 md:items-start">
           <LogoAdriComponent className="h-32 w-32 md:h-36 md:w-36" loading="lazy" />
           <p className="max-w-xs text-sm leading-relaxed text-hueso/55">
@@ -64,7 +69,7 @@ export default function FooterComponent() {
           </div>
         </div>
 
-        {/* Enlaces */}
+        {/* Enlaces. */}
         <nav aria-label="Secciones">
           <p className="text-xs tracking-kicker text-acento">La web</p>
           <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 text-sm md:grid-cols-1">
@@ -78,7 +83,7 @@ export default function FooterComponent() {
           </ul>
         </nav>
 
-        {/* Contacto */}
+        {/* Contacto. */}
         <div className="md:col-span-2 lg:col-span-1">
           <p className="text-xs tracking-kicker text-acento">Visítanos</p>
           <ul className="mt-5 space-y-4 text-sm text-hueso/70">
@@ -137,4 +142,7 @@ export default function FooterComponent() {
       </div>
     </footer>
   )
+  // #endregion
 }
+
+export default FooterComponent

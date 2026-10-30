@@ -1,8 +1,10 @@
+// #region Imports
 import { Link } from 'react-router-dom'
 import { CalendarCheck } from 'lucide-react'
 import WhatsAppIcon from '../WhatsAppIcon/WhatsAppIcon'
 import { reservaEmpezada } from '../../../data/features'
 import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
+// #endregion
 
 /**
  * Botón principal "Pedir cita" — la acción estrella de toda la web.
@@ -16,12 +18,12 @@ import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contacto'
  *  - tamano: 'md' | 'lg'.
  *  - className: clases extra.
  */
-export default function CitaButtonComponent({
+const CitaButtonComponent = ({
   texto,
   variante = 'acento',
   tamano = 'md',
   className = '',
-}) {
+}) => {
   // Con la reserva apagada, los botones grandes dicen que se abre WhatsApp;
   // en el pequeño (menú) no cabe y basta con el icono.
   const online = reservaEmpezada()
@@ -68,3 +70,5 @@ export default function CitaButtonComponent({
     </Link>
   )
 }
+
+export default CitaButtonComponent

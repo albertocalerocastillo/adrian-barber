@@ -1,9 +1,13 @@
+// #region Imports
 import { NEGOCIO } from '../../../data/contacto'
+// #endregion
 
 // Generados con scripts/generar-logo-final.py a partir del logo definitivo.
 const FUENTES = {
-  sello: '/logo-sello.webp', // emblema circular completo (fondo transparente)
-  monograma: '/logo-as.webp', // solo "A.S" con la navaja (apaisado, para fondo oscuro)
+  // Emblema circular completo (fondo transparente).
+  sello: '/logo-sello.webp',
+  // Solo "A.S" con la navaja (apaisado, para fondo oscuro).
+  monograma: '/logo-as.webp',
 }
 
 /**
@@ -12,7 +16,8 @@ const FUENTES = {
  *  - 'monograma': solo las letras con la navaja, para la barra de navegación.
  * El tamaño se controla por CSS (className, p. ej. "h-11 w-11" o "h-10 w-auto").
  */
-export default function LogoAdriComponent({ className = 'h-11 w-11', variante = 'sello', ...resto }) {
+const LogoAdriComponent = ({ className = 'h-11 w-11', variante = 'sello', ...resto }) => {
+  // #region Renderizado
   return (
     <img
       src={FUENTES[variante]}
@@ -22,4 +27,7 @@ export default function LogoAdriComponent({ className = 'h-11 w-11', variante = 
       {...resto}
     />
   )
+  // #endregion
 }
+
+export default LogoAdriComponent

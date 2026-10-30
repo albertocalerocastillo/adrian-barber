@@ -1,7 +1,9 @@
+// #region Imports
 import { Scissors } from 'lucide-react'
 import MarqueeComponent from '../../ui/Marquee/MarqueeComponent'
 import { NEGOCIO } from '../../../data/contacto'
 import { SERVICIOS } from '../../../data/servicios'
+// #endregion
 
 const PRECIO_CORTE = SERVICIOS.find((s) => s.id === 'corte')?.precio
 
@@ -20,7 +22,8 @@ const PALABRAS = [
  * Cinta dorada entre el hero y los servicios. Separa las dos secciones con
  * movimiento y repite de un vistazo lo que se ofrece y a qué precio.
  */
-export default function CintaComponent() {
+const CintaComponent = () => {
+  // #region Renderizado
   return (
     <div className="relative z-10 -mt-px bg-acento py-4 text-tinta md:py-5">
       <p className="sr-only">{PALABRAS.join(' · ')}</p>
@@ -34,4 +37,7 @@ export default function CintaComponent() {
       </MarqueeComponent>
     </div>
   )
+  // #endregion
 }
+
+export default CintaComponent

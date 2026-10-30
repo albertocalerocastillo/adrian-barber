@@ -1,3 +1,4 @@
+// #region Imports
 import { useState, useEffect } from 'react'
 import { m } from 'motion/react'
 import { CalendarX, RefreshCw, Sun, Sunset } from 'lucide-react'
@@ -6,6 +7,7 @@ import { horaEn } from '../../../utils/fechas'
 import { RESERVA } from '../../../data/features'
 import { horasDelDia, rangoConsulta } from './reglas'
 import { EASE_SUAVE } from '../../../theme/animacion'
+// #endregion
 
 /**
  * Paso 3: elegir hora. Vuelve a pedir lo ocupado de ese día (por si alguien
@@ -13,7 +15,8 @@ import { EASE_SUAVE } from '../../../theme/animacion'
  * servicio. Las horas libres se pulsan; las ocupadas salen tachadas.
  * Las horas son SIEMPRE las de la barbería (hora de España).
  */
-export default function PasoHora({ servicio, fecha, horario, hora, aviso, onElegir }) {
+const PasoHora = ({ servicio, fecha, horario, hora, aviso, onElegir }) => {
+  // #region Declaraciones, variables y hooks
   const [rejilla, setRejilla] = useState(null)
   const [error, setError] = useState(false)
   const [intento, setIntento] = useState(0)
@@ -21,13 +24,18 @@ export default function PasoHora({ servicio, fecha, horario, hora, aviso, onEleg
   useEffect(() => {
     let vivo = true
     const { desde, hasta } = rangoConsulta(fecha, fecha)
-    getCitas(desde, hasta)
-      .then((ocupados) => {
+    const cargar = async () => {
+      // Si no se puede leer la agenda, se avisa y se ofrece reintentar.
+      try {
+        const ocupados = await getCitas(desde, hasta)
         if (!vivo) return
         setError(false)
         setRejilla(horasDelDia({ fecha, servicio, horario, ocupados }))
-      })
-      .catch(() => vivo && setError(true))
+      } catch {
+        if (vivo) setError(true)
+      }
+    }
+    cargar()
     return () => {
       vivo = false
     }
@@ -37,7 +45,9 @@ export default function PasoHora({ servicio, fecha, horario, hora, aviso, onEleg
   const manana = rejilla?.filter((s) => horaDe(s.inicio) < 14) ?? []
   const tarde = rejilla?.filter((s) => horaDe(s.inicio) >= 14) ?? []
   const hayLibres = rejilla?.some((s) => s.estado === 'libre')
+  // #endregion
 
+  // #region Renderizado
   return (
     <div>
       <h2 className="mb-6 text-center font-display text-2xl font-semibold sm:text-3xl">¿A qué hora?</h2>
@@ -127,4 +137,7 @@ export default function PasoHora({ servicio, fecha, horario, hora, aviso, onEleg
       )}
     </div>
   )
+  // #endregion
 }
+
+export default PasoHora

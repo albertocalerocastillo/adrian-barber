@@ -5,6 +5,6 @@ import { createContext, useContext } from 'react'
 export const AvisoContexto = createContext(() => {})
 
 /** Devuelve avisar({ texto, tipo: 'ok' | 'error', deshacer }). */
-export function useAviso() {
+export const useAviso = () => {
   return useContext(AvisoContexto)
 }

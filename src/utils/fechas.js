@@ -7,13 +7,13 @@ const MESES = [
   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
 ]
 
-/** "Lunes 6 de julio" */
-export function fechaLarga(d) {
+/** "Lunes 6 de julio". */
+export const fechaLarga = (d) => {
   return `${DIAS[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}`
 }
 
 /** { diaSemana:'Lun', dia:6, mes:'jul' } para tarjetas compactas. */
-export function fechaCorta(d) {
+export const fechaCorta = (d) => {
   return {
     diaSemana: DIAS_CORTO[d.getDay()],
     dia: d.getDate(),
@@ -21,49 +21,50 @@ export function fechaCorta(d) {
   }
 }
 
-/** "12:30" */
-export function hora(d) {
+/** "12:30". */
+export const hora = (d) => {
   return d.toTimeString().slice(0, 5)
 }
 
 /** "YYYY-MM-DD" en hora local, para los <input type="date">. */
-export function aInputDate(d) {
+export const aInputDate = (d) => {
   const p = (n) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 
 /** "10:30" del instante `d` en la zona horaria dada (la del negocio). */
-export function horaEn(d, zona) {
+export const horaEn = (d, zona) => {
   return new Intl.DateTimeFormat('es-ES', { timeZone: zona, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(d)
 }
 
 /** Medianoche del día de `d` (copia). */
-export function inicioDia(d) {
-  const x = new Date(d)
-  x.setHours(0, 0, 0, 0)
-  return x
+export const inicioDia = (d) => {
+  const result = new Date(d)
+  result.setHours(0, 0, 0, 0)
+  return result
 }
 
 /** Devuelve un array con los próximos `n` días a partir de hoy. */
-export function proximosDias(n, desde = new Date()) {
+export const proximosDias = (n, desde = new Date()) => {
   const base = inicioDia(desde)
   return Array.from({ length: n }, (_, i) => {
-    const d = new Date(base)
-    d.setDate(base.getDate() + i)
-    return d
+    const result = new Date(base)
+    result.setDate(base.getDate() + i)
+    return result
   })
 }
 
 /** Lunes 00:00 de la semana que contiene a `d`. */
-export function inicioSemana(d) {
-  const x = inicioDia(d)
-  const lunes = (x.getDay() + 6) % 7 // 0 = lunes
-  x.setDate(x.getDate() - lunes)
-  return x
+export const inicioSemana = (d) => {
+  const result = inicioDia(d)
+  // 0 = lunes.
+  const lunes = (result.getDay() + 6) % 7
+  result.setDate(result.getDate() - lunes)
+  return result
 }
 
 /** ¿Mismo día natural? */
-export function mismoDia(a, b) {
+export const mismoDia = (a, b) => {
   return (
     a.getFullYear() === b.getFullYear() &&
     a.getMonth() === b.getMonth() &&
@@ -71,8 +72,8 @@ export function mismoDia(a, b) {
   )
 }
 
-/** ¿Ese día tiene algún tramo de trabajo? (para activar/desactivar en el selector) */
-export function diaAbierto(fecha, horario) {
+/** ¿Ese día tiene algún tramo de trabajo? (para activar/desactivar en el selector). */
+export const diaAbierto = (fecha, horario) => {
   const def = horario.find((h) => h.dia === fecha.getDay())
   return !!(def && def.tramos && def.tramos.length)
 }
