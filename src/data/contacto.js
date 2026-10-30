@@ -78,13 +78,11 @@ export const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${MAPS_
 export const MAPS_EMBED = `https://www.google.com/maps?q=${MAPS_QUERY}&output=embed`
 
 // ─── Datos legales (aviso legal LSSI y política de privacidad) ───
-// ⚠️ PENDIENTE DE ADRIÁN: la LSSI obliga a poner también un email de
-//    contacto del titular. Mientras esté vacío, esa línea no sale en la
-//    web (mejor que poner datos inventados), pero hay que rellenarlo.
+// La LSSI obliga a poner el NIF y un email de contacto del titular.
 export const LEGAL = {
   titular: 'Adrián Sánchez Aranda',
   nif: '23883092F',
-  email: '', // p. ej. 'adrian@ejemplo.com'
+  email: 'adriansanchezaranda1@gmail.com',
   domicilio: `${NEGOCIO.direccion}, 41309 ${NEGOCIO.localidad} (${NEGOCIO.provincia})`,
   actualizado: '30 de octubre de 2026',
 }
