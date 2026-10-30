@@ -8,8 +8,9 @@ import LoginComponent from './Login/LoginComponent'
 import AgendaComponent from './Agenda/AgendaComponent'
 import ScheduleSettingsComponent from './ScheduleSettings/ScheduleSettingsComponent'
 import ServiceSettingsComponent from './ServiceSettings/ServiceSettingsComponent'
-import { ToastProviderComponent } from './Toast/ToastProviderComponent'
+import ToastProviderComponent from './Toast/ToastProviderComponent'
 import { AuthenticationService } from '../../../services/AuthenticationService'
+import { BrandLogoVariantEnum } from '../../../services/enums/BrandLogoVariantEnum'
 // #endregion
 
 const SECCIONES = [
@@ -180,7 +181,7 @@ const Escritorio = ({ email }) => {
         <header className="pizarra sticky top-0 z-30 border-b border-acento/15 text-hueso lg:hidden">
           <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
             <div className="flex items-center gap-3">
-              <BrandLogoComponent variante="monograma" className="h-8 w-auto" />
+              <BrandLogoComponent variant={BrandLogoVariantEnum.Monogram} className="h-8 w-auto" />
               <span className="h-5 w-px bg-white/15" />
               <span className="text-[0.65rem] tracking-kicker text-acento">Panel</span>
             </div>

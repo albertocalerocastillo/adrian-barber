@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import BrandLogoComponent from '../../core/BrandLogo/BrandLogoComponent'
 import { NEGOCIO, LEGAL, TELEFONO_VISIBLE, WHATSAPP } from '../../../data/contact'
+import { BrandLogoVariantEnum } from '../../../services/enums/BrandLogoVariantEnum'
 // #endregion
 
 /**
@@ -33,7 +34,7 @@ const LegalComponent = ({ tipo }) => {
       <header className="pizarra border-b border-acento/15">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-5">
           <Link to="/" aria-label="Volver al inicio">
-            <BrandLogoComponent variante="monograma" className="h-9 w-auto" />
+            <BrandLogoComponent variant={BrandLogoVariantEnum.Monogram} className="h-9 w-auto" />
           </Link>
           <Link to="/" className="flex items-center gap-1.5 text-sm text-hueso/70 transition-colors hover:text-acento">
             <ArrowLeft size={16} /> Inicio

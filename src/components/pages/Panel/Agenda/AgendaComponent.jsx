@@ -14,6 +14,7 @@ import RescheduleDialogComponent from '../RescheduleDialog/RescheduleDialogCompo
 import CustomerSearchDialogComponent from '../CustomerSearchDialog/CustomerSearchDialogComponent'
 import MonthViewComponent from '../MonthView/MonthViewComponent'
 import { useToast } from '../Toast/ToastContext'
+import { ToastTypeEnum } from '../../../../services/enums/ToastTypeEnum'
 import SectionHeaderComponent from '../Controls/SectionHeader/SectionHeaderComponent'
 import SegmentedControlComponent from '../Controls/SegmentedControl/SegmentedControlComponent'
 import SkeletonComponent from '../Controls/Skeleton/SkeletonComponent'
@@ -34,9 +35,9 @@ import { ConfigurationService } from '../../../../services/ConfigurationService'
 const HUECO_MINIMO = 30
 
 const VISTAS = [
-  { valor: VistaAgendaEnum.Dia, texto: 'Día' },
-  { valor: VistaAgendaEnum.Semana, texto: 'Semana' },
-  { valor: VistaAgendaEnum.Mes, texto: 'Mes' },
+  { value: VistaAgendaEnum.Dia, text: 'Día' },
+  { value: VistaAgendaEnum.Semana, text: 'Semana' },
+  { value: VistaAgendaEnum.Mes, text: 'Mes' },
 ]
 // #endregion
 
@@ -135,12 +136,12 @@ const AgendaComponent = ({ activa = true }) => {
     const res = await AgendaService.cambiarEstado(cita.id, estado)
     if (!res.ok) {
       fijarEstadoLocal(cita.id, anterior)
-      avisar({ texto: 'No se pudo guardar. Revisa la conexión.', tipo: 'error' })
+      avisar({ text: 'No se pudo guardar. Revisa la conexión.', type: ToastTypeEnum.Error })
       return
     }
     avisar({
-      texto,
-      deshacer: async () => {
+      text: texto,
+      onUndo: async () => {
         fijarEstadoLocal(cita.id, anterior)
         await AgendaService.cambiarEstado(cita.id, anterior)
       },
@@ -149,11 +150,11 @@ const AgendaComponent = ({ activa = true }) => {
 
   const quitarBloqueo = async (b) => {
     const res = await AgendaService.borrarBloqueo(b.id)
-    if (!res.ok) return avisar({ texto: 'No se pudo quitar.', tipo: 'error' })
+    if (!res.ok) return avisar({ text: 'No se pudo quitar.', type: ToastTypeEnum.Error })
     recargar()
     avisar({
-      texto: 'Vuelve a estar abierto',
-      deshacer: async () => {
+      text: 'Vuelve a estar abierto',
+      onUndo: async () => {
         await AgendaService.crearBloqueo({ inicio: new Date(b.inicio), fin: new Date(b.fin), motivo: b.motivo })
         recargar()
       },
@@ -163,8 +164,8 @@ const AgendaComponent = ({ activa = true }) => {
   const onMovida = async (cita, inicioAnterior, finAnterior) => {
     recargar()
     avisar({
-      texto: `Cita de ${cita.clienteNombre.split(' ')[0]} cambiada`,
-      deshacer: async () => {
+      text: `Cita de ${cita.clienteNombre.split(' ')[0]} cambiada`,
+      onUndo: async () => {
         await AgendaService.moverCita(cita.id, inicioAnterior, finAnterior)
         recargar()
       },
@@ -194,8 +195,8 @@ const AgendaComponent = ({ activa = true }) => {
     <>
       <SectionHeaderComponent
         kicker={saludo(ahora)}
-        titulo={esHoy ? 'Hoy' : capital(formatLongDate(dia))}
-        ayuda={esHoy ? capital(formatLongDate(dia)) : 'Toca una cita para llamar o escribir al cliente.'}
+        title={esHoy ? 'Hoy' : capital(formatLongDate(dia))}
+        help={esHoy ? capital(formatLongDate(dia)) : 'Toca una cita para llamar o escribir al cliente.'}
       >
         <div className="hidden gap-2 md:flex">
           <button
@@ -289,9 +290,9 @@ const AgendaComponent = ({ activa = true }) => {
             </button>
             <div className="hidden sm:block">
               <SegmentedControlComponent
-                opciones={VISTAS}
-                valor={vista}
-                onCambio={setVista}
+                options={VISTAS}
+                value={vista}
+                onChange={setVista}
               />
             </div>
           </div>
@@ -311,16 +312,16 @@ const AgendaComponent = ({ activa = true }) => {
 
         <div className="mt-3 flex justify-center sm:hidden">
           <SegmentedControlComponent
-            opciones={VISTAS}
-            valor={vista}
-            onCambio={setVista}
+            options={VISTAS}
+            value={vista}
+            onChange={setVista}
           />
         </div>
       </div>
 
       {/* Contenido. */}
       {!delDia || !horario ? (
-        <SkeletonComponent filas={4} alto="h-20" />
+        <SkeletonComponent rows={4} height="h-20" />
       ) : (
         <AnimatePresence mode="wait">
           <m.div
@@ -385,7 +386,7 @@ const AgendaComponent = ({ activa = true }) => {
             onClose={() => setModal(null)}
             onCreada={(texto) => {
               recargar()
-              avisar({ texto })
+              avisar({ text: texto })
             }}
           />
         )}
@@ -409,7 +410,7 @@ const AgendaComponent = ({ activa = true }) => {
             onClose={() => setModal(null)}
             onCreado={(texto) => {
               recargar()
-              avisar({ texto })
+              avisar({ text: texto })
             }}
           />
         )}

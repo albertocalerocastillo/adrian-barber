@@ -10,6 +10,8 @@ import { useCountUp } from '../../../hooks/useCountUp'
 import { PROMO } from '../../../data/services'
 import { ICONS } from '../../../theme/icons'
 import { ConfigurationService } from '../../../services/ConfigurationService'
+import { ButtonSizeEnum } from '../../../services/enums/ButtonSizeEnum'
+import { RevealFromEnum } from '../../../services/enums/RevealFromEnum'
 // #endregion
 
 /**
@@ -51,8 +53,8 @@ const ServicesComponent = () => {
       <div className="relative mx-auto max-w-6xl px-5 md:px-8">
         <SectionHeadingComponent
           kicker="La carta"
-          titulo="Servicios y precios"
-          texto="Precios claros, sin sorpresas. El corte lo incluye todo: cejas, barba y diseños."
+          title="Servicios y precios"
+          text="Precios claros, sin sorpresas. El corte lo incluye todo: cejas, barba y diseños."
         />
 
         <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
@@ -121,7 +123,7 @@ const ServicesComponent = () => {
         {/* Promo destacada. Es la oferta que más fideliza (un cliente semanal
             son unos 260 € al año), así que se le da peso de anuncio y su
             propio botón, en vez de dejarla como nota al pie. */}
-        <RevealComponent className="mt-10" desde="escala">
+        <RevealComponent className="mt-10" from={RevealFromEnum.Scale}>
           <div className="grain destello relative flex flex-col items-center gap-8 overflow-hidden bg-vino px-6 py-12 text-center text-hueso ring-1 ring-acento/30 md:flex-row md:justify-between md:px-14 md:py-14 md:text-left">
             {/* Tijeras gigantes de fondo. */}
             <Scissors
@@ -145,7 +147,7 @@ const ServicesComponent = () => {
                 </span>
                 <span className="text-4xl">€</span>
               </span>
-              <BookingButtonComponent texto="La quiero" />
+              <BookingButtonComponent text="La quiero" />
             </div>
           </div>
         </RevealComponent>
@@ -155,7 +157,7 @@ const ServicesComponent = () => {
           <p className="font-display text-xl italic text-tinta/60">
             ¿No lo tienes claro? Escríbeme y lo vemos.
           </p>
-          <BookingButtonComponent tamano="lg" />
+          <BookingButtonComponent size={ButtonSizeEnum.Lg} />
           <OnlineBookingLinkComponent />
         </RevealComponent>
       </div>

@@ -8,6 +8,7 @@ import RevealComponent from '../../core/Reveal/RevealComponent'
 import OnlineBookingLinkComponent from '../../core/OnlineBookingLink/OnlineBookingLinkComponent'
 import { TELEFONO, TELEFONO_VISIBLE } from '../../../data/contact'
 import { reservaEmpezada } from '../../../data/features'
+import { ButtonSizeEnum } from '../../../services/enums/ButtonSizeEnum'
 // #endregion
 
 /**
@@ -52,7 +53,7 @@ const FinalCtaComponent = () => {
 
         <RevealComponent delay={150} className="mt-10 flex w-full flex-col items-center gap-4 sm:w-auto sm:flex-row">
           <MagneticComponent className="w-full sm:w-auto">
-            <BookingButtonComponent tamano="lg" className="w-full sm:w-auto" />
+            <BookingButtonComponent size={ButtonSizeEnum.Lg} className="w-full sm:w-auto" />
           </MagneticComponent>
           <a
             href={`tel:${TELEFONO}`}
@@ -63,7 +64,7 @@ const FinalCtaComponent = () => {
           </a>
         </RevealComponent>
 
-        <OnlineBookingLinkComponent claro className="mt-8" />
+        <OnlineBookingLinkComponent light className="mt-8" />
       </div>
     </section>
   )

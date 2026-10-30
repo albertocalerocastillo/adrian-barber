@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { AnimatePresence, m } from 'motion/react'
 import { Plus, X, Copy, Info } from 'lucide-react'
 import { useToast } from '../Toast/ToastContext'
+import { ToastTypeEnum } from '../../../../services/enums/ToastTypeEnum'
 import SectionHeaderComponent from '../Controls/SectionHeader/SectionHeaderComponent'
 import SwitchComponent from '../Controls/Switch/SwitchComponent'
 import SaveBarComponent from '../Controls/SaveBar/SaveBarComponent'
@@ -64,13 +65,13 @@ const ScheduleSettingsComponent = ({ activa = true }) => {
   // Copia el horario de un día a todos los que están abiertos.
   const copiarATodos = (origen) => {
     setDias((ds) => ds.map((d) => (d.tramos.length && d.dia !== origen.dia ? { ...d, tramos: origen.tramos.map((t) => [...t]) } : d)))
-    avisar({ texto: `Horario del ${origen.nombre.toLowerCase()} copiado a los días abiertos. Falta guardar.` })
+    avisar({ text: `Horario del ${origen.nombre.toLowerCase()} copiado a los días abiertos. Falta guardar.` })
   }
 
   const onGuardar = async () => {
     if (guardando || !dias) return
     if (tramoMalo) {
-      avisar({ texto: 'Hay un tramo que acaba antes de empezar. Revísalo.', tipo: 'error' })
+      avisar({ text: 'Hay un tramo que acaba antes de empezar. Revísalo.', type: ToastTypeEnum.Error })
       return
     }
     setGuardando(true)
@@ -78,9 +79,9 @@ const ScheduleSettingsComponent = ({ activa = true }) => {
     setGuardando(false)
     if (res.ok) {
       setOriginal(copia(dias))
-      avisar({ texto: 'Horario guardado. La web ya lo muestra.' })
+      avisar({ text: 'Horario guardado. La web ya lo muestra.' })
     } else {
-      avisar({ texto: res.error || 'No se pudo guardar.', tipo: 'error' })
+      avisar({ text: res.error || 'No se pudo guardar.', type: ToastTypeEnum.Error })
     }
   }
   // #endregion
@@ -90,8 +91,8 @@ const ScheduleSettingsComponent = ({ activa = true }) => {
     <>
       <SectionHeaderComponent
         kicker="Ajustes"
-        titulo="Horario"
-        ayuda="Los días y horas que trabajas cada semana. La web los usa para el «Abierto ahora» y para los huecos libres."
+        title="Horario"
+        help="Los días y horas que trabajas cada semana. La web los usa para el «Abierto ahora» y para los huecos libres."
       />
 
       <p className="mb-6 flex gap-3 rounded-2xl bg-acento/10 px-4 py-3.5 text-sm leading-relaxed text-tinta/75">
@@ -102,7 +103,7 @@ const ScheduleSettingsComponent = ({ activa = true }) => {
       </p>
 
       {dias === null ? (
-        <SkeletonComponent filas={7} alto="h-20" />
+        <SkeletonComponent rows={7} height="h-20" />
       ) : (
         <ul className="space-y-3 pb-24 md:pb-20">
           {dias.map((d, i) => {
@@ -121,7 +122,7 @@ const ScheduleSettingsComponent = ({ activa = true }) => {
                       <p className={`font-display text-lg font-semibold ${abierto ? '' : 'text-tinta/40'}`}>{d.nombre}</p>
                       <p className={`text-xs ${abierto ? 'text-green-700' : 'text-tinta/35'}`}>{abierto ? 'Abierto' : 'Cerrado'}</p>
                     </div>
-                    <SwitchComponent activo={abierto} onCambio={(v) => toggleDia(d.dia, v)} etiqueta={`${d.nombre} abierto`} />
+                    <SwitchComponent active={abierto} onChange={(v) => toggleDia(d.dia, v)} label={`${d.nombre} abierto`} />
                   </div>
 
                   <AnimatePresence initial={false}>
@@ -191,10 +192,10 @@ const ScheduleSettingsComponent = ({ activa = true }) => {
 
       <SaveBarComponent
         visible={activa && !!cambiado}
-        guardando={guardando}
-        onGuardar={onGuardar}
-        onDescartar={() => setDias(copia(original))}
-        texto="Has cambiado el horario"
+        saving={guardando}
+        onSave={onGuardar}
+        onDiscard={() => setDias(copia(original))}
+        text="Has cambiado el horario"
       />
     </>
   )

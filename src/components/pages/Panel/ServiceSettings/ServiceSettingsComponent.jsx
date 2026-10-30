@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, m } from 'motion/react'
 import { Plus, Trash2, EyeOff, Sparkles, MessageCircle } from 'lucide-react'
 import { useToast } from '../Toast/ToastContext'
+import { ToastTypeEnum } from '../../../../services/enums/ToastTypeEnum'
 import SectionHeaderComponent from '../Controls/SectionHeader/SectionHeaderComponent'
 import SwitchComponent from '../Controls/Switch/SwitchComponent'
 import StepperComponent from '../Controls/Stepper/StepperComponent'
@@ -63,8 +64,8 @@ const ServiceSettingsComponent = ({ activa = true }) => {
     const posicion = servicios.indexOf(s)
     setServicios((ss) => ss.filter((x) => x._key !== s._key))
     avisar({
-      texto: `«${s.nombre || 'Servicio'}» quitado. Falta guardar.`,
-      deshacer: () =>
+      text: `«${s.nombre || 'Servicio'}» quitado. Falta guardar.`,
+      onUndo: () =>
         setServicios((ss) => {
           const result = [...ss]
           result.splice(posicion, 0, s)
@@ -82,7 +83,7 @@ const ServiceSettingsComponent = ({ activa = true }) => {
   const onGuardar = async () => {
     if (guardando || !servicios) return
     if (servicios.some((s) => !s.nombre.trim())) {
-      avisar({ texto: 'Hay un servicio sin nombre. Pónselo o quítalo.', tipo: 'error' })
+      avisar({ text: 'Hay un servicio sin nombre. Pónselo o quítalo.', type: ToastTypeEnum.Error })
       return
     }
     setGuardando(true)
@@ -90,9 +91,9 @@ const ServiceSettingsComponent = ({ activa = true }) => {
     setGuardando(false)
     if (res.ok) {
       setOriginal(huella(servicios))
-      avisar({ texto: 'Servicios guardados. La web ya muestra los precios nuevos.' })
+      avisar({ text: 'Servicios guardados. La web ya muestra los precios nuevos.' })
     } else {
-      avisar({ texto: res.error || 'No se pudo guardar.', tipo: 'error' })
+      avisar({ text: res.error || 'No se pudo guardar.', type: ToastTypeEnum.Error })
     }
   }
   // #endregion
@@ -102,8 +103,8 @@ const ServiceSettingsComponent = ({ activa = true }) => {
     <>
       <SectionHeaderComponent
         kicker="Ajustes"
-        titulo="Servicios y precios"
-        ayuda="Lo que ve el cliente en la web. Apaga uno para ocultarlo sin borrarlo. La duración sirve para calcular los huecos libres."
+        title="Servicios y precios"
+        help="Lo que ve el cliente en la web. Apaga uno para ocultarlo sin borrarlo. La duración sirve para calcular los huecos libres."
       >
         <button
           type="button"
@@ -115,7 +116,7 @@ const ServiceSettingsComponent = ({ activa = true }) => {
       </SectionHeaderComponent>
 
       {servicios === null ? (
-        <SkeletonComponent filas={3} alto="h-48" />
+        <SkeletonComponent rows={3} height="h-48" />
       ) : (
         <div className="grid gap-4 pb-24 md:pb-20 lg:grid-cols-2">
           <AnimatePresence initial={false}>
@@ -162,7 +163,7 @@ const ServiceSettingsComponent = ({ activa = true }) => {
                         )}
                       </p>
                     </div>
-                    <SwitchComponent activo={visible} onCambio={(v) => editar(s._key, 'activo', v)} etiqueta={`Mostrar ${s.nombre} en la web`} />
+                    <SwitchComponent active={visible} onChange={(v) => editar(s._key, 'activo', v)} label={`Mostrar ${s.nombre} en la web`} />
                   </div>
 
                   <textarea
@@ -178,22 +179,22 @@ const ServiceSettingsComponent = ({ activa = true }) => {
                     <div>
                       <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-tinta/45">Precio</p>
                       <StepperComponent
-                        valor={Number(s.precio) || 0}
-                        onCambio={(v) => editar(s._key, 'precio', v)}
-                        paso={1}
-                        sufijo="€"
-                        etiqueta="precio"
+                        value={Number(s.precio) || 0}
+                        onChange={(v) => editar(s._key, 'precio', v)}
+                        step={1}
+                        suffix="€"
+                        label="precio"
                       />
                     </div>
                     <div>
                       <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-tinta/45">Duración</p>
                       <StepperComponent
-                        valor={Number(s.duracion) || 0}
-                        onCambio={(v) => editar(s._key, 'duracion', v)}
-                        paso={5}
+                        value={Number(s.duracion) || 0}
+                        onChange={(v) => editar(s._key, 'duracion', v)}
+                        step={5}
                         min={5}
-                        sufijo="min"
-                        etiqueta="duración"
+                        suffix="min"
+                        label="duración"
                       />
                     </div>
                   </div>
@@ -209,9 +210,9 @@ const ServiceSettingsComponent = ({ activa = true }) => {
                       </span>
                     </p>
                     <SwitchComponent
-                      activo={s.online !== false}
-                      onCambio={(v) => editar(s._key, 'online', v)}
-                      etiqueta={`Reservar ${s.nombre} online`}
+                      active={s.online !== false}
+                      onChange={(v) => editar(s._key, 'online', v)}
+                      label={`Reservar ${s.nombre} online`}
                     />
                   </div>
 
@@ -242,12 +243,12 @@ const ServiceSettingsComponent = ({ activa = true }) => {
 
       <SaveBarComponent
         visible={activa && !!cambiado}
-        guardando={guardando}
-        onGuardar={onGuardar}
-        onDescartar={() => {
+        saving={guardando}
+        onSave={onGuardar}
+        onDiscard={() => {
           setServicios(JSON.parse(original).map(conKey))
         }}
-        texto="Has cambiado los servicios"
+        text="Has cambiado los servicios"
       />
     </>
   )

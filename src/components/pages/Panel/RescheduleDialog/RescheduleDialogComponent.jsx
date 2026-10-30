@@ -85,7 +85,7 @@ const RescheduleDialogComponent = ({ cita, onClose, onMovida }) => {
     const mensaje = `Hola ${nombre}, te he cambiado la cita al ${formatLongDate(hecha).toLowerCase()} a las ${fmtHora(hecha)}. ¡Nos vemos! Adrián`
     const whatsapp = buildWhatsappLink(cita.clienteMovil, mensaje)
     return (
-      <SheetComponent titulo="Cita cambiada" onCerrar={onClose}>
+      <SheetComponent title="Cita cambiada" onClose={onClose}>
         <m.div
           className="flex flex-col items-center py-4 text-center"
           initial={{ opacity: 0, y: 12 }}
@@ -138,17 +138,17 @@ const RescheduleDialogComponent = ({ cita, onClose, onMovida }) => {
   // #region Renderizado
   return (
     <SheetComponent
-      titulo="Cambiar hora"
-      subtitulo={`${cita.clienteNombre} · ${cita.servicioNombre}`}
-      onCerrar={onClose}
-      pie={
+      title="Cambiar hora"
+      subtitle={`${cita.clienteNombre} · ${cita.servicioNombre}`}
+      onClose={onClose}
+      footer={
         <div>
           {error && (
             <p role="alert" className="mb-3 rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-700">
               {error}
             </p>
           )}
-          <PrimaryButtonComponent type="button" onClick={onGuardar} cargando={guardando} className="w-full">
+          <PrimaryButtonComponent type="button" onClick={onGuardar} loading={guardando} className="w-full">
             {horaISO ? `Pasar a las ${fmtHora(new Date(horaISO))}` : 'Elige la hora nueva'}
           </PrimaryButtonComponent>
         </div>
@@ -163,15 +163,15 @@ const RescheduleDialogComponent = ({ cita, onClose, onMovida }) => {
         </p>
         <FieldComponent label="Nuevo día">
           <DateShortcutsComponent
-            valor={fechaStr}
-            onCambio={(v) => {
+            value={fechaStr}
+            onChange={(v) => {
               setRejilla(null)
               setFechaStr(v)
             }}
           />
         </FieldComponent>
         <FieldComponent label="Nueva hora">
-          <TimePickerComponent rejilla={rejilla} valor={horaISO} onCambio={setHoraISO} />
+          <TimePickerComponent slots={rejilla} value={horaISO} onChange={setHoraISO} />
         </FieldComponent>
       </div>
     </SheetComponent>

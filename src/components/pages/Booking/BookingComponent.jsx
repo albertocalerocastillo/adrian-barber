@@ -15,6 +15,7 @@ import { RESERVA, reservaEmpezada, inicioReservas } from '../../../data/features
 import { WHATSAPP, WHATSAPP_MENSAJE } from '../../../data/contact'
 import { EASE_SMOOTH } from '../../../theme/animation'
 import { ConfigurationService } from '../../../services/ConfigurationService'
+import { BrandLogoVariantEnum } from '../../../services/enums/BrandLogoVariantEnum'
 // #endregion
 
 const PASOS = ['Servicio', 'Día', 'Hora', 'Tus datos']
@@ -92,7 +93,7 @@ const BookingComponent = () => {
       <header className="pizarra sticky top-0 z-30 border-b border-acento/15">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-5">
           <Link to="/" aria-label="Volver al inicio">
-            <BrandLogoComponent variante="monograma" className="h-9 w-auto" />
+            <BrandLogoComponent variant={BrandLogoVariantEnum.Monogram} className="h-9 w-auto" />
           </Link>
           <Link to="/" className="flex items-center gap-1.5 text-sm text-hueso/70 transition-colors hover:text-acento">
             <ArrowLeft size={16} />

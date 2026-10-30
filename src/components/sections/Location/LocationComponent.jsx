@@ -11,6 +11,7 @@ import {
   MAPS_URL,
   MAPS_EMBED,
 } from '../../../data/contact'
+import { RevealFromEnum } from '../../../services/enums/RevealFromEnum'
 // #endregion
 
 /**
@@ -58,14 +59,14 @@ const LocationComponent = () => {
       <div className="relative mx-auto max-w-6xl px-5 md:px-8">
         <SectionHeadingComponent
           kicker="Cómo llegar"
-          titulo="Dónde estamos"
-          texto={`${NEGOCIO.nombreCompleto} está en ${NEGOCIO.localidad} (${NEGOCIO.provincia}), a un paso de San José de la Rinconada. Ven a por tu corte, arreglo de barba, mechas o tinte: pide cita por WhatsApp o por teléfono.`}
-          claro
+          title="Dónde estamos"
+          text={`${NEGOCIO.nombreCompleto} está en ${NEGOCIO.localidad} (${NEGOCIO.provincia}), a un paso de San José de la Rinconada. Ven a por tu corte, arreglo de barba, mechas o tinte: pide cita por WhatsApp o por teléfono.`}
+          light
         />
 
         <div className="mt-14 grid gap-8 lg:grid-cols-[1fr_1.3fr] lg:gap-12">
           {/* Datos. */}
-          <RevealComponent desde="izquierda" className="flex flex-col justify-center">
+          <RevealComponent from={RevealFromEnum.Left} className="flex flex-col justify-center">
             <ul className="space-y-7">
               {datos.map((d) => (
                 <li key={d.etiqueta} className="flex items-start gap-5">
@@ -92,7 +93,7 @@ const LocationComponent = () => {
           </RevealComponent>
 
           {/* Mapa. */}
-          <RevealComponent delay={120} desde="derecha">
+          <RevealComponent delay={120} from={RevealFromEnum.Right}>
             <div className="relative h-[300px] overflow-hidden ring-1 ring-acento/25 md:h-[380px]">
               {mapa ? (
                 <iframe

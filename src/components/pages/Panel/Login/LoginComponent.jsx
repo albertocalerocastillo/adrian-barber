@@ -140,7 +140,7 @@ const LoginComponent = () => {
             </p>
           )}
 
-          <PrimaryButtonComponent type="submit" cargando={enviando} className="w-full">
+          <PrimaryButtonComponent type="submit" loading={enviando} className="w-full">
             {!enviando && <Lock size={17} />}
             {enviando ? 'Entrando…' : 'Entrar'}
           </PrimaryButtonComponent>

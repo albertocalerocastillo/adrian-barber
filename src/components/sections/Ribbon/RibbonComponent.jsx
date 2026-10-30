@@ -27,7 +27,7 @@ const RibbonComponent = () => {
   return (
     <div className="relative z-10 -mt-px bg-acento py-4 text-tinta md:py-5">
       <p className="sr-only">{PALABRAS.join(' · ')}</p>
-      <MarqueeComponent velocidad={4} className="font-display text-xl font-semibold italic md:text-3xl">
+      <MarqueeComponent speed={4} className="font-display text-xl font-semibold italic md:text-3xl">
         {PALABRAS.map((p) => (
           <span key={p} aria-hidden="true" className="flex items-center whitespace-nowrap">
             <span className="px-6 md:px-9">{p}</span>
