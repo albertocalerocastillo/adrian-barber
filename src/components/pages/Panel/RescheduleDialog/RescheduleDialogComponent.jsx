@@ -161,7 +161,7 @@ const RescheduleDialogComponent = ({ cita, onClose, onMovida }) => {
             {formatLongDate(inicioOriginal)} a las {fmtHora(inicioOriginal)}
           </span>
         </p>
-        <FieldComponent etiqueta="Nuevo día">
+        <FieldComponent label="Nuevo día">
           <DateShortcutsComponent
             valor={fechaStr}
             onCambio={(v) => {
@@ -170,7 +170,7 @@ const RescheduleDialogComponent = ({ cita, onClose, onMovida }) => {
             }}
           />
         </FieldComponent>
-        <FieldComponent etiqueta="Nueva hora">
+        <FieldComponent label="Nueva hora">
           <TimePickerComponent rejilla={rejilla} valor={horaISO} onCambio={setHoraISO} />
         </FieldComponent>
       </div>

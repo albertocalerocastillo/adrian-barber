@@ -196,7 +196,7 @@ const HeroComponent = () => {
               </span>
             </a>
             <span className="hidden h-5 w-px bg-hueso/20 sm:block lg:hidden xl:block" />
-            <StatusBadgeComponent estado={estado} claro href="#horario" />
+            <StatusBadgeComponent status={estado} light href="#horario" />
           </div>
 
           <div className="entra mt-5" style={entryOrder(6)}>

@@ -42,7 +42,7 @@ const OpeningHoursComponent = () => {
           </div>
 
           <RevealComponent delay={120} className="mt-8 flex justify-center lg:justify-start">
-            <StatusBadgeComponent estado={estado} />
+            <StatusBadgeComponent status={estado} />
           </RevealComponent>
 
           <RevealComponent delay={200} className="mt-8 hidden lg:block">

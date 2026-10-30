@@ -1,30 +1,30 @@
+// #region Imports
+import type { FunctionComponent } from 'react'
+import type { IStatusBadgeProps } from './IStatusBadgeProps'
+// #endregion
+
 /**
  * Badge en vivo de "Abierto ahora / Cerrado".
  *
  * Responde a la primera pregunta de cualquier cliente —¿puedo ir ya?—, así que
  * se usa tanto en el hero como en la sección de Horario.
- *
- * Props:
- *  - estado: lo que devuelve useBusinessStatus().
- *  - claro: true sobre fondos oscuros (hero).
- *  - href: si se pasa, el badge lleva a esa ancla (p. ej. '#horario'). En la
- *    propia sección de Horario se omite, que no tiene sentido enlazarse a sí.
  */
-const StatusBadgeComponent = ({ estado, claro = false, href }) => {
-  const abierto = estado.abierto
+const StatusBadgeComponent: FunctionComponent<IStatusBadgeProps> = ({ status, light = false, href }) => {
+  // #region Declaraciones, variables y hooks
+  const abierto = status.abierto
 
   const colores = abierto
-    ? claro
+    ? light
       ? 'border-green-400/40 bg-green-400/15 text-green-200'
       : 'border-green-700/30 bg-green-100 text-green-800'
-    : claro
+    : light
       ? 'border-hueso/25 bg-hueso/10 text-hueso/75'
       : 'border-tinta/15 bg-tinta/5 text-tinta/70'
 
   const texto = abierto
-    ? `Abierto ahora · hasta las ${estado.cierraA}`
-    : estado.abreA
-      ? `Cerrado · abre ${estado.proximoDia ? estado.proximoDia.toLowerCase() : 'hoy'} a las ${estado.abreA}`
+    ? `Abierto ahora · hasta las ${status.cierraA}`
+    : status.abreA
+      ? `Cerrado · abre ${status.proximoDia ? status.proximoDia.toLowerCase() : 'hoy'} a las ${status.abreA}`
       : 'Cerrado'
 
   const contenido = (
@@ -37,7 +37,7 @@ const StatusBadgeComponent = ({ estado, claro = false, href }) => {
         )}
         <span
           className={`relative inline-flex h-2 w-2 rounded-full ${
-            abierto ? 'bg-green-500' : claro ? 'bg-hueso/40' : 'bg-tinta/40'
+            abierto ? 'bg-green-500' : light ? 'bg-hueso/40' : 'bg-tinta/40'
           }`}
         />
       </span>
@@ -46,7 +46,9 @@ const StatusBadgeComponent = ({ estado, claro = false, href }) => {
   )
 
   const clases = `inline-flex items-center gap-2 border px-4 py-2 text-xs font-medium uppercase tracking-widest ${colores}`
+  // #endregion
 
+  // #region Renderizado
   if (href) {
     return (
       <a href={href} className={`${clases} transition-opacity hover:opacity-80`}>
@@ -56,6 +58,7 @@ const StatusBadgeComponent = ({ estado, claro = false, href }) => {
   }
 
   return <span className={clases}>{contenido}</span>
+  // #endregion
 }
 
 export default StatusBadgeComponent
