@@ -230,15 +230,16 @@ const consulta = (nombre: string) => {
       ordenes.push([c, ascending])
       return q
     },
-    // Solo la forma que usa la app: "columna.ilike.%texto%" (varias con coma).
-    or: (expresion: string) => {
-      const condiciones = expresion.split(',').map((e) => {
-        const [c, , patron] = e.split('.')
-        // El ilike de Postgres no ignora tildes, así que aquí tampoco.
-        const buscado = patron.replaceAll('%', '').toLowerCase()
-        return (r: Fila) => texto(r[c]).toLowerCase().includes(buscado)
-      })
-      filtros.push((r) => condiciones.some((f) => f(r)))
+    // Solo la forma que usa la app: "%texto%".
+    ilike: (c: string, patron: string) => {
+      const buscado = patron.replaceAll('%', '').toLowerCase()
+      filtros.push((r) => texto(r[c]).toLowerCase().includes(buscado))
+      return q
+    },
+    // Solo el operador que usa la app: imatch (expresión regular sin mayúsculas).
+    filter: (c: string, _operador: string, patron: string) => {
+      const expresion = new RegExp(patron, 'i')
+      filtros.push((r) => expresion.test(texto(r[c])))
       return q
     },
     limit: (n: number) => {

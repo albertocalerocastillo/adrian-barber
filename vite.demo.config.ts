@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { horarioEnDatosEstructurados } from './vite.config'
 import { fileURLToPath } from 'node:url'
 
 /**
@@ -14,7 +15,7 @@ import { fileURLToPath } from 'node:url'
  * No forma parte de la web publicada (el build normal usa vite.config.ts).
  */
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), horarioEnDatosEstructurados()],
   resolve: {
     alias: [
       {

@@ -1,9 +1,21 @@
 # Estado del proyecto — A.S Barbería (Adrián Sánchez)
 
 > Documento de continuación. Si abres un chat nuevo, léelo para ponerte al día.
-> Última actualización: 18 septiembre 2026.
+> Última actualización: 16 noviembre 2026.
 
 ## 🔖 HANDOFF (leer esto primero al abrir chat nuevo)
+
+**16/11/2026 — Aviso de WhatsApp a Adrián EN MARCHA.** CallMeBot activado en el móvil de
+Adrián. La Edge Function `aviso-cita` está desplegada en Supabase (con el mensaje nuevo:
+precio, hoy/mañana, si el cliente es nuevo, citas del día y enlaces) y los secretos
+`CALLMEBOT_PHONE` / `CALLMEBOT_APIKEY` apuntan a Adrián. Borradas en Vercel las
+`VITE_CALLMEBOT_*`. ⬜ Falta una reserva de prueba para confirmar que le llega.
+También: la búsqueda de clientes del panel ya ignora tildes ("jose" encuentra "José",
+con `imatch` y `utils/search.ts`), y el horario de los datos estructurados de Google ya
+no se escribe a mano en `index.html`: lo genera `vite.config.ts` desde
+`data/openingHours.ts` y la web lo cambia por el de Supabase al cargar.
+⬜ Pendiente: cuenta de Adrián en `barberos`, cerrar 1 y 6 de enero, ficha de Google,
+fotos del local y suya, QR de reseñas.
 
 **30/10/2026 — Código según la guía de estilo de frontend de Alberto (wiki de TMS).** Rama
 `refactor/estilo-wiki`: todo en **TypeScript estricto** (`npm run build` comprueba tipos),
@@ -113,8 +125,8 @@ repo quedó limpio (solo `main`, sin stash ni ramas de respaldo).
    cualquier día, lupa para BUSCAR CLIENTE por nombre o móvil (próximas y
    anteriores), CAMBIAR HORA de una cita con WhatsApp ya escrito para avisar
    al cliente (y deshacer), y "Repetir cada semana" al crear una cita (2–12
-   semanas; salta las ocupadas o cerradas y avisa). La búsqueda usa ilike:
-   no ignora tildes ("Jose" no encuentra "José").
+   semanas; salta las ocupadas o cerradas y avisa). La búsqueda ignora tildes
+   y mayúsculas (16/11/2026).
  - Horario y Servicios: interruptores, contadores −/+ y barra "Guardar" que
    solo sale si hay cambios. Horario: "Partir jornada" y "Copiar a los demás".
  - Ventanas, avisos y botones flotantes van en portal (`createPortal`): la
@@ -143,11 +155,8 @@ migración ya ejecutada en Supabase y comprobada):
    confirmación con "añadir al calendario" (Google e .ics), etiqueta "Web" en
    el panel para las citas que vienen de la reserva online. Ya no se pide email.
  - ✅ `supabase/migracion-reservas-2027.sql` ejecutada el 26/10/2026.
- - ⬜ Aviso por WhatsApp a Adrián: la Edge Function `aviso-cita` NUNCA se ha
-   desplegado (no hay CLI de Supabase instalada). Hasta entonces no hay aviso
-   automático; Adrián ve las citas en el panel. Cuando haya su móvil +
-   apikey de CallMeBot: instalar CLI, `supabase secrets set ...` y
-   `supabase functions deploy aviso-cita`.
+ - ✅ Aviso por WhatsApp a Adrián: `aviso-cita` desplegada desde el editor del
+   panel de Supabase y secretos puestos con su móvil y su apikey (16/11/2026).
  - **Festivos:** 1 y 6 de enero salen como días normales: Adrián tiene que
    cerrarlos con "Día libre" en el panel.
 
@@ -175,24 +184,22 @@ email a `barberos` con el bloque del final del SQL):
    cookies de analítica → no hace falta banner.
  - ✅ NIF y email en el aviso legal (`LEGAL` en
    data/contacto.js; mientras estén vacíos esas líneas no se muestran).
- - ⬜ Borrar en Vercel `VITE_CALLMEBOT_PHONE` / `VITE_CALLMEBOT_APIKEY` (ya no
-   se usan). Quitado el móvil de Alberto de este archivo (sigue en el
+ - ✅ Borradas en Vercel `VITE_CALLMEBOT_PHONE` / `VITE_CALLMEBOT_APIKEY`
+   (16/11/2026). Quitado el móvil de Alberto de este archivo (sigue en el
    historial de Git, que es público).
 
 **LO QUE TOCA AHORA (por orden):**
 1. **Generar el QR de reseñas** con el enlace de arriba (qrcode-monkey, mismos
    ajustes que el de la web) y guardarlo como `qr-resenas/qr-resena.png`.
-2. **Desplegar la Edge Function** del aviso: `supabase secrets set
-   CALLMEBOT_PHONE=… CALLMEBOT_APIKEY=…` + `supabase functions deploy aviso-cita`,
-   y **borrar** `VITE_CALLMEBOT_*` de Vercel. (No corre prisa: sin reserva online
-   el aviso no se dispara, pero conviene dejarlo cerrado.)
+2. ✅ Edge Function del aviso desplegada y secretos puestos (16/11/2026).
+   ⬜ Hacer una reserva de prueba y confirmar que a Adrián le llega.
 
 **IDEAS SIGUIENTES (sin depender de Adrián):**
  - **Pies en las fotos de la galería**: palabras clave reales + el cliente puede
    pedir señalando una foto. ⏸️ EN PAUSA: puede que Adrián mande fotos nuevas y
    haya que rehacerlo.
- - Unificar el horario en **una sola fuente** (hoy vive en Supabase, en el
-   estático y en el JSON-LD: pueden volver a contradecirse).
+ - ✅ Horario en una sola fuente (16/11/2026): el JSON-LD sale de
+   `data/openingHours.ts` al compilar y de Supabase al cargar la web.
 
 **TAREAS ANTIGUAS (contexto):**
 1. ✅ **HECHO — Editar servicios/precios desde el panel.** `lib/config.js` tiene

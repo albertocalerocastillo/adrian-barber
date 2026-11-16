@@ -7,6 +7,7 @@ import type { CitaDTO } from './dtos/CitaDTO'
 import type { BloqueoDTO } from './dtos/BloqueoDTO'
 import type { ResultadoOperacionDTO } from './dtos/ResultadoOperacionDTO'
 import type { OrigenCitaEnum } from './enums/OrigenCitaEnum'
+import { patronSinTildes } from '../utils/search'
 
 // #region Constantes
 // Mensajes de error para Adrián.
@@ -16,9 +17,6 @@ const ERROR_MOVER_CITA = 'No se pudo cambiar la cita.'
 
 // Mensajes de Postgres cuando una cita pisa a otra.
 const PATRON_SOLAPE = /exclu|overlap/i
-
-// Caracteres con significado en el filtro `or` de Supabase (se quitan al buscar).
-const PATRON_CARACTERES_FILTRO = /[,()%*\\]/g
 
 // Búsqueda: letras mínimas y resultados máximos.
 const LONGITUD_MINIMA_BUSQUEDA = 2
@@ -114,15 +112,15 @@ const moverCita: IAgendaService['moverCita'] = async (id, inicio, fin) => {
 
 const buscarCitas: IAgendaService['buscarCitas'] = async (texto) => {
   if (!supabase) return []
-  const limpio = texto.replace(PATRON_CARACTERES_FILTRO, ' ').trim()
+  const limpio = texto.trim()
   if (limpio.length < LONGITUD_MINIMA_BUSQUEDA) return []
-  // Si son todo cifras se busca por móvil; si no, por nombre.
+  // Si son todo cifras se busca por móvil; si no, por nombre sin que importen las tildes.
   const movil = limpio.replace(/\s+/g, '')
-  const filtro = /^\d+$/.test(movil) ? `cliente_movil.ilike.%${movil}%` : `cliente_nombre.ilike.%${limpio}%`
-  const { data, error } = await supabase
-    .from(TablaSupabaseEnum.Citas)
-    .select('*')
-    .or(filtro)
+  const todas = supabase.from(TablaSupabaseEnum.Citas).select('*')
+  const filtradas = /^\d+$/.test(movil)
+    ? todas.ilike('cliente_movil', `%${movil}%`)
+    : todas.filter('cliente_nombre', 'imatch', patronSinTildes(limpio))
+  const { data, error } = await filtradas
     .order('inicio', { ascending: false })
     .limit(MAXIMO_RESULTADOS_BUSQUEDA)
   if (error) {

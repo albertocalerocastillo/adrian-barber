@@ -51,8 +51,10 @@
          DATOS ESTRUCTURADOS — Google entiende que esto
          es una barbería local (mejora el posicionamiento
          en "barbería La Rinconada" y similares).
-         ⚠️ Revisar el horario y añadir geo exacto (lat/lng)
-            cuando Adrián los confirme.
+         El horario NO se escribe aquí: lo rellena vite.config.ts
+         con src/data/openingHours.ts y la web lo cambia por el
+         de Supabase al cargar (una sola fuente, sin contradicciones).
+         ⚠️ Falta el geo exacto (lat/lng) cuando Adrián lo confirme.
     ════════════════════════════════════════════ -->
     <script type="application/ld+json">
     {
@@ -74,20 +76,7 @@
         "addressCountry": "ES"
       },
       "areaServed": "La Rinconada, Sevilla",
-      "openingHoursSpecification": [
-        {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-          "opens": "09:00",
-          "closes": "14:00"
-        },
-        {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-          "opens": "14:30",
-          "closes": "22:00"
-        }
-      ],
+      "openingHoursSpecification": [],
       "sameAs": [
         "https://www.instagram.com/adriansanchee/"
       ]

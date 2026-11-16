@@ -2,11 +2,15 @@
 // Trabaja sobre la estructura de src/data/openingHours.ts (dia + tramos "HH:MM").
 import type { HorarioDiaDTO } from '../services/dtos/HorarioDiaDTO'
 import type { EstadoNegocioDTO } from '../services/dtos/EstadoNegocioDTO'
+import type { EspecificacionHorarioDTO } from '../services/dtos/EspecificacionHorarioDTO'
 
 // #region Constantes
 // Minutos de una hora y días de una semana.
 const MINUTOS_HORA = 60
 const DIAS_SEMANA = 7
+
+// Nombres de los días para schema.org (índice = Date.getDay(), 0 = domingo).
+const DIAS_SCHEMA = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 // #endregion
 
 /** Convierte "HH:MM" a minutos desde medianoche. */
@@ -58,6 +62,24 @@ export const estadoNegocio = (horario: HorarioDiaDTO[], fecha: Date = new Date()
 /** Devuelve el índice (getDay) del día de hoy, para resaltarlo en la lista. */
 export const diaHoy = (fecha: Date = new Date()): number => {
   return fecha.getDay()
+}
+
+/**
+ * Horario en el formato de schema.org para los datos estructurados de Google:
+ * un elemento por tramo, con todos los días que lo comparten (de lunes a
+ * domingo). Así Google lee el mismo horario que enseña la web.
+ */
+export const especificacionHorario = (horario: HorarioDiaDTO[]): EspecificacionHorarioDTO[] => {
+  const result: EspecificacionHorarioDTO[] = []
+  const ordenados = [...horario].sort((a, b) => ((a.dia + DIAS_SEMANA - 1) % DIAS_SEMANA) - ((b.dia + DIAS_SEMANA - 1) % DIAS_SEMANA))
+  for (const { dia, tramos } of ordenados) {
+    for (const [opens, closes] of tramos) {
+      const igual = result.find((e) => e.opens === opens && e.closes === closes)
+      if (igual) igual.dayOfWeek.push(DIAS_SCHEMA[dia])
+      else result.push({ '@type': 'OpeningHoursSpecification', dayOfWeek: [DIAS_SCHEMA[dia]], opens, closes })
+    }
+  }
+  return result
 }
 
 /** Formatea los tramos de un día: "10:00–14:00 · 17:00–21:00" o "Cerrado". */

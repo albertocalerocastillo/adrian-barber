@@ -2,6 +2,11 @@ import process from 'node:process'
 import { defineConfig, loadEnv, type Plugin, type HtmlTagDescriptor } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { HORARIO } from './src/data/openingHours'
+import { especificacionHorario } from './src/utils/schedule'
+
+// Hueco del index.html donde va el horario (se rellena al compilar).
+const MARCA_HORARIO = '"openingHoursSpecification": []'
 
 // Fuentes que usa el titular de la portada. Si no se precargan, el texto se
 // pinta con la de reserva y al cambiar a la buena el bloque salta (CLS).
@@ -45,9 +50,24 @@ const precargaCritica = (supabaseUrl: string | undefined): Plugin => {
   }
 }
 
+/**
+ * Rellena el horario de los datos estructurados del index.html con el de
+ * src/data/openingHours.ts, para que no haya que copiarlo a mano y no pueda
+ * contradecir a la web. Al cargar, la web lo cambia por el de Supabase.
+ */
+export const horarioEnDatosEstructurados = (): Plugin => {
+  return {
+    name: 'horario-en-datos-estructurados',
+    transformIndexHtml(html) {
+      const especificacion = JSON.stringify(especificacionHorario(HORARIO))
+      return html.replace(MARCA_HORARIO, `"openingHoursSpecification": ${especificacion}`)
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
   return {
-    plugins: [react(), tailwindcss(), precargaCritica(env.VITE_SUPABASE_URL)],
+    plugins: [react(), tailwindcss(), precargaCritica(env.VITE_SUPABASE_URL), horarioEnDatosEstructurados()],
   }
 })

@@ -3,6 +3,7 @@ import { HORARIO } from '../data/openingHours'
 import { ConfigurationService } from '../services/ConfigurationService'
 import type { HorarioDiaDTO } from '../services/dtos/HorarioDiaDTO'
 import { estadoNegocio } from '../utils/schedule'
+import { actualizarHorarioEnDatosEstructurados } from '../utils/structuredData'
 
 // Cada cuánto se recalcula si está abierto.
 const REFRESCO_MS = 60_000
@@ -31,7 +32,9 @@ export const useBusinessStatus = () => {
     let vivo = true
     const cargar = async () => {
       const h = await ConfigurationService.getHorario()
-      if (vivo) setHorario(h)
+      if (!vivo) return
+      setHorario(h)
+      actualizarHorarioEnDatosEstructurados(h)
     }
     cargar()
     return () => {
