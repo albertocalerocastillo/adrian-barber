@@ -4,7 +4,7 @@ import type { FunctionComponent, SyntheticEvent } from 'react'
 import { Repeat } from 'lucide-react'
 import SheetComponent from '../Sheet/SheetComponent'
 import TimePickerComponent from '../TimePicker/TimePickerComponent'
-import { huecosDelDia } from '../agendaSlots'
+import { huecosDelDia, ERROR_CARGAR_HORAS } from '../agendaSlots'
 import FieldComponent from '../Controls/Field/FieldComponent'
 import PrimaryButtonComponent from '../Controls/PrimaryButton/PrimaryButtonComponent'
 import DateShortcutsComponent from '../Controls/DateShortcuts/DateShortcutsComponent'
@@ -116,8 +116,16 @@ const NewAppointmentDialogComponent: FunctionComponent<INewAppointmentDialogProp
     if (!svc || !horario) return
     let vivo = true
     const cargar = async () => {
-      const libres = await huecosDelDia({ fecha: new Date(`${fechaStr}${SUFIJO_MEDIANOCHE}`), duracion: svc.duracion, horario })
+      const libres = await huecosDelDia({ fecha: new Date(`${fechaStr}${SUFIJO_MEDIANOCHE}`), duracion: svc.duracion, horario }).catch(
+        () => null
+      )
       if (!vivo) return
+      if (!libres) {
+        setRejilla([])
+        setError(ERROR_CARGAR_HORAS)
+        return
+      }
+      setError('')
       setRejilla(libres)
       // Si se vino desde un hueco libre, esa hora sale ya marcada.
       const preferida = horaInicial && libres.find((s) => fmtHora(s.inicio) === horaInicial)
@@ -156,7 +164,12 @@ const NewAppointmentDialogComponent: FunctionComponent<INewAppointmentDialogProp
 
     // Días libres que pisan alguna de las semanas: esas se saltan.
     const ultima = fechas[fechas.length - 1]
-    const bloqueos = fechas.length > 1 ? await AgendaService.listarBloqueos(fechas[0], addMinutes(ultima, servicio.duracion)) : []
+    const bloqueos = fechas.length > 1 ? await AgendaService.listarBloqueos(fechas[0], addMinutes(ultima, servicio.duracion)).catch(() => null) : []
+    if (!bloqueos) {
+      setGuardando(false)
+      setError(ERROR_CARGAR_HORAS)
+      return
+    }
 
     const guardadas: Date[] = []
     const saltadas: Date[] = []

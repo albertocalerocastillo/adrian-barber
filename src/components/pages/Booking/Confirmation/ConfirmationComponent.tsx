@@ -5,7 +5,7 @@ import { m } from 'motion/react'
 import { CalendarPlus, Home, MapPin } from 'lucide-react'
 import WhatsAppIconComponent from '../../../core/WhatsAppIcon/WhatsAppIconComponent'
 import { addMinutes } from '../../../../utils/availability'
-import { formatLongDate, formatTimeInZone } from '../../../../utils/dates'
+import { formatLongDateInZone, formatTimeInZone } from '../../../../utils/dates'
 import { RESERVA } from '../../../../data/features'
 import { NEGOCIO, WHATSAPP, MAPS_URL } from '../../../../data/contact'
 import { EASE_SMOOTH } from '../../../../theme/animation'
@@ -77,7 +77,7 @@ const ConfirmationComponent: FunctionComponent<IConfirmationProps> = ({ servicio
     `&location=${encodeURIComponent(lugar)}`
 
   const mensaje =
-    `Hola Adrián, soy ${nombre}. Tengo cita el ${formatLongDate(hora).toLowerCase()} a las ${desde} ` +
+    `Hola Adrián, soy ${nombre}. Tengo cita el ${formatLongDateInZone(hora, RESERVA.zona).toLowerCase()} a las ${desde} ` +
     `(${servicio.nombre}) y necesito cambiarla.`
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(mensaje)}`
   // #endregion
@@ -115,7 +115,7 @@ const ConfirmationComponent: FunctionComponent<IConfirmationProps> = ({ servicio
             className="pointer-events-none absolute -right-10 -top-10 w-40 opacity-10"
           />
           <p className="text-xs tracking-kicker text-acento">Tu cita</p>
-          <p className="mt-2 font-display text-2xl font-bold">{formatLongDate(hora)}</p>
+          <p className="mt-2 font-display text-2xl font-bold">{formatLongDateInZone(hora, RESERVA.zona)}</p>
           <p className="mt-1 font-display text-4xl font-bold text-acento tabular-nums">
             {desde} <span className="text-xl text-hueso/50">– {hasta}</span>
           </p>

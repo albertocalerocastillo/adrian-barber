@@ -24,6 +24,9 @@ const PATRON_NO_CIFRAS = /\D/g
 
 // Enlace de WhatsApp con el prefijo de España.
 const URL_WHATSAPP = 'https://wa.me/34'
+
+/** Mensaje cuando no se pueden leer las citas para calcular las horas libres. */
+export const ERROR_CARGAR_HORAS = 'No se pudieron cargar las horas libres. Revisa la conexión y vuelve a elegir el día.'
 // #endregion
 
 /** Parámetros de huecosDelDia. */
@@ -40,7 +43,7 @@ interface OpcionesHuecosDelDia {
 
 /**
  * Horas libres de un día para un servicio de `duracion` minutos, de cuarto en
- * cuarto. `excluirId` es la cita que se está moviendo: su propio hueco cuenta
+ * cuarto. Si no se puede leer la agenda, lanza el error (no se ofrecen horas a ciegas). `excluirId` es la cita que se está moviendo: su propio hueco cuenta
  * como libre. En el panel se permite también hoy más temprano (ahora = 0).
  */
 export const huecosDelDia = async ({ fecha, duracion, horario, excluirId }: OpcionesHuecosDelDia): Promise<HuecoDTO[]> => {

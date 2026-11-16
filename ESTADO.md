@@ -20,6 +20,12 @@ deja un WhatsApp para cada cliente; vista «Próximas» con todas las citas que 
 aviso abre la agenda en el día de la cita (`/admin?dia=AAAA-MM-DD`). Las reservas de la web se
 guardan con `origen: 'web'` aunque haya sesión del panel abierta (antes contaban como del panel y
 no avisaban).
+Revisión de calidad (16/11/2026): ⬜ EJECUTAR `supabase/migracion-calidad.sql` en Supabase
+(creado_en lo fija la BD, nombre limpio, 60 días naturales igual que la web, guardado de horario y
+servicios en una sola operación, y aviso lanzado también por la BD con pg_net) y DESACTIVAR
+"Enforce JWT verification" en Edge Functions → aviso-cita → Settings; redesplegar `aviso-cita`
+(no repite avisos, comprueba la respuesta de CallMeBot, limpia el nombre). Panel: errores de carga
+visibles, deshacer que avisa si no puede, aviso de citas fuera del horario nuevo.
 ⬜ Pendiente: cuenta de Adrián en `barberos`, cerrar 1 y 6 de enero, ficha de Google,
 fotos del local y suya, QR de reseñas.
 

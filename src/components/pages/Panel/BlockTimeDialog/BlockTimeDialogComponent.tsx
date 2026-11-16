@@ -66,8 +66,14 @@ const BlockTimeDialogComponent: FunctionComponent<IBlockTimeDialogProps> = ({ fe
     const mirar = async () => {
       setAfectadas(null)
       const delDia = startOfDay(new Date(desdeMs))
-      const citas = await AgendaService.listarCitas(delDia, addMinutes(delDia, MINUTES_PER_DAY))
+      const citas = await AgendaService.listarCitas(delDia, addMinutes(delDia, MINUTES_PER_DAY)).catch(() => null)
       if (!vivo) return
+      // Sin saber qué citas hay no se deja cerrar: se podría dejar a alguien sin avisar.
+      if (!citas) {
+        setError('No se pudieron comprobar las citas de ese día. Revisa la conexión y vuelve a elegir el día.')
+        return
+      }
+      setError('')
       // Solo las pendientes que aún no han pasado: las atendidas ya se hicieron y no se tocan.
       const ahoraMs = Date.now()
       setAfectadas(
@@ -162,7 +168,10 @@ const BlockTimeDialogComponent: FunctionComponent<IBlockTimeDialogProps> = ({ fe
               {error}
             </p>
           )}
-          <PrimaryButtonComponent type="button" onClick={onGuardar} loading={guardando || afectadas === null} className="w-full">
+          <PrimaryButtonComponent type="button" onClick={onGuardar} loading={guardando || (afectadas === null && !error)}
+            disabled={afectadas === null}
+            className="w-full"
+          >
             Cerrar {todoElDia ? 'el día' : `de ${desde} a ${hasta}`}
             {afectadas && afectadas.length > 0 && ` y cancelar ${contarCitas(afectadas.length)}`}
           </PrimaryButtonComponent>

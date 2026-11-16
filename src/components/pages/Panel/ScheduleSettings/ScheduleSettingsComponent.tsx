@@ -11,6 +11,11 @@ import SaveBarComponent from '../Controls/SaveBar/SaveBarComponent'
 import SkeletonComponent from '../Controls/Skeleton/SkeletonComponent'
 import { EASE_SMOOTH } from '../../../../theme/animation'
 import { ConfigurationService } from '../../../../services/ConfigurationService'
+import { AgendaService } from '../../../../services/AgendaService'
+import { EstadoCitaEnum } from '../../../../services/enums/EstadoCitaEnum'
+import type { CitaDTO } from '../../../../services/dtos/CitaDTO'
+import { addMinutes, MINUTES_PER_DAY } from '../../../../utils/availability'
+import { formatLongDate, formatTime, isSameDay } from '../../../../utils/dates'
 import type { HorarioDiaDTO } from '../../../../services/dtos/HorarioDiaDTO'
 import type { IScheduleSettingsProps } from './IScheduleSettingsProps'
 // #endregion
@@ -40,7 +45,19 @@ const CIFRAS_HORA = 2
 // Posición del inicio y del fin dentro de un tramo.
 const POSICION_INICIO = 0
 const POSICION_FIN = 1
+
+// Días hacia delante en los que se buscan citas que el horario nuevo deja fuera.
+const DIAS_REVISION = 120
 // #endregion
+
+/** ¿La cita cabe entera en alguno de los tramos de su día con este horario? */
+const cabeEnHorario = (cita: CitaDTO, dias: HorarioDiaDTO[]): boolean => {
+  const inicio = new Date(cita.inicio)
+  const fin = new Date(cita.fin)
+  const tramos = dias.find((d) => d.dia === inicio.getDay())?.tramos ?? []
+  const result = isSameDay(inicio, fin) && tramos.some(([a, b]) => formatTime(inicio) >= a && formatTime(fin) <= b)
+  return result
+}
 
 /** Copia profunda del horario (los tramos son arrays: no se comparten con el estado). */
 const copia = (dias: HorarioDiaDTO[]): HorarioDiaDTO[] => {
@@ -65,6 +82,8 @@ const ScheduleSettingsComponent: FunctionComponent<IScheduleSettingsProps> = ({ 
   const [dias, setDias] = useState<HorarioDiaDTO[] | null>(null)
   const [original, setOriginal] = useState<HorarioDiaDTO[] | null>(null)
   const [guardando, setGuardando] = useState<boolean>(false)
+  // Citas futuras que el horario recién guardado deja fuera (siguen en pie: hay que moverlas o cancelarlas).
+  const [fuera, setFuera] = useState<CitaDTO[]>([])
 
   useEffect(() => {
     let vivo = true
@@ -128,6 +147,9 @@ const ScheduleSettingsComponent: FunctionComponent<IScheduleSettingsProps> = ({ 
     if (res.ok) {
       setOriginal(copia(dias))
       avisar({ text: 'Horario guardado. La web ya lo muestra.' })
+      const ahora = new Date()
+      const futuras = await AgendaService.listarCitas(ahora, addMinutes(ahora, DIAS_REVISION * MINUTES_PER_DAY)).catch(() => [])
+      setFuera(futuras.filter((c) => c.estado === EstadoCitaEnum.Pendiente && !cabeEnHorario(c, dias)))
     } else {
       avisar({ text: res.error || 'No se pudo guardar.', type: ToastTypeEnum.Error })
     }
@@ -149,6 +171,22 @@ const ScheduleSettingsComponent: FunctionComponent<IScheduleSettingsProps> = ({ 
           ¿Vacaciones o un día suelto? No toques esto: usa <strong>Día libre</strong> en la agenda.
         </span>
       </p>
+
+      {fuera.length > 0 && (
+        <div role="alert" className="mb-6 rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+          <p className="mb-2 font-semibold">
+            Con el horario nuevo, {fuera.length === 1 ? 'esta cita queda' : `estas ${fuera.length} citas quedan`} fuera:
+          </p>
+          <ul className="mb-2 space-y-1">
+            {fuera.map((c) => (
+              <li key={c.id}>
+                {formatLongDate(new Date(c.inicio))} · {formatTime(new Date(c.inicio))} · {c.clienteNombre}
+              </li>
+            ))}
+          </ul>
+          <p>Siguen en pie. Muévelas o cancélalas desde la agenda (al cancelar te deja el WhatsApp para avisar).</p>
+        </div>
+      )}
 
       {dias === null ? (
         <SkeletonComponent rows={7} height="h-20" />

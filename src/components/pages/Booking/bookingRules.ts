@@ -21,12 +21,6 @@ import type { OpcionesHorasDiaDTO } from './OpcionesHorasDiaDTO'
 const DIAS_MARGEN_ANTES = 1
 const DIAS_MARGEN_DESPUES = 2
 
-// Móvil español: 6/7/8/9 + 8 cifras, sin prefijo.
-const PATRON_MOVIL = /^[6789]\d{8}$/
-// Separadores que se aceptan al escribir el móvil (espacios, puntos y guiones).
-const PATRON_SEPARADORES_MOVIL = /[\s.-]/g
-// Prefijo de España que se quita (+34 o 0034).
-const PATRON_PREFIJO_ESPANA = /^(\+34|0034)/
 // #endregion
 
 /** Primer y último día que se pueden elegir (fechas locales a medianoche). */
@@ -34,8 +28,9 @@ export const ventanaReserva = (ahora: Date = new Date()): VentanaReservaDTO => {
   const hoy = startOfDay(ahora)
   const inicio = inicioReservas()
   const primero = hoy > inicio ? hoy : inicio
+  // "60 días vista" = 60 días naturales contando el primero (igual que la BD).
   const ultimo = new Date(primero)
-  ultimo.setDate(primero.getDate() + RESERVA.diasMax)
+  ultimo.setDate(primero.getDate() + RESERVA.diasMax - 1)
   const result: VentanaReservaDTO = { primero, ultimo }
   return result
 }
@@ -71,9 +66,8 @@ export const libresDelDia = (opciones: OpcionesHorasDiaDTO): number => {
   return result
 }
 
-/** Móvil español (6/7/8/9 + 8 cifras), aceptando +34, 0034 y espacios. */
-export const limpiarMovil = (movil: string): string | null => {
-  const solo = movil.replace(PATRON_SEPARADORES_MOVIL, '').replace(PATRON_PREFIJO_ESPANA, '')
-  const result = PATRON_MOVIL.test(solo) ? solo : null
-  return result
-}
+/** Letras de un texto contando cada emoji o letra acentuada como una sola (como la BD). */
+export const contarLetras = (texto: string): number => [...texto].length
+
+/** Móvil español limpio (ver utils/phone.ts); se reexporta para los pasos de la reserva. */
+export { limpiarMovil } from '../../../utils/phone'

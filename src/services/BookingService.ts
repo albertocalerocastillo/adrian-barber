@@ -90,8 +90,13 @@ const traducirError = (error: { message?: string; code?: string }): ResultadoOpe
     (k) => error.message?.includes(k) || (k === CLAVE_SOLAPE && error.code === CODIGO_SOLAPE)
   )
   const result: ResultadoOperacionDTO = clave
-    ? { ok: false, error: ERRORES_BD[clave].texto, volverAHoras: Boolean(ERRORES_BD[clave].volverAHoras) }
-    : { ok: false, error: ERROR_GUARDAR }
+    ? {
+        ok: false,
+        error: ERRORES_BD[clave].texto,
+        volverAHoras: Boolean(ERRORES_BD[clave].volverAHoras),
+        horaOcupada: clave === CLAVE_SOLAPE,
+      }
+    : { ok: false, error: ERROR_GUARDAR, dudoso: true }
   return result
 }
 // #endregion

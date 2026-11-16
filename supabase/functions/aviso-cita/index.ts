@@ -53,6 +53,16 @@ const MS_DIA = 24 * 60 * MS_MINUTO
 const ESTADO_CANCELADA = 'cancelada'
 const ESTADO_ATENDIDA = 'atendida'
 
+// Lo que no puede ir en un texto del aviso: caracteres de control (saltos de
+// línea incluidos) y los símbolos de formato de WhatsApp (*negrita*, _cursiva_,
+// ~tachado~, `código`). Así un nombre no puede colar líneas ni enlaces falsos.
+const PATRON_NO_PERMITIDO = /[\p{Cc}*_~`]/gu
+
+// Respuestas de CallMeBot (contesta 200 aunque falle): la buena dice "Message queued/sent"; las malas,
+// "APIKey is invalid", "Error…". Si dice otra cosa se da por enviado, para no repetir el aviso.
+const PATRON_EXITO_CALLMEBOT = /queued|sent/i
+const PATRON_FALLO_CALLMEBOT = /error|invalid|not (?:allowed|activated)|wrong|blocked/i
+
 // Esferas de reloj para la hora en punto (índice = hora 1..12) y la media.
 const RELOJ_EN_PUNTO = ['🕛', '🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚']
 const RELOJ_Y_MEDIA = ['🕧', '🕜', '🕝', '🕞', '🕟', '🕠', '🕡', '🕢', '🕣', '🕤', '🕥', '🕦']
@@ -129,6 +139,9 @@ const movilLegible = (movil: string): string => movil.replace(/^(\d{3})(\d{2})(\
 const euros = (precio: number): string =>
   `${new Intl.NumberFormat('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(precio)} €`
 
+/** Texto seguro para el aviso: sin saltos de línea ni formato de WhatsApp. */
+const limpio = (texto: string): string => texto.replace(PATRON_NO_PERMITIDO, ' ').replace(/\s+/g, ' ').trim()
+
 /** "Primera vez" o "Ya ha venido 3 veces". */
 const historial = (visitas: number): string => {
   if (visitas === 0) return '🆕 Primera vez'
@@ -153,11 +166,11 @@ export const componerMensaje = ({ cita, precio, citasDelDia, visitasPrevias, aho
   const duracion = Math.round((fin.getTime() - inicio.getTime()) / MS_MINUTO)
   const movil = cita.cliente_movil.replace(/\D/g, '')
 
-  const servicio = [`✂️ *${cita.servicio_nombre}*`, precio !== null ? euros(precio) : null, `${duracion} min`]
+  const servicio = [`✂️ *${limpio(cita.servicio_nombre)}*`, precio !== null ? euros(precio) : null, `${duracion} min`]
     .filter(Boolean)
     .join(' · ')
 
-  const cliente = [`👤 *${cita.cliente_nombre.trim()}*`, visitasPrevias !== null ? `_${historial(visitasPrevias)}_` : null]
+  const cliente = [`👤 *${limpio(cita.cliente_nombre)}*`, visitasPrevias !== null ? `_${historial(visitasPrevias)}_` : null]
     .filter(Boolean)
     .join('\n')
 
@@ -278,25 +291,35 @@ if (typeof Deno !== 'undefined') {
     ])
     const texto = componerMensaje({ cita, precio, citasDelDia, visitasPrevias, ahora: new Date() })
 
+    // Se "reserva" el aviso ANTES de mandarlo, marcándolo solo si nadie lo ha marcado aún: si llegan dos
+    // llamadas a la vez, solo una se lo queda y Adrián no recibe el mismo WhatsApp dos veces.
+    const marcar = (valor: string | null, condicion: string) =>
+      fetch(`${urlBd}/rest/v1/citas?id=eq.${cita.id}${condicion}`, {
+        method: 'PATCH',
+        headers: { ...cabeceras, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+        body: JSON.stringify({ avisado_en: valor }),
+      })
+    const reserva = await marcar(new Date().toISOString(), '&avisado_en=is.null').catch(() => null)
+    const reservadas = reserva?.ok ? ((await reserva.json()) as unknown[]) : []
+    if (reservadas.length === 0) return responder({ avisado: false, motivo: 'ya avisada' })
+
     const url =
       `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(phone)}` +
       `&apikey=${encodeURIComponent(apikey)}&text=${encodeURIComponent(texto)}`
 
-    // Si CallMeBot no responde, la cita sigue guardada: solo se informa.
-    try {
-      const respuesta = await fetch(url)
-      if (respuesta.ok) {
-        await fetch(`${urlBd}/rest/v1/citas?id=eq.${cita.id}`, {
-          method: 'PATCH',
-          headers: { ...cabeceras, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ avisado_en: new Date().toISOString() }),
-        })
-      }
-      // Nunca se devuelve el cuerpo de CallMeBot: podría incluir la apikey.
-      return responder({ avisado: respuesta.ok })
-    } catch {
-      return responder({ avisado: false, motivo: 'CallMeBot no responde' })
-    }
+    // CallMeBot contesta 200 aunque falle (apikey mala, límite…): se mira también lo que dice.
+    const enviado = await fetch(url)
+      .then(async (r) => {
+        if (!r.ok) return false
+        const cuerpo = await r.text()
+        return PATRON_EXITO_CALLMEBOT.test(cuerpo) || !PATRON_FALLO_CALLMEBOT.test(cuerpo)
+      })
+      .catch(() => false)
+
+    // Si no se ha mandado, se quita la marca para que se pueda reintentar. La cita sigue guardada.
+    if (!enviado) await marcar(null, '').catch(() => null)
+    // Nunca se devuelve el cuerpo de CallMeBot: podría incluir la apikey.
+    return responder(enviado ? { avisado: true } : { avisado: false, motivo: 'CallMeBot no responde' })
   })
 }
 // #endregion

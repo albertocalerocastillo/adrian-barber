@@ -4,7 +4,7 @@ import type { FunctionComponent } from 'react'
 import SheetComponent from '../Sheet/SheetComponent'
 import TimePickerComponent from '../TimePicker/TimePickerComponent'
 import RescheduleDoneComponent from './RescheduleDone/RescheduleDoneComponent'
-import { huecosDelDia } from '../agendaSlots'
+import { huecosDelDia, ERROR_CARGAR_HORAS } from '../agendaSlots'
 import FieldComponent from '../Controls/Field/FieldComponent'
 import PrimaryButtonComponent from '../Controls/PrimaryButton/PrimaryButtonComponent'
 import DateShortcutsComponent from '../Controls/DateShortcuts/DateShortcutsComponent'
@@ -59,8 +59,16 @@ const RescheduleDialogComponent: FunctionComponent<IRescheduleDialogProps> = ({ 
     if (!horario) return
     let vivo = true
     const cargar = async () => {
-      const libres = await huecosDelDia({ fecha: new Date(`${fechaStr}${SUFIJO_MEDIANOCHE}`), duracion, horario, excluirId: cita.id })
+      const libres = await huecosDelDia({ fecha: new Date(`${fechaStr}${SUFIJO_MEDIANOCHE}`), duracion, horario, excluirId: cita.id }).catch(
+        () => null
+      )
       if (!vivo) return
+      if (!libres) {
+        setRejilla([])
+        setError(ERROR_CARGAR_HORAS)
+        return
+      }
+      setError('')
       // La hora que ya tiene no se ofrece: no sería un cambio.
       setRejilla(libres.filter((s) => s.inicio.getTime() !== inicioOriginal.getTime()))
       setHoraISO('')

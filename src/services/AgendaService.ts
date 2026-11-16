@@ -8,12 +8,15 @@ import type { BloqueoDTO } from './dtos/BloqueoDTO'
 import type { ResultadoOperacionDTO } from './dtos/ResultadoOperacionDTO'
 import type { OrigenCitaEnum } from './enums/OrigenCitaEnum'
 import { patronSinTildes } from '../utils/search'
+import { limpiarMovil } from '../utils/phone'
 
 // #region Constantes
 // Mensajes de error para Adrián.
 const ERROR_HUECO_OCUPADO = 'Ese hueco ya está ocupado.'
 const ERROR_CREAR_CITA = 'No se pudo crear la cita.'
 const ERROR_MOVER_CITA = 'No se pudo cambiar la cita.'
+const ERROR_GUARDAR = 'No se pudo guardar. Revisa la conexión.'
+const ERROR_CARGAR = 'No se pudo cargar la agenda. Revisa la conexión.'
 
 // Mensajes de Postgres cuando una cita pisa a otra.
 const PATRON_SOLAPE = /exclu|overlap/i
@@ -54,12 +57,16 @@ const aCitaDTO = (fila: FilaCita): CitaDTO => {
 }
 
 /** Resultado de una escritura simple: bien, o el mensaje de Supabase. */
-const resultadoEscritura = (error: { message: string } | null): ResultadoOperacionDTO =>
-  error ? { ok: false, error: error.message } : { ok: true }
-
 /** ¿El error es porque la cita pisa a otra? */
 const esSolape = (error: { message: string; code?: string }) =>
   error.code === CODIGO_SOLAPE || PATRON_SOLAPE.test(error.message)
+
+// Nunca se enseña a Adrián el mensaje técnico de Postgres (en inglés): se traduce.
+const resultadoEscritura = (error: { message: string; code?: string } | null): ResultadoOperacionDTO => {
+  if (!error) return { ok: true }
+  const result: ResultadoOperacionDTO = { ok: false, error: esSolape(error) ? ERROR_HUECO_OCUPADO : ERROR_GUARDAR }
+  return result
+}
 // #endregion
 
 // #region Citas
@@ -71,10 +78,8 @@ const listarCitas: IAgendaService['listarCitas'] = async (desde, hasta) => {
     .gte('inicio', desde.toISOString())
     .lt('inicio', hasta.toISOString())
     .order('inicio', { ascending: true })
-  if (error) {
-    console.error('Error listando citas:', error.message)
-    return []
-  }
+  // Un fallo se lanza (no se devuelve vacío): una agenda vacía por error haría creer a Adrián que no tiene citas.
+  if (error) throw new Error(ERROR_CARGAR)
   return ((data as FilaCita[] | null) ?? []).map(aCitaDTO)
 }
 
@@ -90,7 +95,8 @@ const crearCitaManual: IAgendaService['crearCitaManual'] = async (cita) => {
     // El servicio_id (bigint FK) se omite: los servicios de la web usan id de texto.
     servicio_nombre: cita.servicioNombre,
     cliente_nombre: cita.clienteNombre,
-    cliente_movil: cita.clienteMovil || '',
+    // Si es un móvil español se guarda en 9 cifras, como los de la web (así se reconoce al cliente de siempre).
+    cliente_movil: limpiarMovil(cita.clienteMovil || '') ?? (cita.clienteMovil || ''),
     inicio: cita.inicio.toISOString(),
     fin: cita.fin.toISOString(),
     estado: EstadoCitaEnum.Pendiente,
@@ -140,10 +146,7 @@ const listarBloqueos: IAgendaService['listarBloqueos'] = async (desde, hasta) =>
     .lt('inicio', hasta.toISOString())
     .gt('fin', desde.toISOString())
     .order('inicio', { ascending: true })
-  if (error) {
-    console.error('Error listando bloqueos:', error.message)
-    return []
-  }
+  if (error) throw new Error(ERROR_CARGAR)
   return (data as BloqueoDTO[] | null) ?? []
 }
 

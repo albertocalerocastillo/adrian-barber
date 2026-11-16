@@ -273,8 +273,14 @@ export const supabase = {
       return { data: { avisado: false, motivo: 'demo' }, error: null }
     },
   },
-  rpc: async (nombre: string, { p_desde, p_hasta }: { p_desde?: string; p_hasta?: string } = {}) => {
+  rpc: async (nombre: string, { p_desde, p_hasta, p_filas }: { p_desde?: string; p_hasta?: string; p_filas?: Fila[] } = {}) => {
     if (nombre === FuncionSupabaseEnum.EsBarbero) return { data: true, error: null }
+    // Guardar horario o servicios: se sustituye la tabla entera de una vez, como en la BD.
+    if (nombre === FuncionSupabaseEnum.GuardarHorario || nombre === FuncionSupabaseEnum.GuardarServicios) {
+      const tabla = nombre === FuncionSupabaseEnum.GuardarHorario ? TablaSupabaseEnum.Horario : TablaSupabaseEnum.Servicios
+      tablas[tabla] = (p_filas ?? []).map((f) => ({ ...f, id: nuevoId() }))
+      return { data: null, error: null }
+    }
     if (nombre !== FuncionSupabaseEnum.CitasOcupadas) return { data: [], error: null }
     const ocupados = [
       ...tablas[TablaSupabaseEnum.Citas].filter((c) => c.estado !== EstadoCitaEnum.Cancelada),

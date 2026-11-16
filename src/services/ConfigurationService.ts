@@ -3,6 +3,8 @@ import { ERROR_SIN_SUPABASE } from './SupabaseConstants'
 import { HORARIO } from '../data/openingHours'
 import { SERVICIOS } from '../data/services'
 import { TablaSupabaseEnum } from './enums/TablaSupabaseEnum'
+import { FuncionSupabaseEnum } from './enums/FuncionSupabaseEnum'
+import type { ResultadoOperacionDTO } from './dtos/ResultadoOperacionDTO'
 import type { IConfigurationService } from './IConfigurationService'
 import type { HorarioDiaDTO } from './dtos/HorarioDiaDTO'
 import type { ServicioDTO } from './dtos/ServicioDTO'
@@ -22,6 +24,9 @@ const ID_MINIMO = 0
 
 // Longitud de "HH:MM" (Postgres devuelve "HH:MM:SS").
 const LONGITUD_HORA = 5
+
+// Código de Supabase cuando la función de la BD no existe (migración sin ejecutar).
+const CODIGO_FUNCION_NO_EXISTE = 'PGRST202'
 // #endregion
 
 // #region Horario
@@ -41,8 +46,9 @@ const getHorario: IConfigurationService['getHorario'] = async () => {
     .order('dia_semana', { ascending: true })
     .order('hora_inicio', { ascending: true })
 
+  // Sin conexión se usa el horario fijo; pero si Adrián lo ha dejado vacío, es que cierra todos los días.
+  if (error) return HORARIO
   const filas = (data as FilaHorario[] | null) ?? []
-  if (error || filas.length === 0) return HORARIO
 
   const result: HorarioDiaDTO[] = ORDEN_DIAS.map((dia) => ({
     dia,
@@ -54,20 +60,35 @@ const getHorario: IConfigurationService['getHorario'] = async () => {
   return result
 }
 
+/**
+ * Guarda con la función de la BD que borra y escribe en una sola operación (o
+ * todo o nada). Si esa función aún no existe (migracion-calidad.sql sin
+ * ejecutar), devuelve null y se guarda a la antigua.
+ */
+const guardarDeUnaVez = async (funcion: FuncionSupabaseEnum, filas: object[]): Promise<ResultadoOperacionDTO | null> => {
+  if (!supabase) return { ok: false, error: ERROR_SIN_SUPABASE }
+  const { error } = await supabase.rpc(funcion, { p_filas: filas })
+  if (error?.code === CODIGO_FUNCION_NO_EXISTE) return null
+  const result: ResultadoOperacionDTO = error ? { ok: false, error: error.message } : { ok: true }
+  return result
+}
+
 const guardarHorario: IConfigurationService['guardarHorario'] = async (dias) => {
   if (!supabase) return { ok: false, error: ERROR_SIN_SUPABASE }
 
-  const { error: errorBorrar } = await supabase.from(TablaSupabaseEnum.Horario).delete().gte('id', ID_MINIMO)
-  if (errorBorrar) return { ok: false, error: errorBorrar.message }
-
-  const filas: FilaHorario[] = dias.flatMap((d) =>
+  const nuevas: FilaHorario[] = dias.flatMap((d) =>
     d.tramos
       .filter(([inicio, fin]) => inicio && fin && fin > inicio)
       .map(([inicio, fin]) => ({ dia_semana: d.dia, hora_inicio: inicio, hora_fin: fin }))
   )
+  const deUnaVez = await guardarDeUnaVez(FuncionSupabaseEnum.GuardarHorario, nuevas)
+  if (deUnaVez) return deUnaVez
 
-  if (filas.length > 0) {
-    const { error } = await supabase.from(TablaSupabaseEnum.Horario).insert(filas)
+  const { error: errorBorrar } = await supabase.from(TablaSupabaseEnum.Horario).delete().gte('id', ID_MINIMO)
+  if (errorBorrar) return { ok: false, error: errorBorrar.message }
+
+  if (nuevas.length > 0) {
+    const { error } = await supabase.from(TablaSupabaseEnum.Horario).insert(nuevas)
     if (error) return { ok: false, error: error.message }
   }
   return { ok: true }
@@ -135,7 +156,8 @@ const getServicios: IConfigurationService['getServicios'] = async () => {
     .order('id', { ascending: true })
 
   const filas = (data as FilaServicio[] | null) ?? []
-  if (error || filas.length === 0) return SERVICIOS
+  // Sin conexión se usan los servicios fijos; si Adrián los ha borrado todos, no hay ninguno.
+  if (error) return SERVICIOS
   return filas.map(aServicioDTO)
 }
 
@@ -145,6 +167,9 @@ const guardarServicios: IConfigurationService['guardarServicios'] = async (lista
   const filas = lista
     .filter((s) => (s.nombre || '').trim() && Number(s.duracion) > 0)
     .map((s, i) => ({ ...aFilaServicio(s), orden: i + 1 }))
+
+  const deUnaVez = await guardarDeUnaVez(FuncionSupabaseEnum.GuardarServicios, filas)
+  if (deUnaVez) return deUnaVez
 
   const { error: errorBorrar } = await supabase.from(TablaSupabaseEnum.Servicios).delete().gte('id', ID_MINIMO)
   if (errorBorrar) return { ok: false, error: errorBorrar.message }

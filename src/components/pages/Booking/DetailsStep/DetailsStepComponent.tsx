@@ -4,8 +4,9 @@ import type { FormEvent, FunctionComponent } from 'react'
 import { Link } from 'react-router-dom'
 import { Loader2, AlertCircle, User, Phone, ShieldCheck } from 'lucide-react'
 import { addMinutes } from '../../../../utils/availability'
-import { limpiarMovil } from '../bookingRules'
+import { limpiarMovil, contarLetras } from '../bookingRules'
 import { BookingService } from '../../../../services/BookingService'
+import { WHATSAPP } from '../../../../data/contact'
 import type { PeticionCrearCitaDTO } from '../../../../services/dtos/PeticionCrearCitaDTO'
 import type { IDetailsStepProps } from './IDetailsStepProps'
 // #endregion
@@ -13,6 +14,10 @@ import type { IDetailsStepProps } from './IDetailsStepProps'
 // #region Constantes
 // Letras mínimas del nombre.
 const LONGITUD_MINIMA_NOMBRE = 2
+
+// Si tras un fallo de red la hora sale ocupada, lo más probable es que la cita ya se guardara.
+const ERROR_QUIZA_GUARDADA =
+  'Parece que tu cita ya se guardó en el intento anterior. Para confirmarlo, escríbeme por WhatsApp.'
 // Largo máximo de los campos.
 const LONGITUD_MAXIMA_NOMBRE = 60
 const LONGITUD_MAXIMA_MOVIL = 20
@@ -36,8 +41,11 @@ const DetailsStepComponent: FunctionComponent<IDetailsStepProps> = ({ servicio, 
   const [enviando, setEnviando] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
   const [tocado, setTocado] = useState<boolean>(false)
+  // El intento anterior falló sin respuesta de la BD (red caída): puede que la cita sí se guardara.
+  const [quizaGuardada, setQuizaGuardada] = useState<boolean>(false)
 
-  const nombreOk = nombre.trim().length >= LONGITUD_MINIMA_NOMBRE
+  // Se cuenta como la BD: un emoji o una letra con tilde es una sola letra.
+  const nombreOk = contarLetras(nombre.trim().replace(PATRON_ESPACIOS, ' ')) >= LONGITUD_MINIMA_NOMBRE
   const movilLimpio = limpiarMovil(movil)
   // #endregion
 
@@ -61,9 +69,18 @@ const DetailsStepComponent: FunctionComponent<IDetailsStepProps> = ({ servicio, 
     const res = await BookingService.crearCita(datos)
     setEnviando(false)
 
-    if (res.ok) onConfirmado(datos)
-    else if (res.volverAHoras) onHoraPerdida(res.error ?? '')
-    else setError(res.error ?? '')
+    if (res.ok) {
+      onConfirmado(datos)
+    } else if (res.horaOcupada && quizaGuardada) {
+      // Tras un fallo de red, "hora ocupada" casi seguro es SU cita del intento anterior: no se le
+      // manda a elegir otra (acabaría con dos citas o creyendo que no tiene ninguna).
+      setError(ERROR_QUIZA_GUARDADA)
+    } else if (res.volverAHoras) {
+      onHoraPerdida(res.error ?? '')
+    } else {
+      if (res.dudoso) setQuizaGuardada(true)
+      setError(res.error ?? '')
+    }
   }
   // #endregion
 
@@ -116,7 +133,19 @@ const DetailsStepComponent: FunctionComponent<IDetailsStepProps> = ({ servicio, 
         {error && (
           <div role="alert" className="flex items-start gap-2 rounded-2xl bg-red-50 p-4 text-sm text-red-700">
             <AlertCircle size={18} className="mt-0.5 shrink-0" />
-            <span>{error}</span>
+            <span>
+              {error}
+              {error === ERROR_QUIZA_GUARDADA && (
+                <a
+                  href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hola Adrián, soy ${nombre.trim()}. ¿Me confirmas si se guardó mi cita de la web?`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 block font-semibold underline"
+                >
+                  Escribir por WhatsApp
+                </a>
+              )}
+            </span>
           </div>
         )}
 

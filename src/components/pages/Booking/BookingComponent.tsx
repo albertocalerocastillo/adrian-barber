@@ -62,6 +62,8 @@ const BookingComponent: FunctionComponent = () => {
   const [servicios, setServicios] = useState<ServicioDTO[] | null>(null)
   const [soloWhatsapp, setSoloWhatsapp] = useState<ServicioDTO[]>([])
   const [direccion, setDireccion] = useState<number>(HACIA_ADELANTE)
+  // Sube cada vez que la BD rechaza la hora: se vuelven a leer horario y servicios por si Adrián los ha cambiado.
+  const [recarga, setRecarga] = useState<number>(0)
   // #endregion
 
   // #region Carga del horario y los servicios
@@ -72,14 +74,25 @@ const BookingComponent: FunctionComponent = () => {
       if (!vivo) return
       setHorario(horarioSemana)
       const activos = todosServicios.filter((s) => s.activo !== false)
-      setServicios(activos.filter((s) => s.online !== false))
+      const reservables = activos.filter((s) => s.online !== false)
+      setServicios(reservables)
       setSoloWhatsapp(activos.filter((s) => s.online === false))
+      // Si el servicio elegido ha cambiado (precio o duración) o ya no se puede reservar, se pone el nuevo o se
+      // vuelve a elegir servicio: así nunca se intenta guardar con datos viejos que la BD rechazaría en bucle.
+      setServicio((elegido) => {
+        if (!elegido) return elegido
+        const actual = reservables.find((s) => s.nombre === elegido.nombre)
+        if (actual && actual.duracion === elegido.duracion) return actual
+        setHora(null)
+        setFecha(null)
+        return null
+      })
     }
     cargar()
     return () => {
       vivo = false
     }
-  }, [])
+  }, [recarga])
   // #endregion
 
   // #region Paso actual y navegación
@@ -247,7 +260,10 @@ const BookingComponent: FunctionComponent = () => {
                 onHoraPerdida={(texto) => {
                   setHora(null)
                   setAvisoHora(texto)
-                  irA(PasoReservaEnum.Hora, { replace: true })
+                  setRecarga((r) => r + 1)
+                  // Se vuelve a la entrada anterior del historial (la de elegir hora) en vez de crear otra:
+                  // si no, el botón atrás del móvil repetiría el mismo paso.
+                  atras()
                 }}
               />
             )}

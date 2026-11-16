@@ -43,6 +43,14 @@ export const toInputDate = (d: Date): string => {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 
+/** "Martes 15 de enero" del instante `d` visto en la zona horaria dada (la del negocio). */
+export const formatLongDateInZone = (d: Date, zona: string): string => {
+  const partes = new Intl.DateTimeFormat('en-CA', { timeZone: zona, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d)
+  const [anio, mes, dia] = partes.split('-').map(Number)
+  const result = formatLongDate(new Date(anio, mes - 1, dia))
+  return result
+}
+
 /** "10:30" del instante `d` en la zona horaria dada (la del negocio). */
 export const formatTimeInZone = (d: Date, zona: string): string => {
   return new Intl.DateTimeFormat('es-ES', { timeZone: zona, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(d)

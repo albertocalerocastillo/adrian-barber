@@ -54,6 +54,9 @@ const INTERVALO_RELOJ_MS = 60_000
 // Semanas que se cargan de una vez: las 6 que pinta la vista mes.
 const SEMANAS_CARGADAS = 6
 
+// Si deshacer no se puede guardar.
+const ERROR_DESHACER = 'No se pudo deshacer. Revisa la conexión.'
+
 // Placeholders del resumen mientras carga.
 const TARJETAS_RESUMEN = 4
 
@@ -120,6 +123,8 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
   const [tick, setTick] = useState<number>(0)
   const [modal, setModal] = useState<HojaAbierta | null>(null)
   const [ahora, setAhora] = useState<Date>(() => new Date())
+  // La agenda no se ha podido leer (sin conexión): se dice, en vez de enseñar el día vacío.
+  const [errorCarga, setErrorCarga] = useState<boolean>(false)
 
   // Una vez leído el día de la URL se quita, para que al recargar se vuelva a hoy.
   useEffect(() => {
@@ -159,8 +164,14 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
     const hasta = addMinutes(desde, SEMANAS_CARGADAS * DIAS_SEMANA * MINUTES_PER_DAY)
     let vivo = true
     const cargar = async () => {
-      const [citas, bloqueos] = await Promise.all([AgendaService.listarCitas(desde, hasta), AgendaService.listarBloqueos(desde, hasta)])
-      if (vivo) setDatos({ citas, bloqueos })
+      try {
+        const [citas, bloqueos] = await Promise.all([AgendaService.listarCitas(desde, hasta), AgendaService.listarBloqueos(desde, hasta)])
+        if (!vivo) return
+        setErrorCarga(false)
+        setDatos({ citas, bloqueos })
+      } catch {
+        if (vivo) setErrorCarga(true)
+      }
     }
     cargar()
     return () => {
@@ -199,7 +210,11 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
       text: texto,
       onUndo: async () => {
         fijarEstadoLocal(cita.id, anterior)
-        await AgendaService.cambiarEstado(cita.id, anterior)
+        const deshecho = await AgendaService.cambiarEstado(cita.id, anterior)
+        if (deshecho.ok) return
+        // P. ej. una cita cancelada cuyo hueco ya tiene otra: la pantalla vuelve a decir la verdad.
+        fijarEstadoLocal(cita.id, estado)
+        avisar({ text: deshecho.error ?? ERROR_DESHACER, type: ToastTypeEnum.Error })
       },
     })
   }
@@ -220,8 +235,9 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
     avisar({
       text: 'Vuelve a estar abierto',
       onUndo: async () => {
-        await AgendaService.crearBloqueo({ inicio: new Date(b.inicio), fin: new Date(b.fin), motivo: b.motivo })
+        const deshecho = await AgendaService.crearBloqueo({ inicio: new Date(b.inicio), fin: new Date(b.fin), motivo: b.motivo })
         recargar()
+        if (!deshecho.ok) avisar({ text: deshecho.error ?? ERROR_DESHACER, type: ToastTypeEnum.Error })
       },
     })
   }
@@ -231,8 +247,9 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
     avisar({
       text: `Cita de ${cita.clienteNombre.split(' ')[0]} cambiada`,
       onUndo: async () => {
-        await AgendaService.moverCita(cita.id, inicioAnterior, finAnterior)
+        const deshecho = await AgendaService.moverCita(cita.id, inicioAnterior, finAnterior)
         recargar()
+        if (!deshecho.ok) avisar({ text: deshecho.error ?? ERROR_DESHACER, type: ToastTypeEnum.Error })
       },
     })
   }
@@ -395,7 +412,20 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
       </div>
 
       {/* Contenido. */}
-      {!datos || !delDia || !horario ? (
+      {errorCarga ? (
+        <div role="alert" className="flex flex-col items-center gap-3 rounded-3xl bg-red-50 p-8 text-center text-sm text-red-800">
+          No se pudo cargar la agenda. Revisa la conexión.
+          <button
+            type="button"
+            onClick={recargar}
+            className="rounded-full bg-red-600 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-red-700"
+          >
+            Reintentar
+          </button>
+        </div>
+      ) : vista === VistaAgendaEnum.Proximas ? (
+        <UpcomingViewComponent ahora={ahora} recarga={tick} onDia={irA} />
+      ) : !datos || !delDia || !horario ? (
         <SkeletonComponent rows={FILAS_ESQUELETO} height="h-20" />
       ) : (
         <AnimatePresence mode="wait">
@@ -406,9 +436,7 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: EASE_SMOOTH }}
           >
-            {vista === VistaAgendaEnum.Proximas ? (
-              <UpcomingViewComponent ahora={ahora} recarga={tick} onDia={irA} />
-            ) : vista === VistaAgendaEnum.Mes ? (
+            {vista === VistaAgendaEnum.Mes ? (
               <MonthViewComponent
                 mes={dia}
                 dia={dia}

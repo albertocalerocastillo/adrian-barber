@@ -57,14 +57,17 @@ const rotuloDia = (dia: Date, ahora: Date): string => {
 const UpcomingViewComponent: FunctionComponent<IUpcomingViewProps> = ({ ahora, recarga, onDia }) => {
   // #region Declaraciones, variables y hooks
   const [citas, setCitas] = useState<CitaDTO[] | null>(null)
+  const [error, setError] = useState<boolean>(false)
   const hoy = startOfDay(ahora).getTime()
 
   useEffect(() => {
     let vivo = true
     const cargar = async () => {
       const desde = new Date(hoy)
-      const result = await AgendaService.listarCitas(desde, addMinutes(desde, DIAS_PROXIMAS * MINUTES_PER_DAY))
-      if (vivo) setCitas(result)
+      const result = await AgendaService.listarCitas(desde, addMinutes(desde, DIAS_PROXIMAS * MINUTES_PER_DAY)).catch(() => null)
+      if (!vivo) return
+      setError(result === null)
+      setCitas(result)
     }
     cargar()
     return () => {
@@ -78,6 +81,13 @@ const UpcomingViewComponent: FunctionComponent<IUpcomingViewProps> = ({ ahora, r
   // #endregion
 
   // #region Renderizado
+  if (error) {
+    return (
+      <p role="alert" className="rounded-3xl bg-red-50 p-8 text-center text-sm text-red-800">
+        No se pudieron cargar las próximas citas. Revisa la conexión.
+      </p>
+    )
+  }
   if (!dias) return <SkeletonComponent rows={FILAS_ESQUELETO} height="h-24" />
 
   if (dias.length === 0) {

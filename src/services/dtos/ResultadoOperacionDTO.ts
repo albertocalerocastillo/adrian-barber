@@ -6,4 +6,8 @@ export interface ResultadoOperacionDTO {
   error?: string;
   /** En la reserva: el hueco ya no vale y hay que volver a elegir hora. */
   volverAHoras?: boolean;
+  /** En la reserva: el error no vino de la BD (red caída): puede que la cita sí se guardara. */
+  dudoso?: boolean;
+  /** En la reserva: la hora la tiene ya otra cita. */
+  horaOcupada?: boolean;
 }
