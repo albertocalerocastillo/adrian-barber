@@ -12,6 +12,7 @@ import { CODIGO_SOLAPE } from './SupabaseConstants'
 import { NotificationService } from './NotificationService'
 import { overlaps } from '../utils/availability'
 import { EstadoCitaEnum } from './enums/EstadoCitaEnum'
+import { OrigenCitaEnum } from './enums/OrigenCitaEnum'
 import { TablaSupabaseEnum } from './enums/TablaSupabaseEnum'
 import { FuncionSupabaseEnum } from './enums/FuncionSupabaseEnum'
 import type { IBookingService } from './IBookingService'
@@ -132,7 +133,9 @@ const crearCita: IBookingService['crearCita'] = async (cita) => {
   }
 
   if (supabase) {
-    const { error } = await supabase.from(TablaSupabaseEnum.Citas).insert(registro)
+    // Se marca como reservada en la web aunque quien reserve tenga abierta la sesión del panel (al probar
+    // la web desde el mismo navegador): si no, la BD la daría por metida a mano y no se avisaría a Adrián.
+    const { error } = await supabase.from(TablaSupabaseEnum.Citas).insert({ ...registro, origen: OrigenCitaEnum.Web })
     if (error) return traducirError(error)
     NotificationService.avisarNuevaCita(cita)
     return { ok: true }

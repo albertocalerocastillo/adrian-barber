@@ -173,7 +173,8 @@ export const componerMensaje = ({ cita, precio, citasDelDia, visitasPrevias, aho
     `💬 Escribirle: wa.me/${PREFIJO_ESPANA}${movil}`,
     '',
     citasDelDia !== null ? resumenDia(citasDelDia) : null,
-    `🗓️ Agenda: ${URL_PANEL}`,
+    // El enlace abre la agenda directamente en el día de la cita.
+    `🗓️ Ver en la agenda: ${URL_PANEL}?dia=${diaEnEspana(inicio)}`,
   ]
     .filter((linea) => linea !== null)
     .join('\n')

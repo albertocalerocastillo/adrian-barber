@@ -14,6 +14,12 @@ También: la búsqueda de clientes del panel ya ignora tildes ("jose" encuentra 
 con `imatch` y `utils/search.ts`), y el horario de los datos estructurados de Google ya
 no se escribe a mano en `index.html`: lo genera `vite.config.ts` desde
 `data/openingHours.ts` y la web lo cambia por el de Supabase al cargar.
+Panel (16/11/2026): cancelar abre una hoja con «Cancelar y avisar» (WhatsApp ya escrito al
+cliente) o «Solo cancelar»; «Día libre» avisa de las citas pendientes de ese rato, las cancela y
+deja un WhatsApp para cada cliente; vista «Próximas» con todas las citas que vienen; el enlace del
+aviso abre la agenda en el día de la cita (`/admin?dia=AAAA-MM-DD`). Las reservas de la web se
+guardan con `origen: 'web'` aunque haya sesión del panel abierta (antes contaban como del panel y
+no avisaban).
 ⬜ Pendiente: cuenta de Adrián en `barberos`, cerrar 1 y 6 de enero, ficha de Google,
 fotos del local y suya, QR de reseñas.
 

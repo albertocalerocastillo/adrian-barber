@@ -1,5 +1,5 @@
 // #region Imports
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { FunctionComponent, SyntheticEvent } from 'react'
 import SheetComponent from '../Sheet/SheetComponent'
 import FieldComponent from '../Controls/Field/FieldComponent'
@@ -10,6 +10,9 @@ import { INPUT_CLASS_NAME } from '../Controls/controlClasses'
 import { atTime, addMinutes, MINUTES_PER_DAY } from '../../../../utils/availability'
 import { startOfDay, formatLongDate, toInputDate } from '../../../../utils/dates'
 import { AgendaService } from '../../../../services/AgendaService'
+import { EstadoCitaEnum } from '../../../../services/enums/EstadoCitaEnum'
+import type { CitaDTO } from '../../../../services/dtos/CitaDTO'
+import AffectedAppointmentsComponent from './AffectedAppointments/AffectedAppointmentsComponent'
 import type { IBlockTimeDialogProps } from './IBlockTimeDialogProps'
 // #endregion
 
@@ -25,9 +28,16 @@ const HASTA_INICIAL = '14:00'
 const SUFIJO_MEDIANOCHE = 'T00:00:00'
 // #endregion
 
+/** "1 cita" o "3 citas". */
+const contarCitas = (n: number): string => (n === 1 ? '1 cita' : `${n} citas`)
+
 /**
  * Cierra un día entero o un rato (vacaciones, médico, descanso). Esos huecos
  * desaparecen de la web automáticamente.
+ *
+ * Si en ese rato ya hay citas, lo dice antes de cerrar; al cerrar las cancela
+ * (nadie va a estar para atenderlas) y deja un WhatsApp escrito para avisar a
+ * cada cliente.
  */
 const BlockTimeDialogComponent: FunctionComponent<IBlockTimeDialogProps> = ({ fechaInicial, onClose, onCreado }) => {
   // #region Declaraciones, variables y hooks
@@ -38,13 +48,45 @@ const BlockTimeDialogComponent: FunctionComponent<IBlockTimeDialogProps> = ({ fe
   const [motivo, setMotivo] = useState<string>('')
   const [guardando, setGuardando] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
+  // Citas activas que caen en el rato elegido (null mientras se miran).
+  const [afectadas, setAfectadas] = useState<CitaDTO[] | null>(null)
+  // Texto del aviso final, cuando ya se ha cerrado y quedan clientes por avisar.
+  const [hecho, setHecho] = useState<string>('')
+
+  const fecha = new Date(`${fechaStr}${SUFIJO_MEDIANOCHE}`)
+  const inicio = todoElDia ? startOfDay(fecha) : atTime(fecha, desde)
+  const fin = todoElDia ? addMinutes(inicio, MINUTES_PER_DAY) : atTime(fecha, hasta)
+  const desdeMs = inicio.getTime()
+  const hastaMs = fin.getTime()
+
+  // Mira qué citas hay en ese rato cada vez que cambia el día o las horas.
+  useEffect(() => {
+    if (hecho) return
+    let vivo = true
+    const mirar = async () => {
+      setAfectadas(null)
+      const delDia = startOfDay(new Date(desdeMs))
+      const citas = await AgendaService.listarCitas(delDia, addMinutes(delDia, MINUTES_PER_DAY))
+      if (!vivo) return
+      // Solo las pendientes que aún no han pasado: las atendidas ya se hicieron y no se tocan.
+      const ahoraMs = Date.now()
+      setAfectadas(
+        citas.filter((c) => {
+          const ini = new Date(c.inicio).getTime()
+          const fin = new Date(c.fin).getTime()
+          return c.estado === EstadoCitaEnum.Pendiente && fin > ahoraMs && ini < hastaMs && fin > desdeMs
+        })
+      )
+    }
+    mirar()
+    return () => {
+      vivo = false
+    }
+  }, [desdeMs, hastaMs, hecho])
 
   const onGuardar = async (e?: SyntheticEvent) => {
     e?.preventDefault()
-    if (guardando) return
-    const fecha = new Date(`${fechaStr}${SUFIJO_MEDIANOCHE}`)
-    const inicio = todoElDia ? startOfDay(fecha) : atTime(fecha, desde)
-    const fin = todoElDia ? addMinutes(inicio, MINUTES_PER_DAY) : atTime(fecha, hasta)
+    if (guardando || afectadas === null) return
     if (!todoElDia && fin <= inicio) {
       setError('La hora de fin tiene que ser después de la de inicio.')
       return
@@ -52,13 +94,58 @@ const BlockTimeDialogComponent: FunctionComponent<IBlockTimeDialogProps> = ({ fe
     setGuardando(true)
     setError('')
     const res = await AgendaService.crearBloqueo({ inicio, fin, motivo: motivo.trim() })
-    setGuardando(false)
-    if (res.ok) {
-      onCreado(`${formatLongDate(fecha)}: ${todoElDia ? 'cerrado todo el día' : `cerrado de ${desde} a ${hasta}`}`)
-      onClose()
-    } else {
+    if (!res.ok) {
+      setGuardando(false)
       setError(res.error ?? '')
+      return
     }
+    const cancelaciones = await Promise.all(afectadas.map((c) => AgendaService.cambiarEstado(c.id, EstadoCitaEnum.Cancelada)))
+    setGuardando(false)
+    const fallidas = cancelaciones.filter((r) => !r.ok).length
+    const texto =
+      `${formatLongDate(fecha)}: ${todoElDia ? 'cerrado todo el día' : `cerrado de ${desde} a ${hasta}`}` +
+      (afectadas.length > 0 ? ` · ${contarCitas(afectadas.length - fallidas)} cancelada${afectadas.length - fallidas === 1 ? '' : 's'}` : '')
+    if (fallidas > 0) {
+      // El día ya está cerrado: se avisa de las que no se pudieron cancelar para hacerlo a mano.
+      setError(`No se pudieron cancelar ${contarCitas(fallidas)}. Cancélalas desde la agenda.`)
+    }
+    if (afectadas.length === 0) {
+      onCreado(texto)
+      onClose()
+      return
+    }
+    // Quedan clientes por avisar: la hoja sigue abierta con sus WhatsApp.
+    setHecho(texto)
+  }
+
+  const terminar = () => {
+    onCreado(hecho)
+    onClose()
+  }
+
+  if (hecho && afectadas) {
+    return (
+      <SheetComponent
+        title="Día cerrado"
+        subtitle="Avisa a cada cliente para que no venga: el mensaje ya va escrito."
+        onClose={terminar}
+        footer={
+          <div>
+            {error && (
+              <p role="alert" className="mb-3 rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-700">
+                {error}
+              </p>
+            )}
+            <PrimaryButtonComponent type="button" onClick={terminar} className="w-full">
+              Listo
+            </PrimaryButtonComponent>
+          </div>
+        }
+      >
+        <p className="mb-4 text-sm text-tinta/60">{hecho}</p>
+        <AffectedAppointmentsComponent citas={afectadas} conAviso />
+      </SheetComponent>
+    )
   }
   // #endregion
 
@@ -75,8 +162,9 @@ const BlockTimeDialogComponent: FunctionComponent<IBlockTimeDialogProps> = ({ fe
               {error}
             </p>
           )}
-          <PrimaryButtonComponent type="button" onClick={onGuardar} loading={guardando} className="w-full">
+          <PrimaryButtonComponent type="button" onClick={onGuardar} loading={guardando || afectadas === null} className="w-full">
             Cerrar {todoElDia ? 'el día' : `de ${desde} a ${hasta}`}
+            {afectadas && afectadas.length > 0 && ` y cancelar ${contarCitas(afectadas.length)}`}
           </PrimaryButtonComponent>
         </div>
       }
@@ -108,6 +196,16 @@ const BlockTimeDialogComponent: FunctionComponent<IBlockTimeDialogProps> = ({ fe
             </div>
           )}
         </FieldComponent>
+
+        {afectadas && afectadas.length > 0 && (
+          <div role="alert" className="rounded-2xl bg-red-50 p-4">
+            <p className="mb-3 text-sm text-red-800">
+              Ese {todoElDia ? 'día' : 'rato'} tienes <strong>{contarCitas(afectadas.length)}</strong>. Al cerrarlo se
+              cancelan y te dejo el WhatsApp escrito para avisar a cada cliente.
+            </p>
+            <AffectedAppointmentsComponent citas={afectadas} />
+          </div>
+        )}
 
         <FieldComponent label="Motivo (opcional)" help="Solo lo ves tú.">
           <div className="mb-2 flex flex-wrap gap-2">

@@ -3,4 +3,5 @@ export enum VistaAgendaEnum {
   Dia = 'dia',
   Semana = 'semana',
   Mes = 'mes',
+  Proximas = 'proximas',
 }

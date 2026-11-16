@@ -1,6 +1,6 @@
 // #region Imports
 import { generarRejilla, addMinutes, MINUTES_PER_DAY } from '../../../utils/availability'
-import { startOfDay } from '../../../utils/dates'
+import { startOfDay, formatLongDate, formatTime } from '../../../utils/dates'
 import { EstadoCitaEnum } from '../../../services/enums/EstadoCitaEnum'
 import { EstadoHuecoEnum } from '../../../services/enums/EstadoHuecoEnum'
 import { AgendaService } from '../../../services/AgendaService'
@@ -64,5 +64,21 @@ export const buildWhatsappLink = (movil: string | null | undefined, texto: strin
   const limpio = (movil || '').replace(PATRON_NO_CIFRAS, '')
   if (!PATRON_MOVIL.test(limpio)) return null
   const result = `${URL_WHATSAPP}${limpio}?text=${encodeURIComponent(texto)}`
+  return result
+}
+
+/**
+ * WhatsApp para decirle al cliente que se le anula la cita, con el día y la
+ * hora y ofreciéndole otro hueco. null si la cita no tiene un móvil válido.
+ */
+export const buildCancelWhatsappLink = (cita: CitaDTO): string | null => {
+  const inicio = new Date(cita.inicio)
+  const nombre = cita.clienteNombre.trim().split(' ')[0]
+  const cuando = `${formatLongDate(inicio).toLowerCase()} a las ${formatTime(inicio)}`
+  const result = buildWhatsappLink(
+    cita.clienteMovil,
+    `Hola ${nombre}, soy Adrián, de A.S Barbería. Te escribo porque tengo que anular tu cita del ${cuando}. ` +
+      'Perdona las molestias. Si quieres, dime qué día te viene bien y te busco otro hueco.'
+  )
   return result
 }

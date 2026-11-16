@@ -7,6 +7,7 @@ import NewAppointmentDialogComponent from '../NewAppointmentDialog/NewAppointmen
 import BlockTimeDialogComponent from '../BlockTimeDialog/BlockTimeDialogComponent'
 import RescheduleDialogComponent from '../RescheduleDialog/RescheduleDialogComponent'
 import CustomerSearchDialogComponent from '../CustomerSearchDialog/CustomerSearchDialogComponent'
+import CancelDialogComponent from '../CancelDialog/CancelDialogComponent'
 import MonthViewComponent from '../MonthView/MonthViewComponent'
 import { useToast } from '../Toast/ToastContext'
 import SectionHeaderComponent from '../Controls/SectionHeader/SectionHeaderComponent'
@@ -19,12 +20,13 @@ import NextAppointmentComponent from './NextAppointment/NextAppointmentComponent
 import DayStripComponent from './DayStrip/DayStripComponent'
 import DayViewComponent from './DayView/DayViewComponent'
 import WeekViewComponent from './WeekView/WeekViewComponent'
+import UpcomingViewComponent from './UpcomingView/UpcomingViewComponent'
 import FloatingAddButtonComponent from './FloatingAddButton/FloatingAddButtonComponent'
 import { addMinutes, MINUTES_PER_DAY } from '../../../../utils/availability'
 import { formatLongDate, startOfDay, startOfWeek, isSameDay, toInputDate } from '../../../../utils/dates'
 import { EASE_SMOOTH } from '../../../../theme/animation'
 import { ToastTypeEnum } from '../../../../services/enums/ToastTypeEnum'
-import type { EstadoCitaEnum } from '../../../../services/enums/EstadoCitaEnum'
+import { EstadoCitaEnum } from '../../../../services/enums/EstadoCitaEnum'
 import { VistaAgendaEnum } from '../../../../services/enums/VistaAgendaEnum'
 import { HojaAgendaEnum } from '../../../../services/enums/HojaAgendaEnum'
 import { AgendaService } from '../../../../services/AgendaService'
@@ -43,6 +45,7 @@ const VISTAS: ISegmentedControlOption[] = [
   { value: VistaAgendaEnum.Dia, text: 'Día' },
   { value: VistaAgendaEnum.Semana, text: 'Semana' },
   { value: VistaAgendaEnum.Mes, text: 'Mes' },
+  { value: VistaAgendaEnum.Proximas, text: 'Próximas' },
 ]
 
 // Cada cuánto avanza el reloj de la agenda, en milisegundos (un minuto).
@@ -56,7 +59,20 @@ const TARJETAS_RESUMEN = 4
 
 // Bloques del esqueleto del contenido mientras carga.
 const FILAS_ESQUELETO = 4
+
+// Parámetro de la URL con el día que abre la agenda (/admin?dia=2027-01-15), el
+// que trae el enlace del aviso de WhatsApp.
+const PARAMETRO_DIA = 'dia'
+const PATRON_DIA = /^\d{4}-\d{2}-\d{2}$/
 // #endregion
+
+/** Día pedido en la URL (?dia=AAAA-MM-DD), o hoy si no hay ninguno válido. */
+const diaInicial = (): Date => {
+  const pedido = new URLSearchParams(window.location.search).get(PARAMETRO_DIA)
+  const fecha = pedido && PATRON_DIA.test(pedido) ? new Date(`${pedido}T00:00:00`) : null
+  const result = fecha && !Number.isNaN(fecha.getTime()) ? fecha : startOfDay(new Date())
+  return result
+}
 
 /** Citas y bloqueos de las semanas cargadas. */
 interface DatosAgenda {
@@ -97,13 +113,21 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
   // #region Declaraciones, variables y hooks
   const avisar = useToast()
   const [vista, setVista] = useState<VistaAgendaEnum>(VistaAgendaEnum.Dia)
-  const [dia, setDia] = useState<Date>(() => startOfDay(new Date()))
+  const [dia, setDia] = useState<Date>(diaInicial)
   const [datos, setDatos] = useState<DatosAgenda | null>(null)
   const [horario, setHorario] = useState<HorarioDiaDTO[] | null>(null)
   const [servicios, setServicios] = useState<ServicioDTO[]>([])
   const [tick, setTick] = useState<number>(0)
   const [modal, setModal] = useState<HojaAbierta | null>(null)
   const [ahora, setAhora] = useState<Date>(() => new Date())
+
+  // Una vez leído el día de la URL se quita, para que al recargar se vuelva a hoy.
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    if (!url.searchParams.has(PARAMETRO_DIA)) return
+    url.searchParams.delete(PARAMETRO_DIA)
+    window.history.replaceState(window.history.state, '', url)
+  }, [])
 
   // El reloj avanza cada minuto ("en curso", "en 20 min").
   useEffect(() => {
@@ -178,6 +202,12 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
         await AgendaService.cambiarEstado(cita.id, anterior)
       },
     })
+  }
+
+  // Cancelar pasa antes por una hoja que ofrece avisar al cliente por WhatsApp.
+  const pedirEstado = (cita: CitaDTO, estado: EstadoCitaEnum, texto: string) => {
+    if (estado === EstadoCitaEnum.Cancelada) setModal({ tipo: HojaAgendaEnum.Cancelar, cita })
+    else cambiar(cita, estado, texto)
   }
 
   const quitarBloqueo = async (b: BloqueoDTO) => {
@@ -272,6 +302,9 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
       {/* Semana: navegación + tira de días. */}
       <div className="mb-6 rounded-3xl border border-hueso-200 bg-white p-3 shadow-sm sm:p-4">
         <div className="mb-3 flex items-center justify-between gap-2 px-1">
+          {vista === VistaAgendaEnum.Proximas ? (
+            <span className="px-1 font-display text-base font-bold sm:text-lg">De hoy en adelante</span>
+          ) : (
           <div className="flex items-center gap-1">
             <RoundButtonComponent onClick={() => mover(-1)} label={vista === VistaAgendaEnum.Mes ? 'Mes anterior' : 'Semana anterior'}>
               <ChevronLeft size={18} />
@@ -308,6 +341,7 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
               />
             </label>
           </div>
+          )}
           <div className="flex items-center gap-1.5 sm:gap-2">
             {!esHoy && (
               <button
@@ -337,6 +371,7 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
           </div>
         </div>
 
+        {vista !== VistaAgendaEnum.Proximas && (
         <DayStripComponent
           inicio={new Date(semana)}
           dia={dia}
@@ -348,6 +383,7 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
             setVista(VistaAgendaEnum.Dia)
           }}
         />
+        )}
 
         <div className="mt-3 flex justify-center sm:hidden">
           <SegmentedControlComponent
@@ -370,7 +406,9 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: EASE_SMOOTH }}
           >
-            {vista === VistaAgendaEnum.Mes ? (
+            {vista === VistaAgendaEnum.Proximas ? (
+              <UpcomingViewComponent ahora={ahora} recarga={tick} onDia={irA} />
+            ) : vista === VistaAgendaEnum.Mes ? (
               <MonthViewComponent
                 mes={dia}
                 dia={dia}
@@ -397,7 +435,7 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
                 citas={delDia.citas}
                 bloqueos={delDia.bloqueos}
                 precios={precios}
-                onEstado={cambiar}
+                onEstado={pedirEstado}
                 onMover={(cita) => setModal({ tipo: HojaAgendaEnum.Mover, cita })}
                 onQuitarBloqueo={quitarBloqueo}
                 onNuevaEn={(hora) => setModal({ tipo: HojaAgendaEnum.Cita, hora })}
@@ -431,6 +469,14 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
         )}
         {modal?.tipo === HojaAgendaEnum.Mover && modal.cita && (
           <RescheduleDialogComponent key="mover" cita={modal.cita} onClose={() => setModal(null)} onMovida={onMovida} />
+        )}
+        {modal?.tipo === HojaAgendaEnum.Cancelar && modal.cita && (
+          <CancelDialogComponent
+            key="cancelar"
+            cita={modal.cita}
+            onClose={() => setModal(null)}
+            onCancelar={() => modal.cita && cambiar(modal.cita, EstadoCitaEnum.Cancelada, `Cita de ${modal.cita.clienteNombre.split(' ')[0]} cancelada`)}
+          />
         )}
         {modal?.tipo === HojaAgendaEnum.Buscar && (
           <CustomerSearchDialogComponent
