@@ -1,3 +1,4 @@
+import type { AperturaDTO } from '../../../../services/dtos/AperturaDTO'
 import type { CitaDTO } from '../../../../services/dtos/CitaDTO'
 import type { BloqueoDTO } from '../../../../services/dtos/BloqueoDTO'
 import type { HorarioDiaDTO } from '../../../../services/dtos/HorarioDiaDTO'
@@ -18,4 +19,6 @@ export interface IMonthViewProps {
   horario: HorarioDiaDTO[];
   /** Se llama con el día tocado. */
   onDia: (dia: Date) => void;
+  /** Aperturas extra (días u horas que se trabaja fuera del horario de la semana). */
+  aperturas: AperturaDTO[];
 }

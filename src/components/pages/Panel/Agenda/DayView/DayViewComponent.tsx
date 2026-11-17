@@ -2,11 +2,12 @@
 import { useState } from 'react'
 import type { FunctionComponent } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { Coffee, Moon, Plus, RotateCcw } from 'lucide-react'
+import { Coffee, DoorOpen, Moon, Plus, RotateCcw } from 'lucide-react'
 import AppointmentCardComponent from '../AppointmentCard/AppointmentCardComponent'
 import BlockCardComponent from '../BlockCard/BlockCardComponent'
 import FreeSlotComponent from '../FreeSlot/FreeSlotComponent'
-import { formatTime as fmtHora, startOfDay, diaAbierto } from '../../../../../utils/dates'
+import { formatTime as fmtHora, startOfDay, diaAbierto, isSameDay } from '../../../../../utils/dates'
+import { horarioDelDia } from '../../../../../utils/schedule'
 import { EASE_SMOOTH } from '../../../../../theme/animation'
 import { EstadoCitaEnum } from '../../../../../services/enums/EstadoCitaEnum'
 import { TipoEntradaDiaEnum } from '../../../../../services/enums/TipoEntradaDiaEnum'
@@ -45,16 +46,42 @@ interface EntradaDia {
  * plegadas, por si hay que recuperar alguna.
  */
 const DayViewComponent: FunctionComponent<IDayViewProps> = ({
-  dia, ahora, horario, citas, bloqueos, precios, onEstado, onMover, onQuitarBloqueo, onNuevaEn,
+  dia, ahora, horario, citas, bloqueos, precios, onEstado, onMover, onQuitarBloqueo, onNuevaEn, aperturas, onAbrirDia, onQuitarApertura,
 }) => {
   // #region Declaraciones, variables y hooks
   const [verCanceladas, setVerCanceladas] = useState<boolean>(false)
   const activas = citas.filter((c) => c.estado !== EstadoCitaEnum.Cancelada)
   const canceladas = citas.filter((c) => c.estado === EstadoCitaEnum.Cancelada)
-  const abierto = diaAbierto(dia, horario)
+  // El horario de la semana más lo que se haya abierto aparte ese día.
+  const horarioHoy = horarioDelDia(dia, horario, aperturas)
+  const aperturasHoy = aperturas.filter((a) => isSameDay(new Date(a.inicio), dia))
+  const abierto = diaAbierto(dia, horarioHoy)
   const pasado = startOfDay(dia) < startOfDay(ahora)
 
-  const libres = pasado ? [] : huecosLibres(dia, horario, [...activas, ...bloqueos], ahora)
+  const libres = pasado ? [] : huecosLibres(dia, horarioHoy, [...activas, ...bloqueos], ahora)
+
+  // Aviso de las aperturas extra de este día, con su botón para quitarlas.
+  const avisoAperturas = aperturasHoy.length > 0 && (
+    <ul className="mb-4 space-y-2">
+      {aperturasHoy.map((a) => (
+        <li key={a.id} className="flex items-center gap-3 rounded-2xl bg-green-50 px-4 py-3 text-sm text-green-800">
+          <DoorOpen size={18} className="shrink-0" />
+          <span className="min-w-0 flex-1">
+            Abierto fuera de horario: <strong>{fmtHora(new Date(a.inicio))}–{fmtHora(new Date(a.fin))}</strong>
+          </span>
+          {!pasado && (
+            <button
+              type="button"
+              onClick={() => onQuitarApertura(a)}
+              className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-green-100"
+            >
+              Quitar
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
 
   const entradas: EntradaDia[] = [
     ...activas.map((c) => ({ tipo: TipoEntradaDiaEnum.Cita, inicio: new Date(c.inicio), cita: c })),
@@ -70,6 +97,8 @@ const DayViewComponent: FunctionComponent<IDayViewProps> = ({
   // #region Renderizado
   if (entradas.length === 0) {
     return (
+      <>
+      {avisoAperturas}
       <div className="flex flex-col items-center rounded-3xl border border-dashed border-tinta/15 px-6 py-14 text-center">
         <span className="flex h-14 w-14 items-center justify-center rounded-full bg-tinta/5 text-tinta/40">
           {abierto ? <Coffee size={24} /> : <Moon size={24} />}
@@ -80,9 +109,9 @@ const DayViewComponent: FunctionComponent<IDayViewProps> = ({
             ? 'Este día ya pasó y no tuvo citas.'
             : abierto
               ? 'No queda hueco libre en el horario de hoy.'
-              : 'Según tu horario, este día no se trabaja. Puedes meter una cita igualmente.'}
+              : 'Según tu horario, este día no se trabaja. Si vas a abrir, ábrelo y pon las horas: así puedes apuntar citas y, si quieres, que se reserve en la web.'}
         </p>
-        {!pasado && (
+        {!pasado && abierto && (
           <button
             type="button"
             onClick={() => onNuevaEn()}
@@ -91,12 +120,23 @@ const DayViewComponent: FunctionComponent<IDayViewProps> = ({
             <Plus size={17} /> Añadir cita
           </button>
         )}
+        {!pasado && !abierto && (
+          <button
+            type="button"
+            onClick={onAbrirDia}
+            className="mt-5 flex items-center gap-2 rounded-full bg-acento px-5 py-3 text-sm font-semibold text-tinta transition-colors hover:bg-acento-claro"
+          >
+            <DoorOpen size={17} /> Abrir este día
+          </button>
+        )}
       </div>
+      </>
     )
   }
 
   return (
     <>
+      {avisoAperturas}
       <ol className="relative space-y-3">
         {/* Hilo vertical de la línea de tiempo. */}
         <span aria-hidden="true" className="absolute bottom-3 left-[4.25rem] top-3 hidden w-px bg-hueso-200 sm:block" />

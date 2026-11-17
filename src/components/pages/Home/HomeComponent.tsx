@@ -5,6 +5,7 @@ import FooterComponent from '../../layout/Footer/FooterComponent'
 import HeroComponent from '../../sections/Hero/HeroComponent'
 import RibbonComponent from '../../sections/Ribbon/RibbonComponent'
 import ServicesComponent from '../../sections/Services/ServicesComponent'
+import OnlineBookingComponent from '../../sections/OnlineBooking/OnlineBookingComponent'
 import AboutMeComponent from '../../sections/AboutMe/AboutMeComponent'
 import GalleryComponent from '../../sections/Gallery/GalleryComponent'
 import ReviewsComponent from '../../sections/Reviews/ReviewsComponent'
@@ -36,6 +37,7 @@ const HomeComponent: FunctionComponent = () => {
         <HeroComponent />
         <RibbonComponent />
         <ServicesComponent />
+        <OnlineBookingComponent />
         <AboutMeComponent />
         <GalleryComponent />
         <ReviewsComponent />

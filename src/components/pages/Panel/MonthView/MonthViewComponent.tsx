@@ -3,6 +3,7 @@ import type { FunctionComponent } from 'react'
 import { m } from 'motion/react'
 import { Ban } from 'lucide-react'
 import { startOfWeek, isSameDay, formatTime as fmtHora, formatLongDate } from '../../../../utils/dates'
+import { horarioDelDia } from '../../../../utils/schedule'
 import { atTime, addMinutes, MINUTES_PER_DAY } from '../../../../utils/availability'
 import { EASE_SMOOTH } from '../../../../theme/animation'
 import { EstadoCitaEnum } from '../../../../services/enums/EstadoCitaEnum'
@@ -44,7 +45,7 @@ const MEDIANOCHE = '00:00'
  * llena según lo ocupado que está su horario y, en pantallas grandes, las
  * primeras citas con nombre. Tocar un día lleva a ese día.
  */
-const MonthViewComponent: FunctionComponent<IMonthViewProps> = ({ mes, dia, ahora, citas, bloqueos, horario, onDia }) => {
+const MonthViewComponent: FunctionComponent<IMonthViewProps> = ({ mes, dia, ahora, citas, bloqueos, horario, aperturas, onDia }) => {
   // #region Declaraciones, variables y hooks
   const primero = new Date(mes.getFullYear(), mes.getMonth(), 1)
   const diasMes = new Date(mes.getFullYear(), mes.getMonth() + 1, 0).getDate()
@@ -84,7 +85,7 @@ const MonthViewComponent: FunctionComponent<IMonthViewProps> = ({ mes, dia, ahor
             const suyas = activas
               .filter((c) => isSameDay(new Date(c.inicio), d))
               .sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime())
-            const tramos = horario.find((h) => h.dia === d.getDay())?.tramos ?? []
+            const tramos = horarioDelDia(d, horario, aperturas).find((h) => h.dia === d.getDay())?.tramos ?? []
             const ultimoTramo = tramos.at(-1)
             const abierto = tramos.reduce((t, [a, b]) => t + (atTime(d, b).getTime() - atTime(d, a).getTime()) / MS_MINUTO, 0)
             const ocupado = suyas.reduce((t, c) => t + (new Date(c.fin).getTime() - new Date(c.inicio).getTime()) / MS_MINUTO, 0)

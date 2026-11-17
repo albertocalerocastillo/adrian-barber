@@ -1,3 +1,4 @@
+import type { AperturaDTO } from '../../../../../services/dtos/AperturaDTO'
 import type { CitaDTO } from '../../../../../services/dtos/CitaDTO'
 import type { HorarioDiaDTO } from '../../../../../services/dtos/HorarioDiaDTO'
 
@@ -15,4 +16,6 @@ export interface IDayStripProps {
   horario: HorarioDiaDTO[] | null;
   /** Se llama con el día tocado. */
   onElegir: (dia: Date) => void;
+  /** Aperturas extra (días u horas que se trabaja fuera del horario de la semana). */
+  aperturas: AperturaDTO[];
 }

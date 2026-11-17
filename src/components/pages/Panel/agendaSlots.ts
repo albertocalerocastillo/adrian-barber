@@ -4,6 +4,8 @@ import { startOfDay, formatLongDate, formatTime } from '../../../utils/dates'
 import { EstadoCitaEnum } from '../../../services/enums/EstadoCitaEnum'
 import { EstadoHuecoEnum } from '../../../services/enums/EstadoHuecoEnum'
 import { AgendaService } from '../../../services/AgendaService'
+import { ConfigurationService } from '../../../services/ConfigurationService'
+import { horarioDelDia } from '../../../utils/schedule'
 import type { CitaDTO } from '../../../services/dtos/CitaDTO'
 import type { HorarioDiaDTO } from '../../../services/dtos/HorarioDiaDTO'
 import type { HuecoDTO } from '../../../services/dtos/HuecoDTO'
@@ -49,11 +51,16 @@ interface OpcionesHuecosDelDia {
 export const huecosDelDia = async ({ fecha, duracion, horario, excluirId }: OpcionesHuecosDelDia): Promise<HuecoDTO[]> => {
   const desde = startOfDay(fecha)
   const hasta = addMinutes(desde, MINUTES_PER_DAY)
-  const [citas, bloqueos] = await Promise.all([AgendaService.listarCitas(desde, hasta), AgendaService.listarBloqueos(desde, hasta)])
+  const [citas, bloqueos, aperturas] = await Promise.all([
+    AgendaService.listarCitas(desde, hasta),
+    AgendaService.listarBloqueos(desde, hasta),
+    ConfigurationService.listarAperturas(desde, hasta),
+  ])
   const result = generarRejilla({
     fecha,
     duracionMin: duracion,
-    horario,
+    // Con las aperturas extra de ese día (un sábado que se abre aparte).
+    horario: horarioDelDia(fecha, horario, aperturas),
     citas: citas.filter((c) => c.estado !== EstadoCitaEnum.Cancelada && c.id !== excluirId),
     bloqueos,
     ahora: new Date(AHORA_PANEL),

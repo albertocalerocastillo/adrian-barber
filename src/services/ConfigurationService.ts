@@ -5,6 +5,7 @@ import { SERVICIOS } from '../data/services'
 import { TablaSupabaseEnum } from './enums/TablaSupabaseEnum'
 import { FuncionSupabaseEnum } from './enums/FuncionSupabaseEnum'
 import type { ResultadoOperacionDTO } from './dtos/ResultadoOperacionDTO'
+import type { AperturaDTO } from './dtos/AperturaDTO'
 import type { IConfigurationService } from './IConfigurationService'
 import type { HorarioDiaDTO } from './dtos/HorarioDiaDTO'
 import type { ServicioDTO } from './dtos/ServicioDTO'
@@ -24,6 +25,10 @@ const ID_MINIMO = 0
 
 // Longitud de "HH:MM" (Postgres devuelve "HH:MM:SS").
 const LONGITUD_HORA = 5
+
+// Mensajes de las aperturas extra.
+const ERROR_LEER_APERTURAS = 'No se pudieron leer los días abiertos fuera de horario.'
+const ERROR_GUARDAR_APERTURA = 'No se pudo guardar. Revisa la conexión.'
 
 // Código de Supabase cuando la función de la BD no existe (migración sin ejecutar).
 const CODIGO_FUNCION_NO_EXISTE = 'PGRST202'
@@ -182,5 +187,46 @@ const guardarServicios: IConfigurationService['guardarServicios'] = async (lista
 }
 // #endregion
 
-/** Horario y servicios editables desde el panel. */
-export const ConfigurationService: IConfigurationService = { getHorario, guardarHorario, getServicios, guardarServicios }
+// #region Aperturas extra
+// Código de Postgres cuando la tabla no existe (migracion-aperturas.sql sin ejecutar).
+const CODIGO_TABLA_NO_EXISTE = '42P01'
+
+const listarAperturas: IConfigurationService['listarAperturas'] = async (desde, hasta) => {
+  if (!supabase) return []
+  const { data, error } = await supabase
+    .from(TablaSupabaseEnum.Aperturas)
+    .select('id, inicio, fin')
+    .lt('inicio', hasta.toISOString())
+    .gt('fin', desde.toISOString())
+    .order('inicio', { ascending: true })
+  // Sin la migración no hay aperturas, y eso no es un fallo.
+  if (error?.code === CODIGO_TABLA_NO_EXISTE) return []
+  if (error) throw new Error(ERROR_LEER_APERTURAS)
+  return (data as AperturaDTO[] | null) ?? []
+}
+
+const crearApertura: IConfigurationService['crearApertura'] = async (inicio, fin) => {
+  if (!supabase) return { ok: false, error: ERROR_SIN_SUPABASE }
+  const { error } = await supabase.from(TablaSupabaseEnum.Aperturas).insert({ inicio: inicio.toISOString(), fin: fin.toISOString() })
+  const result: ResultadoOperacionDTO = error ? { ok: false, error: ERROR_GUARDAR_APERTURA } : { ok: true }
+  return result
+}
+
+const borrarApertura: IConfigurationService['borrarApertura'] = async (id) => {
+  if (!supabase) return { ok: false, error: ERROR_SIN_SUPABASE }
+  const { error } = await supabase.from(TablaSupabaseEnum.Aperturas).delete().eq('id', id)
+  const result: ResultadoOperacionDTO = error ? { ok: false, error: ERROR_GUARDAR_APERTURA } : { ok: true }
+  return result
+}
+// #endregion
+
+/** Horario, servicios y aperturas extra editables desde el panel. */
+export const ConfigurationService: IConfigurationService = {
+  getHorario,
+  guardarHorario,
+  getServicios,
+  guardarServicios,
+  listarAperturas,
+  crearApertura,
+  borrarApertura,
+}

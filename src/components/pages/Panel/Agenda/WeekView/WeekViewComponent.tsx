@@ -2,6 +2,7 @@
 import type { FunctionComponent } from 'react'
 import { m } from 'motion/react'
 import { formatShortDate, formatTime as fmtHora, isSameDay, diaAbierto } from '../../../../../utils/dates'
+import { horarioDelDia } from '../../../../../utils/schedule'
 import { EASE_SMOOTH } from '../../../../../theme/animation'
 import { EstadoCitaEnum } from '../../../../../services/enums/EstadoCitaEnum'
 import { bloqueoEnDia, diasDeLaSemana } from '../agendaUtils'
@@ -14,7 +15,7 @@ const RETRASO_DIA_S = 0.04
 // #endregion
 
 /** Vista SEMANA: los 7 días de un vistazo; tocar un día lleva a ese día. */
-const WeekViewComponent: FunctionComponent<IWeekViewProps> = ({ inicio, citas, bloqueos, horario, ahora, onDia }) => {
+const WeekViewComponent: FunctionComponent<IWeekViewProps> = ({ inicio, citas, bloqueos, horario, aperturas, ahora, onDia }) => {
   // #region Declaraciones, variables y hooks
   const activas = citas.filter((c) => c.estado !== EstadoCitaEnum.Cancelada)
   const dias = diasDeLaSemana(inicio)
@@ -28,7 +29,7 @@ const WeekViewComponent: FunctionComponent<IWeekViewProps> = ({ inicio, citas, b
           .filter((c) => isSameDay(new Date(c.inicio), d))
           .sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime())
         const bloqueado = bloqueos.some((b) => bloqueoEnDia(b, d))
-        const cerrado = !diaAbierto(d, horario)
+        const cerrado = !diaAbierto(d, horarioDelDia(d, horario, aperturas))
         const { diaSemana, dia: num } = formatShortDate(d)
         const hoy = isSameDay(d, ahora)
 

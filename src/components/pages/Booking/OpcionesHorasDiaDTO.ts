@@ -14,4 +14,6 @@ export interface OpcionesHorasDiaDTO {
   ocupados: OcupadoDTO[];
   /** Momento actual, para descartar el pasado. */
   ahora?: Date;
+  /** Ratos abiertos fuera del horario de la semana (un sábado que se abre aparte). */
+  aperturas?: OcupadoDTO[];
 }

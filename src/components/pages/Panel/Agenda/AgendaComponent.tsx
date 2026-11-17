@@ -8,6 +8,7 @@ import BlockTimeDialogComponent from '../BlockTimeDialog/BlockTimeDialogComponen
 import RescheduleDialogComponent from '../RescheduleDialog/RescheduleDialogComponent'
 import CustomerSearchDialogComponent from '../CustomerSearchDialog/CustomerSearchDialogComponent'
 import CancelDialogComponent from '../CancelDialog/CancelDialogComponent'
+import OpenDayDialogComponent from '../OpenDayDialog/OpenDayDialogComponent'
 import MonthViewComponent from '../MonthView/MonthViewComponent'
 import { useToast } from '../Toast/ToastContext'
 import SectionHeaderComponent from '../Controls/SectionHeader/SectionHeaderComponent'
@@ -33,6 +34,7 @@ import { AgendaService } from '../../../../services/AgendaService'
 import { ConfigurationService } from '../../../../services/ConfigurationService'
 import type { CitaDTO } from '../../../../services/dtos/CitaDTO'
 import type { BloqueoDTO } from '../../../../services/dtos/BloqueoDTO'
+import type { AperturaDTO } from '../../../../services/dtos/AperturaDTO'
 import type { HorarioDiaDTO } from '../../../../services/dtos/HorarioDiaDTO'
 import type { ServicioDTO } from '../../../../services/dtos/ServicioDTO'
 import { bloqueoEnDia, capital, DIAS_SEMANA, rotuloMes, rotuloSemana, saludo } from './agendaUtils'
@@ -83,6 +85,8 @@ interface DatosAgenda {
   citas: CitaDTO[];
   /** Ratos cerrados de las semanas cargadas. */
   bloqueos: BloqueoDTO[];
+  /** Ratos abiertos fuera del horario de la semana. */
+  aperturas: AperturaDTO[];
 }
 
 /** Hoja (ventana) abierta desde la agenda. */
@@ -165,10 +169,14 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
     let vivo = true
     const cargar = async () => {
       try {
-        const [citas, bloqueos] = await Promise.all([AgendaService.listarCitas(desde, hasta), AgendaService.listarBloqueos(desde, hasta)])
+        const [citas, bloqueos, aperturas] = await Promise.all([
+          AgendaService.listarCitas(desde, hasta),
+          AgendaService.listarBloqueos(desde, hasta),
+          ConfigurationService.listarAperturas(desde, hasta),
+        ])
         if (!vivo) return
         setErrorCarga(false)
-        setDatos({ citas, bloqueos })
+        setDatos({ citas, bloqueos, aperturas })
       } catch {
         if (vivo) setErrorCarga(true)
       }
@@ -188,7 +196,7 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
     if (!datos) return null
     const citas = datos.citas.filter((c) => isSameDay(new Date(c.inicio), dia))
     const bloqueos = datos.bloqueos.filter((b) => bloqueoEnDia(b, dia))
-    const result = { citas, bloqueos }
+    const result = { citas, bloqueos, aperturas: datos.aperturas }
     return result
   }, [datos, dia])
   // #endregion
@@ -248,6 +256,23 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
       text: `Cita de ${cita.clienteNombre.split(' ')[0]} cambiada`,
       onUndo: async () => {
         const deshecho = await AgendaService.moverCita(cita.id, inicioAnterior, finAnterior)
+        recargar()
+        if (!deshecho.ok) avisar({ text: deshecho.error ?? ERROR_DESHACER, type: ToastTypeEnum.Error })
+      },
+    })
+  }
+
+  const quitarApertura = async (a: AperturaDTO) => {
+    const res = await ConfigurationService.borrarApertura(a.id)
+    if (!res.ok) {
+      avisar({ text: res.error ?? 'No se pudo quitar.', type: ToastTypeEnum.Error })
+      return
+    }
+    recargar()
+    avisar({
+      text: 'Vuelve a estar cerrado',
+      onUndo: async () => {
+        const deshecho = await ConfigurationService.crearApertura(new Date(a.inicio), new Date(a.fin))
         recargar()
         if (!deshecho.ok) avisar({ text: deshecho.error ?? ERROR_DESHACER, type: ToastTypeEnum.Error })
       },
@@ -395,6 +420,7 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
           ahora={ahora}
           citas={datos?.citas ?? []}
           horario={horario}
+          aperturas={datos?.aperturas ?? []}
           onElegir={(d) => {
             setDia(d)
             setVista(VistaAgendaEnum.Dia)
@@ -444,6 +470,7 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
                 citas={datos.citas}
                 bloqueos={datos.bloqueos}
                 horario={horario}
+                aperturas={datos.aperturas}
                 onDia={irA}
               />
             ) : vista === VistaAgendaEnum.Semana ? (
@@ -452,6 +479,7 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
                 citas={datos.citas}
                 bloqueos={datos.bloqueos}
                 horario={horario}
+                aperturas={datos.aperturas}
                 ahora={ahora}
                 onDia={irA}
               />
@@ -467,6 +495,9 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
                 onMover={(cita) => setModal({ tipo: HojaAgendaEnum.Mover, cita })}
                 onQuitarBloqueo={quitarBloqueo}
                 onNuevaEn={(hora) => setModal({ tipo: HojaAgendaEnum.Cita, hora })}
+                aperturas={datos.aperturas}
+                onAbrirDia={() => setModal({ tipo: HojaAgendaEnum.Abrir })}
+                onQuitarApertura={quitarApertura}
               />
             )}
           </m.div>
@@ -497,6 +528,17 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
         )}
         {modal?.tipo === HojaAgendaEnum.Mover && modal.cita && (
           <RescheduleDialogComponent key="mover" cita={modal.cita} onClose={() => setModal(null)} onMovida={onMovida} />
+        )}
+        {modal?.tipo === HojaAgendaEnum.Abrir && (
+          <OpenDayDialogComponent
+            key="abrir"
+            fechaInicial={dia}
+            onClose={() => setModal(null)}
+            onAbierto={(texto: string) => {
+              recargar()
+              avisar({ text: texto })
+            }}
+          />
         )}
         {modal?.tipo === HojaAgendaEnum.Cancelar && modal.cita && (
           <CancelDialogComponent

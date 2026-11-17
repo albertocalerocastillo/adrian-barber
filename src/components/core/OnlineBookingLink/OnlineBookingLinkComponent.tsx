@@ -11,9 +11,9 @@ const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', '
 // #endregion
 
 /**
- * Enlace secundario a la reserva online mientras aún no ha empezado: el botón
- * principal sigue siendo WhatsApp (para quien quiere cita ya), y esto deja
- * coger hueco online para enero en adelante. Cuando empieza la reserva, el
+ * Píldora "NUEVO · Reserva online desde el 1 de enero" mientras aún no ha
+ * empezado: el botón principal sigue siendo WhatsApp (para quien quiere cita
+ * ya), y esto, bien visible, deja coger hueco online para enero en adelante. Cuando empieza la reserva, el
  * botón principal ya lleva a /reserva y este enlace desaparece solo.
  */
 const OnlineBookingLinkComponent: FunctionComponent<IOnlineBookingLinkProps> = ({ light = false, className = '' }) => {
@@ -27,15 +27,25 @@ const OnlineBookingLinkComponent: FunctionComponent<IOnlineBookingLinkProps> = (
   return (
     <Link
       to="/reserva"
-      className={`group inline-flex items-center gap-2 text-sm transition-colors ${
-        light ? 'text-hueso/70 hover:text-acento' : 'text-tinta/60 hover:text-acento-oscuro'
+      className={`group inline-flex max-w-full items-center gap-3 rounded-full border py-1.5 pl-1.5 pr-4 text-sm transition-all hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 ${
+        light
+          ? 'border-acento/40 bg-acento/10 text-hueso shadow-lg shadow-acento/10 hover:border-acento hover:bg-acento/20'
+          : 'border-acento/50 bg-white text-tinta shadow-md shadow-acento/15 hover:border-acento'
       } ${className}`}
     >
-      <CalendarCheck size={16} className="text-acento" />
-      <span>
-        ¿Para {mes} o después? <span className="font-semibold underline decoration-acento/50 underline-offset-4">Resérvalo online</span>
+      <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-acento px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-widest text-tinta">
+        <span className="relative flex h-1.5 w-1.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-tinta opacity-60 motion-reduce:animate-none" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-tinta" />
+        </span>
+        Nuevo
       </span>
-      <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+      <span className="min-w-0 truncate">
+        Reserva online <span className="hidden sm:inline">desde el 1 de {mes}</span>
+        <span className="sm:hidden">desde {mes}</span>
+      </span>
+      <CalendarCheck size={16} className="hidden shrink-0 text-acento sm:block" />
+      <ArrowRight size={15} className="shrink-0 transition-transform group-hover:translate-x-0.5" />
     </Link>
   )
   // #endregion

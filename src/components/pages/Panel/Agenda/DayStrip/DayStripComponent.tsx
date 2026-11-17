@@ -1,6 +1,7 @@
 // #region Imports
 import type { FunctionComponent } from 'react'
 import { formatLongDate, formatShortDate, isSameDay, diaAbierto } from '../../../../../utils/dates'
+import { horarioDelDia } from '../../../../../utils/schedule'
 import { EstadoCitaEnum } from '../../../../../services/enums/EstadoCitaEnum'
 import { capital, diasDeLaSemana } from '../agendaUtils'
 import type { IDayStripProps } from './IDayStripProps'
@@ -15,7 +16,7 @@ const MAXIMO_PUNTOS = 4
  * Tira con los 7 días de la semana (con puntitos de cuántas citas hay) para
  * saltar de un día a otro de un toque.
  */
-const DayStripComponent: FunctionComponent<IDayStripProps> = ({ inicio, dia, ahora, citas, horario, onElegir }) => {
+const DayStripComponent: FunctionComponent<IDayStripProps> = ({ inicio, dia, ahora, citas, horario, aperturas, onElegir }) => {
   // #region Declaraciones, variables y hooks
   const dias = diasDeLaSemana(inicio)
   // #endregion
@@ -27,7 +28,7 @@ const DayStripComponent: FunctionComponent<IDayStripProps> = ({ inicio, dia, aho
         const n = citas.filter((c) => c.estado !== EstadoCitaEnum.Cancelada && isSameDay(new Date(c.inicio), d)).length
         const elegido = isSameDay(d, dia)
         const hoy = isSameDay(d, ahora)
-        const cerrado = horario && !diaAbierto(d, horario)
+        const cerrado = horario && !diaAbierto(d, horarioDelDia(d, horario, aperturas))
         const { diaSemana, dia: num } = formatShortDate(d)
         return (
           <button

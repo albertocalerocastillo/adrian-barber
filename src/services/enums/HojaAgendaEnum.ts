@@ -5,4 +5,5 @@ export enum HojaAgendaEnum {
   Mover = 'mover',
   Buscar = 'buscar',
   Cancelar = 'cancelar',
+  Abrir = 'abrir',
 }

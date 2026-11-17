@@ -6,7 +6,10 @@ import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
 import { isSameDay, startOfDay } from '../../../../utils/dates'
 import { ventanaReserva, rangoConsulta, libresDelDia } from '../bookingRules'
 import { EASE_SMOOTH } from '../../../../theme/animation'
+import { RESERVA } from '../../../../data/features'
+import { horarioDelDia } from '../../../../utils/schedule'
 import { BookingService } from '../../../../services/BookingService'
+import { ConfigurationService } from '../../../../services/ConfigurationService'
 import type { OcupadoDTO } from '../../../../services/dtos/OcupadoDTO'
 import type { IDateStepProps } from './IDateStepProps'
 // #endregion
@@ -35,6 +38,7 @@ const DateStepComponent: FunctionComponent<IDateStepProps> = ({ servicio, fecha,
     return new Date(base.getFullYear(), base.getMonth(), 1)
   })
   const [ocupados, setOcupados] = useState<OcupadoDTO[] | null>(null)
+  const [aperturas, setAperturas] = useState<OcupadoDTO[]>([])
   const [error, setError] = useState<boolean>(false)
   const [intento, setIntento] = useState<number>(0)
   // #endregion
@@ -61,9 +65,13 @@ const DateStepComponent: FunctionComponent<IDateStepProps> = ({ servicio, fecha,
     const cargar = async () => {
       // Si no se puede leer la agenda, se avisa y se ofrece reintentar.
       try {
-        const ocupadosMes = await BookingService.getCitas(desde, hasta)
+        const [ocupadosMes, aperturasMes] = await Promise.all([
+          BookingService.getCitas(desde, hasta),
+          ConfigurationService.listarAperturas(desde, hasta),
+        ])
         if (!vivo) return
         setError(false)
+        setAperturas(aperturasMes)
         setOcupados(ocupadosMes)
       } catch {
         if (vivo) setError(true)
@@ -145,9 +153,9 @@ const DateStepComponent: FunctionComponent<IDateStepProps> = ({ servicio, fecha,
             {dias.map((d) => {
               const delMes = d.getMonth() === mes.getMonth()
               const enVentana = d >= primero && d <= ultimo
-              const abierto = !!horario.find((h) => h.dia === d.getDay())?.tramos?.length
+              const abierto = !!horarioDelDia(d, horario, aperturas, RESERVA.zona).find((h) => h.dia === d.getDay())?.tramos?.length
               const libres =
-                ocupados && enVentana && abierto ? libresDelDia({ fecha: d, servicio, horario, ocupados, ahora }) : 0
+                ocupados && enVentana && abierto ? libresDelDia({ fecha: d, servicio, horario, ocupados, ahora, aperturas }) : 0
               const elegible = enVentana && abierto && libres > 0
               const sel = fecha !== null && isSameDay(fecha, d)
               const hoy = isSameDay(d, ahora)

@@ -4,4 +4,5 @@ export enum TablaSupabaseEnum {
   Bloqueos = 'bloqueos',
   Horario = 'horario',
   Servicios = 'servicios',
+  Aperturas = 'aperturas',
 }

@@ -26,6 +26,11 @@ servicios en una sola operación, y aviso lanzado también por la BD con pg_net)
 "Enforce JWT verification" en Edge Functions → aviso-cita → Settings; redesplegar `aviso-cita`
 (no repite avisos, comprueba la respuesta de CallMeBot, limpia el nombre). Panel: errores de carga
 visibles, deshacer que avisa si no puede, aviso de citas fuera del horario nuevo.
+Aperturas extra (17/11/2026): tabla `aperturas` (lo contrario de `bloqueos`) para abrir un día que
+normalmente se cierra, p. ej. un sábado. Panel: en un día cerrado, «Abrir este día» con horas; el
+día muestra «Abierto fuera de horario · Quitar». Cuenta en agenda, nueva cita, mover cita y en la web
+(`horarioDelDia` en utils/schedule.ts). ⬜ EJECUTAR `supabase/migracion-aperturas.sql`.
+Portada: sección «Reserva online» con cuenta atrás y píldora «NUEVO» en hero/servicios/CTA final.
 ⬜ Pendiente: cuenta de Adrián en `barberos`, cerrar 1 y 6 de enero, ficha de Google,
 fotos del local y suya, QR de reseñas.
 

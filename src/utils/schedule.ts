@@ -3,11 +3,16 @@
 import type { HorarioDiaDTO } from '../services/dtos/HorarioDiaDTO'
 import type { EstadoNegocioDTO } from '../services/dtos/EstadoNegocioDTO'
 import type { EspecificacionHorarioDTO } from '../services/dtos/EspecificacionHorarioDTO'
+import type { OcupadoDTO } from '../services/dtos/OcupadoDTO'
+import { formatTime, formatTimeInZone, toInputDate } from './dates'
 
 // #region Constantes
 // Minutos de una hora y días de una semana.
 const MINUTOS_HORA = 60
 const DIAS_SEMANA = 7
+
+// Última hora de un día, para un tramo que acaba a medianoche.
+const FIN_DEL_DIA = '23:59'
 
 // Nombres de los días para schema.org (índice = Date.getDay(), 0 = domingo).
 const DIAS_SCHEMA = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -86,4 +91,46 @@ export const especificacionHorario = (horario: HorarioDiaDTO[]): EspecificacionH
 export const formatoTramos = (tramos: HorarioDiaDTO['tramos']): string => {
   if (!tramos || tramos.length === 0) return 'Cerrado'
   return tramos.map(([i, f]) => `${i}–${f}`).join('  ·  ')
+}
+
+/** "AAAA-MM-DD" del instante, en la zona dada (o en la del navegador). */
+const claveDia = (instante: Date, zona?: string): string =>
+  zona
+    ? new Intl.DateTimeFormat('en-CA', { timeZone: zona, year: 'numeric', month: '2-digit', day: '2-digit' }).format(instante)
+    : toInputDate(instante)
+
+/** Junta los tramos que se pisan o se tocan ("10:00–14:00" + "13:00–16:00" → "10:00–16:00"). */
+const juntarTramos = (tramos: HorarioDiaDTO['tramos']): HorarioDiaDTO['tramos'] => {
+  const result: HorarioDiaDTO['tramos'] = []
+  for (const [ini, fin] of [...tramos].sort((a, b) => a[0].localeCompare(b[0]))) {
+    const ultimo = result[result.length - 1]
+    if (ultimo && ini <= ultimo[1]) ultimo[1] = fin > ultimo[1] ? fin : ultimo[1]
+    else result.push([ini, fin])
+  }
+  return result
+}
+
+/**
+ * Horario de la semana con las APERTURAS EXTRA del día `dia` añadidas a su día
+ * de la semana. Se usa en todo lo que mira un día concreto (huecos libres, día
+ * abierto o cerrado): así un sábado abierto de forma excepcional cuenta como
+ * abierto ese sábado, y solo ese. `zona` es la del negocio en la web pública
+ * (las horas se leen con el reloj de España); el panel usa la del navegador.
+ */
+export const horarioDelDia = (dia: Date, horario: HorarioDiaDTO[], aperturas: OcupadoDTO[] = [], zona?: string): HorarioDiaDTO[] => {
+  const clave = toInputDate(dia)
+  const hora = (instante: Date) => (zona ? formatTimeInZone(instante, zona) : formatTime(instante))
+  const extra = aperturas
+    .filter((a) => claveDia(new Date(a.inicio), zona) === clave)
+    .map((a): [string, string] => {
+      const fin = new Date(a.fin)
+      // Si acaba otro día (a medianoche), el tramo llega hasta el final de este.
+      return [hora(new Date(a.inicio)), claveDia(fin, zona) === clave ? hora(fin) : FIN_DEL_DIA]
+    })
+  if (extra.length === 0) return horario
+
+  const diaSemana = dia.getDay()
+  const base = horario.some((h) => h.dia === diaSemana) ? horario : [...horario, { dia: diaSemana, nombre: '', tramos: [] }]
+  const result = base.map((h) => (h.dia === diaSemana ? { ...h, tramos: juntarTramos([...h.tramos, ...extra]) } : h))
+  return result
 }

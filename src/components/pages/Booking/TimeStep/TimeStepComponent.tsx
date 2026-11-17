@@ -9,6 +9,7 @@ import { RESERVA } from '../../../../data/features'
 import { horasDelDia, rangoConsulta } from '../bookingRules'
 import { EASE_SMOOTH } from '../../../../theme/animation'
 import { BookingService } from '../../../../services/BookingService'
+import { ConfigurationService } from '../../../../services/ConfigurationService'
 import { EstadoHuecoEnum } from '../../../../services/enums/EstadoHuecoEnum'
 import type { HuecoDTO } from '../../../../services/dtos/HuecoDTO'
 import type { ITimeStepProps } from './ITimeStepProps'
@@ -58,10 +59,13 @@ const TimeStepComponent: FunctionComponent<ITimeStepProps> = ({ servicio, fecha,
     const cargar = async () => {
       // Si no se puede leer la agenda, se avisa y se ofrece reintentar.
       try {
-        const ocupados = await BookingService.getCitas(desde, hasta)
+        const [ocupados, aperturas] = await Promise.all([
+          BookingService.getCitas(desde, hasta),
+          ConfigurationService.listarAperturas(desde, hasta),
+        ])
         if (!vivo) return
         setError(false)
-        setRejilla(horasDelDia({ fecha, servicio, horario, ocupados }))
+        setRejilla(horasDelDia({ fecha, servicio, horario, ocupados, aperturas }))
       } catch {
         if (vivo) setError(true)
       }

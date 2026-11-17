@@ -9,6 +9,7 @@
 import { RESERVA, inicioReservas } from '../../../data/features'
 import { generarRejilla, addMinutes, MINUTES_PER_DAY } from '../../../utils/availability'
 import { startOfDay } from '../../../utils/dates'
+import { horarioDelDia } from '../../../utils/schedule'
 import { EstadoHuecoEnum } from '../../../services/enums/EstadoHuecoEnum'
 import type { HuecoDTO } from '../../../services/dtos/HuecoDTO'
 import type { VentanaReservaDTO } from './VentanaReservaDTO'
@@ -46,11 +47,11 @@ export const rangoConsulta = (desde: Date, hasta: Date): RangoConsultaDTO => {
 }
 
 /** Horas del día (libres y ocupadas) para un servicio. */
-export const horasDelDia = ({ fecha, servicio, horario, ocupados, ahora = new Date() }: OpcionesHorasDiaDTO): HuecoDTO[] => {
+export const horasDelDia = ({ fecha, servicio, horario, ocupados, ahora = new Date(), aperturas = [] }: OpcionesHorasDiaDTO): HuecoDTO[] => {
   const result = generarRejilla({
     fecha,
     duracionMin: servicio.duracion,
-    horario,
+    horario: horarioDelDia(fecha, horario, aperturas, RESERVA.zona),
     citas: ocupados,
     ahora,
     granularidadMin: RESERVA.pasoMin,

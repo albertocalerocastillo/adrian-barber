@@ -1,3 +1,4 @@
+import type { AperturaDTO } from '../../../../../services/dtos/AperturaDTO'
 import type { CitaDTO } from '../../../../../services/dtos/CitaDTO'
 import type { BloqueoDTO } from '../../../../../services/dtos/BloqueoDTO'
 import type { HorarioDiaDTO } from '../../../../../services/dtos/HorarioDiaDTO'
@@ -25,4 +26,10 @@ export interface IDayViewProps {
   onQuitarBloqueo: (bloqueo: BloqueoDTO) => void;
   /** Abre la hoja de nueva cita, a la hora `hora` ("HH:MM") si se pasa. */
   onNuevaEn: (hora?: string) => void;
+  /** Aperturas extra (días u horas que se trabaja fuera del horario de la semana). */
+  aperturas: AperturaDTO[];
+  /** Abre la hoja para abrir este día (o unas horas) fuera del horario. */
+  onAbrirDia: () => void;
+  /** Quita una apertura extra de este día. */
+  onQuitarApertura: (apertura: AperturaDTO) => void;
 }
