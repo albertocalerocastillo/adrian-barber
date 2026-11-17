@@ -4,4 +4,6 @@ export interface IFloatingAddButtonProps {
   onCita: () => void;
   /** Abre la hoja para cerrar un rato (día libre). */
   onBloquear: () => void;
+  /** Abre la hoja para abrir un día que normalmente se cierra. */
+  onAbrir: () => void;
 }

@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import type { FunctionComponent } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { ChevronLeft, ChevronRight, Plus, Ban, ChevronDown, Search } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Ban, ChevronDown, Search, DoorOpen } from 'lucide-react'
 import NewAppointmentDialogComponent from '../NewAppointmentDialog/NewAppointmentDialogComponent'
 import BlockTimeDialogComponent from '../BlockTimeDialog/BlockTimeDialogComponent'
 import RescheduleDialogComponent from '../RescheduleDialog/RescheduleDialogComponent'
@@ -319,6 +319,13 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
           </button>
           <button
             type="button"
+            onClick={() => setModal({ tipo: HojaAgendaEnum.Abrir })}
+            className="flex items-center gap-2 rounded-full border border-tinta/15 bg-white px-5 py-3 text-sm font-semibold transition-all hover:border-tinta hover:bg-tinta hover:text-hueso active:scale-[0.98]"
+          >
+            <DoorOpen size={17} /> Abrir un día
+          </button>
+          <button
+            type="button"
             onClick={() => setModal({ tipo: HojaAgendaEnum.Cita })}
             className="flex items-center gap-2 rounded-full bg-acento px-5 py-3 text-sm font-semibold text-tinta shadow-lg shadow-acento/25 transition-all hover:bg-acento-claro active:scale-[0.98]"
           >
@@ -510,6 +517,7 @@ const AgendaComponent: FunctionComponent<IAgendaProps> = ({ activa = true }) => 
         <FloatingAddButtonComponent
           onCita={() => setModal({ tipo: HojaAgendaEnum.Cita })}
           onBloquear={() => setModal({ tipo: HojaAgendaEnum.Bloquear })}
+          onAbrir={() => setModal({ tipo: HojaAgendaEnum.Abrir })}
         />
       )}
 

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import type { FunctionComponent } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, m } from 'motion/react'
-import { Ban, CalendarDays, Plus } from 'lucide-react'
+import { Ban, CalendarDays, DoorOpen, Plus } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { EASE_SMOOTH } from '../../../../../theme/animation'
 import type { IFloatingAddButtonProps } from './IFloatingAddButtonProps'
@@ -28,11 +28,12 @@ interface OpcionBotonFlotante {
  * Botón flotante (móvil): nueva cita o día libre. Va en un portal para que
  * quede fijo sobre toda la pantalla.
  */
-const FloatingAddButtonComponent: FunctionComponent<IFloatingAddButtonProps> = ({ onCita, onBloquear }) => {
+const FloatingAddButtonComponent: FunctionComponent<IFloatingAddButtonProps> = ({ onCita, onBloquear, onAbrir }) => {
   // #region Declaraciones, variables y hooks
   const [abierto, setAbierto] = useState<boolean>(false)
   const opciones: OpcionBotonFlotante[] = [
     { texto: 'Día libre', Icono: Ban, accion: onBloquear },
+    { texto: 'Abrir un día', Icono: DoorOpen, accion: onAbrir },
     { texto: 'Nueva cita', Icono: CalendarDays, accion: onCita },
   ]
   // #endregion
